@@ -13,6 +13,7 @@
   
   programs.helix.enable = true;
   programs.zellij.enable = true;
+  programs.tealdeer.enable = true;
 
   home.packages = with pkgs; [
     nix
