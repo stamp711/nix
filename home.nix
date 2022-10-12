@@ -15,6 +15,7 @@
   programs.zellij.enable = true;
 
   home.packages = with pkgs; [
+    nix
     rnix-lsp
     assh
     kubectl
