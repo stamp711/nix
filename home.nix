@@ -28,6 +28,9 @@
     "autosuggestions"
   ];
   programs.zsh.prezto.terminal.autoTitle = true;
+  programs.zsh.prezto.terminal.multiplexerTitleFormat = "%s";
+  programs.zsh.prezto.terminal.tabTitleFormat = "%m: %s";
+  programs.zsh.prezto.terminal.windowTitleFormat = "%n@%m: %s";
 
   programs.starship.enable = true;
 
