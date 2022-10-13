@@ -21,6 +21,7 @@
     "history-substring-search"
     "autosuggestions"
   ];
+  programs.zsh.prezto.terminal.autoTitle = true;
 
   programs.starship.enable = true;
 
