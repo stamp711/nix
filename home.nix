@@ -43,7 +43,10 @@
 
   programs.zoxide.enable = true;
   programs.zellij.enable = true;
+
   programs.tealdeer.enable = true;
+  programs.tealdeer.settings.updates.auto_update = true;
+
   programs.btop.enable = true;
   programs.bat.enable = true;
 
