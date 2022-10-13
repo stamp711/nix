@@ -27,6 +27,11 @@
     EDITOR = "hx";
   };
 
+  home.shellAliases = {
+    ssh = "assh wrapper ssh";
+    vim = "hx";
+  };
+
   programs.helix.enable = true;
   programs.helix.settings = {
     theme = "flatwhite";
