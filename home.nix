@@ -5,8 +5,8 @@
 
   programs.zsh.enable = true;
   programs.zsh.enableAutosuggestions = true;
-  # programs.zsh.prezto.enable = true;
-  # programs.zsh.prezto.prompt.theme = "pure";
+  programs.zsh.prezto.enable = true;
+  programs.zsh.prezto.prompt.theme = "off";
   
   programs.starship.enable = true;
 
