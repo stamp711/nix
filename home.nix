@@ -4,8 +4,8 @@
   programs.home-manager.enable = true;
 
   programs.zsh.enable = true;
-  programs.zsh.enableAutosuggestions = true;
-  programs.zsh.historySubstringSearch.enable = true;
+  programs.zsh.prezto.enable = true;
+  programs.zsh.prezto.pmodules = [ "history" "syntax-highlighting" "history-substring-search" "autosuggestions"];
 
   programs.starship.enable = true;
 
