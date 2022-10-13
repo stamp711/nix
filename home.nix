@@ -3,6 +3,12 @@
 
   programs.home-manager.enable = true;
 
+  nix.package = pkgs.nix;
+  nix.settings = {
+    experimental-features = [ "nix-command" "flakes" ];
+    substituters = [ "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://cache.nixos.org/" ];
+  };
+
   programs.zsh.enable = true;
   programs.zsh.prezto.enable = true;
   programs.zsh.prezto.pmodules = [
