@@ -5,7 +5,7 @@
 
   programs.zsh.enable = true;
   programs.zsh.prezto.enable = true;
-  programs.zsh.prezto.pmodules = [ "history" "syntax-highlighting" "history-substring-search" "autosuggestions"];
+  programs.zsh.prezto.pmodules = [ "history" "utility" "completion" "syntax-highlighting" "history-substring-search" "autosuggestions"];
 
   programs.starship.enable = true;
 
