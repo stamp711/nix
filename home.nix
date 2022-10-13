@@ -5,7 +5,21 @@
 
   programs.zsh.enable = true;
   programs.zsh.prezto.enable = true;
-  programs.zsh.prezto.pmodules = [ "history" "utility" "completion" "syntax-highlighting" "history-substring-search" "autosuggestions"];
+  programs.zsh.prezto.pmodules = [
+    "archive"
+    "command-not-found"
+    "directory"
+    "history"
+    "git"
+    "gpg"
+    # The order matters
+    "gnu-utility"
+    "utility"
+    "completion"
+    "syntax-highlighting"
+    "history-substring-search"
+    "autosuggestions"
+  ];
 
   programs.starship.enable = true;
 
