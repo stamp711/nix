@@ -27,6 +27,7 @@
     };
   };
 
+  programs.zoxide.enable = true;
   programs.zellij.enable = true;
   programs.tealdeer.enable = true;
   programs.btop.enable = true;
