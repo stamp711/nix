@@ -6,8 +6,6 @@
   programs.zsh.enable = true;
   programs.zsh.enableAutosuggestions = true;
   programs.zsh.historySubstringSearch.enable = true;
-  programs.zsh.prezto.enable = true;
-  programs.zsh.prezto.prompt.theme = "off";
 
   programs.starship.enable = true;
 
