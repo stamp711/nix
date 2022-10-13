@@ -17,6 +17,9 @@
   programs.helix.enable = true;
   programs.helix.settings = {
     theme = "flatwhite";
+    editor.line-number = "relative";
+    editor.true-color = true;
+    editor.color-modes = true;
     editor.lsp.display-messages = true;
     editor.cursor-shape = {
       normal = "block";
