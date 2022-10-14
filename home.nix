@@ -79,7 +79,6 @@
     numberLines.enable = true;
     numberLines.highlightCursor = true;
     ui.setTitle = true;
-    ui.assistant = "cat";
     ui.enableMouse = true;
   };
   programs.kakoune.extraConfig = ''
