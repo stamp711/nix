@@ -40,8 +40,12 @@
 
   home.shellAliases = {
     ssh = "assh wrapper ssh";
+    vi = "hx";
     vim = "hx";
   };
+
+  programs.lsd.enable = true;
+  programs.lsd.enableAliases = true;
 
   programs.helix.enable = true;
   programs.helix.settings = {
@@ -73,6 +77,8 @@
     nix
     rnix-lsp
     assh
+    wget
+    watch
     kubectl
   ];
 }
