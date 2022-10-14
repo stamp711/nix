@@ -31,6 +31,13 @@
   programs.zsh.prezto.terminal.multiplexerTitleFormat = "%s";
   programs.zsh.prezto.terminal.tabTitleFormat = "%m: %s";
   programs.zsh.prezto.terminal.windowTitleFormat = "%n@%m: %s";
+  programs.zsh.initExtra = ''
+    if nc -z localhost 6152 &>/dev/null; then
+      export https_proxy=http://127.0.0.1:6152
+      export http_proxy=http://127.0.0.1:6152
+      export all_proxy=socks5://127.0.0.1:6153
+    fi
+  '';
 
   programs.starship.enable = true;
 
