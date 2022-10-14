@@ -42,6 +42,7 @@
   programs.starship.enable = true;
 
   home.sessionVariables = {
+    VISUAL = "hx";
     EDITOR = "hx";
   };
 
