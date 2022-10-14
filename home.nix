@@ -77,6 +77,7 @@
     nix
     rnix-lsp
     assh
+    netcat
     wget
     watch
     kubectl
