@@ -80,5 +80,6 @@
     wget
     watch
     kubectl
+    rust-analyzer
   ];
 }
