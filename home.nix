@@ -67,6 +67,10 @@
       insert = "bar";
       select = "bar";
     };
+    editor.whitespace.render = {
+      space = "all";
+      tab = "all";
+    };
   };
 
   programs.kakoune.enable = true;
