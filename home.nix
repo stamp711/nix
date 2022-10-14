@@ -69,6 +69,24 @@
     };
   };
 
+  programs.kakoune.enable = true;
+  programs.kakoune.plugins = with pkgs.kakounePlugins; [
+    kak-lsp
+    active-window-kak
+  ];
+  programs.kakoune.config = {
+    colorScheme = "kaleidoscope-light";
+    numberLines.enable = true;
+    numberLines.highlightCursor = true;
+    ui.setTitle = true;
+    ui.assistant = "cat";
+    ui.enableMouse = true;
+  };
+  programs.kakoune.extraConfig = ''
+    eval %sh{kak-lsp --kakoune -s $kak_session}
+    lsp-enable
+  '';
+
   programs.zoxide.enable = true;
   programs.zellij.enable = true;
 
