@@ -6,7 +6,7 @@
   nix.package = pkgs.nix;
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
-    substituters = [ "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store" "https://cache.nixos.org/" ];
+    substituters = [ "https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store" ];
   };
 
   programs.zsh.enable = true;
