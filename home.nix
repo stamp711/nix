@@ -56,8 +56,9 @@
   programs.lsd.enableAliases = true;
 
   programs.helix.enable = true;
+  programs.helix.themes.kaleidoscope-light = pkgs.lib.importTOML ./helix/themes/kaleidoscope-light.toml;
   programs.helix.settings = {
-    theme = "flatwhite";
+    theme = "kaleidoscope-light";
     editor.line-number = "relative";
     editor.true-color = true;
     editor.color-modes = true;

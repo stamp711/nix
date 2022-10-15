@@ -1,0 +1,154 @@
+## For Code
+
+# set-face global keyword ${muted_indigo}
+keyword = "muted_indigo"
+# set-face global attribute ${muted_purple}
+attribute = "muted_purple"
+# set-face global type ${vibrant_blue}
+type = "vibrant_blue"
+# set-face global string ${muted_wine}
+string = "muted_wine"
+# set-face global value ${muted_rose}
+# set-face global meta ${muted_olive}
+# set-face global builtin ${muted_indigo}+b
+# set-face global module ${vibrant_orange}
+# set-face global comment ${muted_green}+i
+comment = { fg = "muted_green", modifiers = ["italic"] }
+# set-face global documentation comment
+# set-face global function Default
+# set-face global operator Default
+# set-face global variable Default
+variable = { bg = "white", fg = "black" }
+
+
+## For markup
+
+# set-face global title ${muted_indigo}+b
+# set-face global header ${high_contrast_blue}
+# set-face global block ${vibrant_magenta}
+# set-face global mono ${vibrant_red}
+# set-face global link ${vibrant_blue}+u
+"markup.link" = { fg = "vibrant_blue", modifiers = ["underline"] }
+# set-face global list Default
+# set-face global bullet +b
+
+
+## Built-in faces
+
+# set-face global Default ${black},${white}
+"ui" = { bg = "white", fg = "black" }
+"ui.background" = { bg = "white" }
+"ui.text" = { fg = "black" }
+# set-face global PrimarySelection ${black},${pale_blue}+fg
+"ui.selection.primary" = { fg = "black", bg = "pale_blue" }
+# set-face global SecondarySelection ${black},${pale_cyan}+fg
+"ui.selection" = { fg = "black", bg = "pale_cyan" }
+# set-face global PrimaryCursor ${white},${dark_blue}+fg
+"ui.cursor.primary" = { fg = "white", bg = "dark_blue" }
+# set-face global SecondaryCursor ${white},${dark_cyan}+fg
+"ui.cursor" = { fg = "white", bg = "dark_cyan" }
+# set-face global PrimaryCursorEol ${white},${dark_grey}+fg
+# set-face global SecondaryCursorEol ${white},${vibrant_grey}+fg
+
+# set-face global StatusLine ${white},${dark_grey}
+"ui.statusline" = { fg = "white", bg = "dark_grey" }
+# set-face global StatusLineMode ${black},${pale_blue}
+# set-face global StatusLineInfo ${black},${muted_sand}
+# set-face global StatusLineValue ${vibrant_orange},${muted_sand}+b
+# set-face global StatusCursor ${black},${high_contrast_yellow}
+# set-face global Prompt ${black},${muted_sand}
+"ui.popup" = { fg = "black", bg = "muted_sand" }
+# set-face global MenuForeground ${black},${muted_sand}
+"ui.menu.selected" = { fg = "black", bg = "muted_sand" }
+# set-face global MenuBackground ${black},${pale_grey}
+"ui.menu" = { fg = "black", bg = "pale_grey" }
+# set-face global MenuInfo ${high_contrast_blue}+i
+
+# set-face global LineNumbers ${black},${pale_grey}
+"ui.linenr" = { fg = "black", bg = "pale_grey" }
+# set-face global LineNumbersWrapped ${black},${vibrant_grey}+i
+# set-face global LineNumberCursor ${white},${dark_grey}+b
+"ui.linenr.selected" = { fg = "white", bg = "dark_grey", modifiers = ["bold"] }
+# set-face global MatchingChar ${white},${dark_grey}
+"ui.cursor.match" = { fg = "white", bg = "dark_grey" }
+# set-face global Whitespace ${vibrant_grey}+f
+# set-face global WrapMarker ${vibrant_grey}+f
+"ui.virtual" = "vibrant_grey"
+
+
+# set-face global Information ${black},${muted_sand}
+"info" = { fg = "black", bg = "muted_sand" }
+# set-face global Error ${white},${vibrant_red}
+"error" = { fg = "white", bg = "vibrant_red" }
+# set-face global DiagnosticError ${high_contrast_red}
+"diagnostic.error" = "high_contrast_red"
+# set-face global DiagnosticWarning ${high_contrast_yellow}
+"diagnostic.warning" = "high_contrast_yellow"
+# set-face global BufferPadding ${vibrant_grey}
+
+
+[palette]
+black = "#1C1C1C"
+white = "#FDFDFD"
+
+# Regular text
+bright_blue = "#4477AA"
+bright_cyan = "#66CCEE"
+bright_green = "#228833"
+bright_yellow = "#CCBB44"
+bright_red = "#EE6677"
+bright_purple = "#AA3377"
+bright_grey = "#BBBBBB"
+
+# Emphasis
+high_contrast_blue = "#004488"
+high_contrast_yellow = "#DDAA33"
+high_contrast_red = "#BB5566"
+
+# High contrast alternative text
+vibrant_orange = "#EE7733"
+vibrant_blue = "#0077BB"
+vibrant_cyan = "#33BBEE"
+vibrant_magenta = "#EE3377"
+vibrant_red = "#CC3311"
+vibrant_teal = "#009988"
+vibrant_grey = "#BBBBBB"
+
+# Darker text with no red
+muted_rose = "#CC6677"
+muted_indigo = "#332288"
+muted_sand = "#DDCC77"
+muted_green = "#117733"
+muted_cyan = "#88CCEE"
+muted_wine = "#882255"
+muted_teal = "#44AA99"
+muted_olive = "#999933"
+muted_purple = "#AA4499"
+muted_pale_grey = "#DDDDDD"
+
+# Low contrast background colors
+light_blue = "#77AADD"
+light_orange = "#EE8866"
+light_yellow = "#EEDD88"
+light_pink = "#FFAABB"
+light_cyan = "#99DDFF"
+light_mint = "#44BB99"
+light_pear = "#BBCC33"
+light_olive = "#AAAA00"
+light_grey = "#DDDDDD"
+
+# Pale background colors, black foreground
+pale_blue = "#BBCCEE"
+pale_cyan = "#CCEEFF"
+pale_green = "#CCDDAA"
+pale_yellow = "#EEEEBB"
+pale_red = "#FFCCCC"
+pale_grey = "#DDDDDD"
+
+# Dark background colors, white foreground
+dark_blue = "#222255"
+dark_cyan = "#225555"
+dark_green = "#225522"
+dark_yellow = "#666633"
+dark_red = "#663333"
+dark_grey = "#555555"
