@@ -69,7 +69,6 @@
       select = "bar";
     };
     editor.whitespace.render = {
-      space = "all";
       tab = "all";
     };
   };
