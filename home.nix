@@ -110,6 +110,7 @@
     rust-analyzer
     watch
     wget
+    k9s
     kubectl
     kubernetes-helm
     kubie
