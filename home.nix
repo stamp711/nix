@@ -112,5 +112,6 @@
     wget
     kubectl
     kubernetes-helm
+    kubie
   ];
 }
