@@ -103,13 +103,14 @@
   programs.git.difftastic.enable = true;
 
   home.packages = with pkgs; [
-    nix
-    rnix-lsp
     assh
     netcat
-    wget
-    watch
-    kubectl
+    nix
+    rnix-lsp
     rust-analyzer
+    watch
+    wget
+    kubectl
+    kubernetes-helm
   ];
 }
