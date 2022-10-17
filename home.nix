@@ -43,6 +43,9 @@
   '';
 
   programs.starship.enable = true;
+  programs.starship.settings = {
+    kubernetes.disabled = false;
+  };
 
   home.sessionVariables = {
     VISUAL = "hx";
@@ -118,4 +121,8 @@
     kubernetes-helm
     kubie
   ];
+
+  home.file.".kube/kubie.yaml".text = builtins.toJSON {
+    prompt.disable = true;
+  };
 }
