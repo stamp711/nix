@@ -46,7 +46,7 @@
   programs.starship.settings = {
     git_metrics.disabled = false;
     kubernetes.disabled = false;
-    status.disabled = false;
+    # status.disabled = false;
     # shlvl.disabled = false;
   };
 
@@ -112,6 +112,7 @@
   programs.git.difftastic.enable = true;
 
   home.packages = with pkgs; [
+    arkade
     assh
     netcat
     nix
