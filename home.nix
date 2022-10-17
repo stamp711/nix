@@ -44,7 +44,10 @@
 
   programs.starship.enable = true;
   programs.starship.settings = {
+    git_metrics.disabled = false;
     kubernetes.disabled = false;
+    status.disabled = false;
+    # shlvl.disabled = false;
   };
 
   home.sessionVariables = {
