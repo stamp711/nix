@@ -45,7 +45,7 @@
   programs.starship.enable = true;
   programs.starship.settings = {
     git_metrics.disabled = false;
-    kubernetes.disabled = false;
+    # kubernetes.disabled = false;
     # status.disabled = false;
     # shlvl.disabled = false;
   };
@@ -127,6 +127,7 @@
   ];
 
   home.file.".kube/kubie.yaml".text = builtins.toJSON {
-    prompt.disable = true;
+    # prompt.disable = true;
+    prompt.zsh_use_rps1 = true;
   };
 }
