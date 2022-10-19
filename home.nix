@@ -115,19 +115,22 @@
     arkade
     assh
     helmfile
+    imgcat
+    k9s
+    kubectl
+    kubectx
+    kubernetes-helm
+    kubetail
+    kubie
     mkcert
     netcat
     nix
     rnix-lsp
     rust-analyzer
     sops
+    vcluster
     watch
     wget
-    k9s
-    kubectl
-    kubernetes-helm
-    kubetail
-    kubie
   ];
 
   home.file.".kube/kubie.yaml".text = builtins.toJSON {
