@@ -118,6 +118,7 @@
     nix
     rnix-lsp
     rust-analyzer
+    sops
     watch
     wget
     k9s
