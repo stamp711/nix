@@ -114,6 +114,8 @@
   home.packages = with pkgs; [
     arkade
     assh
+    helmfile
+    mkcert
     netcat
     nix
     rnix-lsp
@@ -124,6 +126,7 @@
     k9s
     kubectl
     kubernetes-helm
+    kubetail
     kubie
   ];
 
