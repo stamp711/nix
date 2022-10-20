@@ -11,6 +11,8 @@
       "https://cache.nixos.org/"
     ];
   };
+  
+  programs.bash.enable = true;
 
   programs.zsh.enable = true;
   programs.zsh.prezto.enable = true;
