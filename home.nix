@@ -116,6 +116,7 @@
   home.packages = with pkgs; [
     arkade
     assh
+    clusterctl
     helmfile
     imgcat
     k9s
