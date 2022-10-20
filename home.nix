@@ -11,7 +11,7 @@
       "https://cache.nixos.org/"
     ];
   };
-  
+
   programs.bash.enable = true;
 
   programs.zsh.enable = true;
@@ -130,6 +130,7 @@
     rnix-lsp
     rust-analyzer
     sops
+    talosctl
     vcluster
     watch
     wget
