@@ -20,7 +20,7 @@
     "directory"
     "history"
     "git"
-    "gpg"
+    # "gpg"
     "terminal"
     # The order matters
     "gnu-utility"
