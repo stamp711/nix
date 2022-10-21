@@ -145,6 +145,8 @@
     vcluster
     watch
     wget
+    yaml-language-server
+    yj
   ];
 
   home.file.".kube/kubie.yaml".text = builtins.toJSON {
