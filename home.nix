@@ -28,27 +28,56 @@ in
 
   programs.zsh.enable = true;
 
-  programs.zsh.prezto.enable = true;
-  programs.zsh.prezto.pmodules = [
-    "archive"
+  programs.zsh.enableAutosuggestions = true;
+  programs.zsh.enableSyntaxHighlighting = true;
+  programs.zsh.enableVteIntegration = true;
+
+  programs.zsh.oh-my-zsh.enable = true;
+  programs.zsh.oh-my-zsh.theme = "af-magic";
+  programs.zsh.oh-my-zsh.plugins = [
+    # Productivity
     "command-not-found"
-    "directory"
-    "history"
-    "git"
-    # "gpg"
-    "terminal"
-    # The order matters
-    "gnu-utility"
-    "utility"
-    "completion"
-    "syntax-highlighting"
+    "encode64"
+    "extract"
+    "fbterm"
     "history-substring-search"
-    "autosuggestions"
+    # "per-directory-history"
+    "urltools"
+    "web-search"
+    # Build tools
+    "git"
+    "gitignore"
+    "gnu-utils"
+    # Distro-related
+    "systemd"
+    # macOS
+    "brew"
+    "macos"
+    # Misc
+    "themes"
   ];
-  programs.zsh.prezto.terminal.autoTitle = true;
-  programs.zsh.prezto.terminal.multiplexerTitleFormat = "%s";
-  programs.zsh.prezto.terminal.tabTitleFormat = "%m: %s";
-  programs.zsh.prezto.terminal.windowTitleFormat = "%n@%m: %s";
+
+  # programs.zsh.prezto.enable = true;
+  # programs.zsh.prezto.pmodules = [
+  #   "archive"
+  #   "command-not-found"
+  #   "directory"
+  #   "history"
+  #   "git"
+  #   # "gpg"
+  #   "terminal"
+  #   # The order matters
+  #   "gnu-utility"
+  #   "utility"
+  #   "completion"
+  #   "syntax-highlighting"
+  #   "history-substring-search"
+  #   "autosuggestions"
+  # ];
+  # programs.zsh.prezto.terminal.autoTitle = true;
+  # programs.zsh.prezto.terminal.multiplexerTitleFormat = "%s";
+  # programs.zsh.prezto.terminal.tabTitleFormat = "%m: %s";
+  # programs.zsh.prezto.terminal.windowTitleFormat = "%n@%m: %s";
 
   programs.zsh.plugins = [
     {
