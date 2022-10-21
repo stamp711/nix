@@ -52,7 +52,7 @@
     # shlvl.disabled = false;
   };
   
-  home.sessionPath = [ "~/.krew/bin" ];
+  home.sessionPath = [ "$HOME/.krew/bin" ];
 
   home.sessionVariables = {
     VISUAL = "hx";
