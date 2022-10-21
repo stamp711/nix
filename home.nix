@@ -27,6 +27,7 @@ in
   programs.bash.enable = true;
 
   programs.zsh.enable = true;
+
   programs.zsh.prezto.enable = true;
   programs.zsh.prezto.pmodules = [
     "archive"
@@ -48,6 +49,15 @@ in
   programs.zsh.prezto.terminal.multiplexerTitleFormat = "%s";
   programs.zsh.prezto.terminal.tabTitleFormat = "%m: %s";
   programs.zsh.prezto.terminal.windowTitleFormat = "%n@%m: %s";
+
+  programs.zsh.plugins = [
+    {
+      name = "zsh-nix-shell";
+      src = pkgs.zsh-nix-shell;
+      file = "share/zsh-nix-shell/nix-shell.plugin.zsh";
+    }
+  ];
+
   programs.zsh.initExtra = ''
     if nc -z localhost 6152 &>/dev/null; then
       export https_proxy=http://127.0.0.1:6152
@@ -85,7 +95,7 @@ in
   programs.helix.themes.kaleidoscope-light = pkgs.lib.importTOML ./helix/themes/kaleidoscope-light.toml;
   programs.helix.settings = {
     theme = "flatwhite";
-    editor.line-number = "relative";
+    # editor.line-number = "relative";
     editor.true-color = true;
     editor.color-modes = true;
     editor.lsp.display-messages = true;
@@ -137,6 +147,7 @@ in
   home.packages = with pkgs; [
     arkade
     assh
+    bash
     clusterctl
     helmfile
     imgcat
@@ -160,6 +171,7 @@ in
     wget
     yaml-language-server
     yj
+    zsh
   ];
 
   home.file.".kube/kubie.yaml".text = builtins.toJSON {
