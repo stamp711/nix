@@ -51,7 +51,7 @@
     # status.disabled = false;
     # shlvl.disabled = false;
   };
-  
+
   home.sessionPath = [ "$HOME/.krew/bin" ];
 
   home.sessionVariables = {
@@ -85,6 +85,12 @@
       tab = "all";
     };
   };
+  programs.helix.languages = [
+    {
+      name = "yaml";
+      formatter = { command = "prettier"; args = [ "--parser" "yaml" ]; };
+    }
+  ];
 
   programs.kakoune.enable = true;
   programs.kakoune.plugins = with pkgs.kakounePlugins; [
@@ -131,6 +137,7 @@
     mkcert
     netcat
     nix
+    nodePackages.prettier
     rnix-lsp
     rust-analyzer
     sops
@@ -138,7 +145,6 @@
     vcluster
     watch
     wget
-    yaml-language-server
   ];
 
   home.file.".kube/kubie.yaml".text = builtins.toJSON {
