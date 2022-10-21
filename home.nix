@@ -51,6 +51,8 @@
     # status.disabled = false;
     # shlvl.disabled = false;
   };
+  
+  home.sessionPath = [ "~/.krew/bin" ];
 
   home.sessionVariables = {
     VISUAL = "hx";
@@ -120,6 +122,7 @@
     helmfile
     imgcat
     k9s
+    krew
     kubectl
     kubectx
     kubernetes-helm
