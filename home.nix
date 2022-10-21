@@ -1,7 +1,19 @@
-{ config, pkgs, ... }: {
+{ pkgs, config, nix-colors, ... }:
+
+let
+  nix-colors-lib = nix-colors.lib-contrib { inherit pkgs; };
+in
+{
+
+  imports = [
+    nix-colors.homeManagerModule
+  ];
+
   home.stateVersion = "22.11";
 
   programs.home-manager.enable = true;
+
+  colorScheme = nix-colors.colorSchemes.dracula;
 
   nix.package = pkgs.nix;
   nix.settings = {
@@ -42,6 +54,7 @@
       export http_proxy=http://127.0.0.1:6152
       export all_proxy=socks5://127.0.0.1:6153
     fi
+    bash ${nix-colors-lib.shellThemeFromScheme { scheme = config.colorScheme; }}
   '';
 
   programs.starship.enable = true;

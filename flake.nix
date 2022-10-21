@@ -10,15 +10,14 @@
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
-    # Shameless plug: looking for a way to nixify your themes and make
-    # everything match nicely? Try nix-colors!
-    # nix-colors.url = "github:misterio77/nix-colors";
+    nix-colors.url = "github:misterio77/nix-colors";
   };
 
-  outputs = { nixpkgs, home-manager, ... }@inputs: rec {
-    
+  outputs = { nixpkgs, home-manager, nix-colors, ... }@inputs: rec {
+
     homeConfigurations."stamp@darwin" = home-manager.lib.homeManagerConfiguration {
       pkgs = nixpkgs.legacyPackages."x86_64-darwin";
+      extraSpecialArgs = { inherit nix-colors; };
       modules = [
         {
           home.username = "stamp";
@@ -30,6 +29,7 @@
 
     homeConfigurations."stamp@linux" = home-manager.lib.homeManagerConfiguration {
       pkgs = nixpkgs.legacyPackages."x86_64-linux";
+      extraSpecialArgs = { inherit nix-colors; };
       modules = [
         {
           home.username = "stamp";
@@ -41,6 +41,7 @@
 
     homeConfigurations."REDACTED@linux" = home-manager.lib.homeManagerConfiguration {
       pkgs = nixpkgs.legacyPackages."x86_64-linux";
+      extraSpecialArgs = { inherit nix-colors; };
       modules = [
         {
           home.username = "REDACTED";
