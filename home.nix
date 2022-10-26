@@ -93,7 +93,7 @@ in
       export http_proxy=http://127.0.0.1:6152
       export all_proxy=socks5://127.0.0.1:6153
     fi
-    bash ${nix-colors-lib.shellThemeFromScheme { scheme = config.colorScheme; }}
+    # bash ${nix-colors-lib.shellThemeFromScheme { scheme = config.colorScheme; }}
   '';
 
   programs.starship.enable = true;
