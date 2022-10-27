@@ -175,10 +175,12 @@ in
   programs.git.difftastic.enable = true;
 
   home.packages = with pkgs; [
+    age
     arkade
     assh
     bash
     clusterctl
+    fluxcd
     helmfile
     imgcat
     k9s
