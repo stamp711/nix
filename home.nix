@@ -141,6 +141,7 @@ in
     {
       name = "yaml";
       formatter = { command = "prettier"; args = [ "--parser" "yaml" ]; };
+      config.yaml.schemas = { Kubernetes = "*"; };
     }
   ];
 
