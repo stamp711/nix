@@ -202,6 +202,7 @@ in
     netcat
     nix
     nodePackages.prettier
+    rage
     rnix-lsp
     rust-analyzer
     sops
