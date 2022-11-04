@@ -207,6 +207,7 @@ in
     kubernetes-helm
     kubetail
     kubie
+    kustomize
     mkcert
     netcat
     nix
