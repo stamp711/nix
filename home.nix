@@ -180,7 +180,16 @@ in
   programs.bat.enable = true;
 
   programs.git.enable = true;
+  programs.git.userName = "Apricity";
+  programs.git.userEmail = "REDACTED";
+  programs.git.signing.signByDefault = true;
+  programs.git.signing.key = null;
   programs.git.difftastic.enable = true;
+  programs.git.lfs.enable = true;
+  programs.git.extraConfig = {
+    init.defaultBranch = "main";
+    pull.ff = "only";
+  };
 
   home.packages = with pkgs; [
     age
