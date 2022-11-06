@@ -115,6 +115,7 @@ in
   };
 
   home.shellAliases = {
+    k = "kubectl";
     ssh = "assh wrapper ssh";
     vi = "hx";
     vim = "hx";
