@@ -104,7 +104,10 @@ in
     # shlvl.disabled = false;
   };
 
-  home.sessionPath = [ "$HOME/.krew/bin" ];
+  home.sessionPath = [
+    "$HOME/.krew/bin"
+    "${config.xdg.dataHome}/aquaproj-aqua/bin"
+  ];
 
   home.sessionVariables = {
     VISUAL = "hx";
