@@ -206,6 +206,7 @@ in
     imgcat
     k9s
     krew
+    kubeconform
     kubectl
     kubectx
     kubernetes-helm
