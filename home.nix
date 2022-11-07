@@ -210,6 +210,7 @@ in
     kubectx
     kubernetes-helm
     kubetail
+    kubespy
     kubie
     kustomize
     mkcert
