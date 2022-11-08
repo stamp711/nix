@@ -48,6 +48,7 @@ in
     "git"
     "gitignore"
     "gnu-utils"
+    "kubectl"
     # Distro-related
     "systemd"
     # macOS
