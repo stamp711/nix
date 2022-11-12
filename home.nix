@@ -193,6 +193,7 @@ in
   programs.git.extraConfig = {
     init.defaultBranch = "main";
     pull.ff = "only";
+    push.autoSetupRemote = true;
   };
 
   home.packages = with pkgs; [
