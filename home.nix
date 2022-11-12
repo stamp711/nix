@@ -200,6 +200,7 @@ in
     arkade
     assh
     bash
+    cilium-cli
     clusterctl
     fluxcd
     helmfile
