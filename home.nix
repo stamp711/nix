@@ -107,6 +107,7 @@ in
 
   home.sessionPath = [
     "$HOME/.krew/bin"
+    "$HOME/.arkade/bin/hubble"
     "${config.xdg.dataHome}/aquaproj-aqua/bin"
   ];
 
