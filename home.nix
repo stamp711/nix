@@ -205,6 +205,7 @@ in
     cilium-cli
     clusterctl
     fluxcd
+    govc
     helmfile
     imgcat
     k9s
