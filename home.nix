@@ -208,6 +208,7 @@ in
     govc
     helmfile
     imgcat
+    just
     k9s
     krew
     kubeconform
