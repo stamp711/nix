@@ -1,13 +1,9 @@
 { pkgs, config, nix-colors, ... }:
 
-let
-  nix-colors-lib = nix-colors.lib-contrib { inherit pkgs; };
-in
-{
+let nix-colors-lib = nix-colors.lib-contrib { inherit pkgs; };
+in {
 
-  imports = [
-    nix-colors.homeManagerModule
-  ];
+  imports = [ nix-colors.homeManagerModule ];
 
   home.stateVersion = "22.11";
 
@@ -58,13 +54,11 @@ in
     "themes"
   ];
 
-  programs.zsh.plugins = [
-    {
-      name = "zsh-nix-shell";
-      src = pkgs.zsh-nix-shell;
-      file = "share/zsh-nix-shell/nix-shell.plugin.zsh";
-    }
-  ];
+  programs.zsh.plugins = [{
+    name = "zsh-nix-shell";
+    src = pkgs.zsh-nix-shell;
+    file = "share/zsh-nix-shell/nix-shell.plugin.zsh";
+  }];
 
   programs.zsh.initExtra = ''
     source ~/.config/op/plugins.sh
@@ -73,7 +67,7 @@ in
       export http_proxy=http://127.0.0.1:6152
       export all_proxy=socks5://127.0.0.1:6153
     fi
-    # bash ${nix-colors-lib.shellThemeFromScheme { scheme = config.colorScheme; }}
+    # sh ${nix-colors-lib.shellThemeFromScheme { scheme = config.colorScheme; }}
   '';
 
   programs.starship.enable = true;
@@ -99,9 +93,10 @@ in
   programs.gpg.mutableKeys = false;
   programs.gpg.mutableTrust = false;
   programs.gpg.scdaemonSettings = { disable-ccid = true; };
-  programs.gpg.publicKeys = [
-    { source = ./pgp_keys/Apricity.asc; trust = "ultimate"; }
-  ];
+  programs.gpg.publicKeys = [{
+    source = ./pgp_keys/Apricity.asc;
+    trust = "ultimate";
+  }];
 
   programs.lsd.enable = true;
   programs.lsd.enableAliases = true;
@@ -118,17 +113,16 @@ in
       insert = "bar";
       select = "bar";
     };
-    editor.whitespace.render = {
-      tab = "all";
-    };
+    editor.whitespace.render = { tab = "all"; };
   };
-  programs.helix.languages = [
-    {
-      name = "yaml";
-      formatter = { command = "prettier"; args = [ "--parser" "yaml" ]; };
-      config.yaml.schemas = { Kubernetes = "*"; };
-    }
-  ];
+  programs.helix.languages = [{
+    name = "yaml";
+    formatter = {
+      command = "prettier";
+      args = [ "--parser" "yaml" ];
+    };
+    config.yaml.schemas = { Kubernetes = "*"; };
+  }];
 
   programs.zoxide.enable = true;
   programs.zellij.enable = true;
@@ -142,7 +136,8 @@ in
   programs.git.enable = true;
   programs.git.userName = "stamp711";
   programs.git.userEmail = "REDACTED";
-  programs.git.signing.key = "ssh-ed25519 REDACTED";
+  programs.git.signing.key =
+    "ssh-ed25519 REDACTED";
   programs.git.signing.signByDefault = true;
   programs.git.difftastic.enable = true;
   programs.git.lfs.enable = true;
@@ -152,9 +147,9 @@ in
     push.autoSetupRemote = true;
     gpg.format = "ssh";
     gpg.ssh.allowedSignersFile = "${config.xdg.configHome}/git/allowed_signers";
-    # gpg.ssh.program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
   };
-  home.file."${config.xdg.configHome}/git/allowed_signers".source = ./git_allowed_signers;
+  home.file."${config.xdg.configHome}/git/allowed_signers".source =
+    ./git_allowed_signers;
 
   programs.gh.enable = true;
   programs.gh.extensions = [ pkgs.gh-eco ];
@@ -177,8 +172,10 @@ in
     netcat
     nil
     nix
+    nixpkgs-fmt
     nodePackages.prettier
     rage
+    rnix-lsp
     rust-analyzer
     sops
     watch
