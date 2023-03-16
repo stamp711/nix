@@ -156,11 +156,21 @@ in
   };
   home.file."${config.xdg.configHome}/git/allowed_signers".source = ./git_allowed_signers;
 
+  programs.gh.enable = true;
+  programs.gh.extensions = [ pkgs.gh-eco ];
+  programs.gh.settings = {
+    git_protocol = "ssh";
+    prompt = "enabled";
+    aliases = {
+      co = "pr checkout";
+      pv = "pr view";
+    };
+  };
+
   home.packages = with pkgs; [
     assh
     bash
     fluxcd
-    gh
     imgcat
     just
     mkcert
