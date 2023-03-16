@@ -175,10 +175,10 @@ in
     just
     mkcert
     netcat
+    nil
     nix
     nodePackages.prettier
     rage
-    rnix-lsp
     rust-analyzer
     sops
     watch
