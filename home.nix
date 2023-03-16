@@ -58,28 +58,6 @@ in
     "themes"
   ];
 
-  # programs.zsh.prezto.enable = true;
-  # programs.zsh.prezto.pmodules = [
-  #   "archive"
-  #   "command-not-found"
-  #   "directory"
-  #   "history"
-  #   "git"
-  #   # "gpg"
-  #   "terminal"
-  #   # The order matters
-  #   "gnu-utility"
-  #   "utility"
-  #   "completion"
-  #   "syntax-highlighting"
-  #   "history-substring-search"
-  #   "autosuggestions"
-  # ];
-  # programs.zsh.prezto.terminal.autoTitle = true;
-  # programs.zsh.prezto.terminal.multiplexerTitleFormat = "%s";
-  # programs.zsh.prezto.terminal.tabTitleFormat = "%m: %s";
-  # programs.zsh.prezto.terminal.windowTitleFormat = "%n@%m: %s";
-
   programs.zsh.plugins = [
     {
       name = "zsh-nix-shell";
@@ -89,6 +67,7 @@ in
   ];
 
   programs.zsh.initExtra = ''
+    source ~/.config/op/plugins.sh
     if nc -z localhost 6152 &>/dev/null; then
       export https_proxy=http://127.0.0.1:6152
       export http_proxy=http://127.0.0.1:6152
@@ -104,12 +83,6 @@ in
     # status.disabled = false;
     # shlvl.disabled = false;
   };
-
-  home.sessionPath = [
-    "$HOME/.krew/bin"
-    "$HOME/.arkade/bin"
-    "${config.xdg.dataHome}/aquaproj-aqua/bin"
-  ];
 
   home.sessionVariables = {
     VISUAL = "hx";
@@ -134,7 +107,6 @@ in
   programs.lsd.enableAliases = true;
 
   programs.helix.enable = true;
-  programs.helix.themes.kaleidoscope-light = pkgs.lib.importTOML ./helix/themes/kaleidoscope-light.toml;
   programs.helix.settings = {
     theme = "flatwhite";
     # editor.line-number = "relative";
@@ -158,23 +130,6 @@ in
     }
   ];
 
-  programs.kakoune.enable = true;
-  programs.kakoune.plugins = with pkgs.kakounePlugins; [
-    kak-lsp
-    active-window-kak
-  ];
-  programs.kakoune.config = {
-    colorScheme = "kaleidoscope-light";
-    numberLines.enable = true;
-    numberLines.highlightCursor = true;
-    ui.setTitle = true;
-    ui.enableMouse = true;
-  };
-  programs.kakoune.extraConfig = ''
-    eval %sh{kak-lsp --kakoune -s $kak_session}
-    lsp-enable
-  '';
-
   programs.zoxide.enable = true;
   programs.zellij.enable = true;
 
@@ -185,41 +140,29 @@ in
   programs.bat.enable = true;
 
   programs.git.enable = true;
-  programs.git.userName = "Apricity";
+  programs.git.userName = "stamp711";
   programs.git.userEmail = "REDACTED";
+  programs.git.signing.key = "ssh-ed25519 REDACTED";
   programs.git.signing.signByDefault = true;
-  programs.git.signing.key = null;
   programs.git.difftastic.enable = true;
   programs.git.lfs.enable = true;
   programs.git.extraConfig = {
-    init.defaultBranch = "main";
+    init.defaultBranch = "master";
     pull.ff = "only";
     push.autoSetupRemote = true;
+    gpg.format = "ssh";
+    gpg.ssh.allowedSignersFile = "${config.xdg.configHome}/git/allowed_signers";
+    # gpg.ssh.program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
   };
+  home.file."${config.xdg.configHome}/git/allowed_signers".source = ./git_allowed_signers;
 
   home.packages = with pkgs; [
-    age
-    arkade
     assh
     bash
-    cilium-cli
-    clusterctl
     fluxcd
     gh
-    govc
-    helmfile
     imgcat
     just
-    k9s
-    krew
-    kubeconform
-    kubectl
-    kubectx
-    kubernetes-helm
-    kubetail
-    kubespy
-    kubie
-    kustomize
     mkcert
     netcat
     nix
@@ -228,17 +171,9 @@ in
     rnix-lsp
     rust-analyzer
     sops
-    talosctl
-    vcluster
     watch
     wget
     yaml-language-server
-    yj
     zsh
   ];
-
-  home.file.".kube/kubie.yaml".text = builtins.toJSON {
-    # prompt.disable = true;
-    prompt.zsh_use_rps1 = true;
-  };
 }
