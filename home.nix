@@ -54,11 +54,22 @@ in {
     "themes"
   ];
 
-  programs.zsh.plugins = [{
-    name = "zsh-nix-shell";
-    src = pkgs.zsh-nix-shell;
-    file = "share/zsh-nix-shell/nix-shell.plugin.zsh";
-  }];
+  programs.zsh.plugins = [
+    {
+      name = "zsh-nix-shell";
+      src = pkgs.zsh-nix-shell;
+      file = "share/zsh-nix-shell/nix-shell.plugin.zsh";
+    }
+    # TODO use flake inputs for this
+    {
+      name = "wakatime-zsh-plugin";
+      file = "wakatime.plugin.zsh";
+      src = builtins.fetchGit {
+        url = "https://github.com/sobolevn/wakatime-zsh-plugin";
+        rev = "69c6028b0c8f72e2afcfa5135b1af29afb49764a";
+      };
+    }
+  ];
 
   programs.zsh.initExtra = ''
     source ~/.config/op/plugins.sh
@@ -78,13 +89,13 @@ in {
     # shlvl.disabled = false;
   };
 
-  home.sessionPath = [
-     "$HOME/.cargo/bin"
-   ];
+  home.sessionPath = [ "$HOME/.cargo/bin" ];
 
   home.sessionVariables = {
     VISUAL = "hx";
     EDITOR = "hx";
+    WAKATIME_HOME = "${config.xdg.configHome}/wakatime";
+    ZSH_WAKATIME_BIN = "wakatime-cli";
   };
 
   home.shellAliases = {
@@ -183,6 +194,7 @@ in {
     rnix-lsp
     rust-analyzer
     sops
+    wakatime
     watch
     wget
     yaml-language-server
