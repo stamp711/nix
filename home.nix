@@ -78,6 +78,10 @@ in {
     # shlvl.disabled = false;
   };
 
+  home.sessionPath = [
+     "$HOME/.cargo/bin"
+   ];
+
   home.sessionVariables = {
     VISUAL = "hx";
     EDITOR = "hx";
