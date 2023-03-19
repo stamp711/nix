@@ -176,6 +176,7 @@ in {
     netcat
     nil
     nix
+    nixfmt
     nixpkgs-fmt
     nodePackages.prettier
     rage
