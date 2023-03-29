@@ -74,9 +74,11 @@ in {
   programs.zsh.initExtra = ''
     source ~/.config/op/plugins.sh
     if nc -z localhost 6152 &>/dev/null; then
-      export https_proxy=http://127.0.0.1:6152
       export http_proxy=http://127.0.0.1:6152
+      export https_proxy=http://127.0.0.1:6152
       export all_proxy=socks5://127.0.0.1:6153
+    else
+      unset http_proxy https_proxy all_proxy
     fi
     # sh ${nix-colors-lib.shellThemeFromScheme { scheme = config.colorScheme; }}
   '';
