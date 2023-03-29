@@ -72,6 +72,7 @@ in {
   ];
 
   programs.zsh.initExtra = ''
+    unset __HM_SESS_VARS_SOURCED # workaround for orbstack shells
     [ -f ~/.config/op/plugins.sh ] && source ~/.config/op/plugins.sh
     if nc -z localhost 6152 &>/dev/null; then
       export http_proxy=http://127.0.0.1:6152
