@@ -164,6 +164,7 @@ in {
     push.autoSetupRemote = true;
     gpg.format = "ssh";
     gpg.ssh.allowedSignersFile = "${config.xdg.configHome}/git/allowed_signers";
+    gpg.ssh.program = "${pkgs.openssh}/bin/ssh-keygen";
   };
   home.file."${config.xdg.configHome}/git/allowed_signers".source =
     ./git_allowed_signers;
