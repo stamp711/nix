@@ -72,7 +72,7 @@ in {
   ];
 
   programs.zsh.initExtra = ''
-    source ~/.config/op/plugins.sh
+    [ -f ~/.config/op/plugins.sh ] && source ~/.config/op/plugins.sh
     if nc -z localhost 6152 &>/dev/null; then
       export http_proxy=http://127.0.0.1:6152
       export https_proxy=http://127.0.0.1:6152
