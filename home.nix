@@ -92,6 +92,8 @@ in {
     # shlvl.disabled = false;
   };
 
+  programs.direnv.enable = true;
+
   home.sessionPath = [ "$HOME/.cargo/bin" ];
 
   home.sessionVariables = {
