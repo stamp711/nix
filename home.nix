@@ -200,6 +200,7 @@ in {
     rage
     rnix-lsp
     rust-analyzer
+    rustup
     sops
     wakatime
     watch
