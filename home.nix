@@ -9,6 +9,9 @@ in {
 
   programs.home-manager.enable = true;
 
+  nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.allowUnfreePredicate = (pkg: true);
+
   colorScheme = nix-colors.colorSchemes.dracula;
 
   nix.package = pkgs.nix;
@@ -139,6 +142,8 @@ in {
     };
     config.yaml.schemas = { Kubernetes = "*"; };
   }];
+
+  programs.vscode.enable = true;
 
   programs.zoxide.enable = true;
   programs.zellij.enable = true;
