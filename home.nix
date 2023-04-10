@@ -15,9 +15,7 @@ in {
   colorScheme = nix-colors.colorSchemes.dracula;
 
   nix.package = pkgs.nix;
-  nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
-  };
+  nix.settings = { experimental-features = [ "nix-command" "flakes" ]; };
 
   programs.bash.enable = true;
 
@@ -144,6 +142,26 @@ in {
   }];
 
   programs.vscode.enable = true;
+  programs.vscode.extensions = with pkgs.vscode-extensions; [
+    brettm12345.nixfmt-vscode
+    github.copilot
+    jnoortheen.nix-ide
+    mkhl.direnv
+    ms-vscode-remote.remote-ssh
+    redhat.vscode-yaml
+    rust-lang.rust-analyzer
+    tamasfe.even-better-toml
+    vscodevim.vim
+    wakatime.vscode-wakatime
+    zxh404.vscode-proto3
+  ];
+  programs.vscode.userSettings = {
+    "editor.formatOnSave" = true;
+    "editor.inlineSuggest.enabled" = true;
+    "[nix]"."editor.defaultFormatter" = "brettm12345.nixfmt-vscode";
+    "redhat.telemetry.enabled" = false;
+    "workbench.colorTheme" = "Default Light+ Experimental";
+  };
 
   programs.zoxide.enable = true;
   programs.zellij.enable = true;
