@@ -149,6 +149,7 @@ in {
     jnoortheen.nix-ide
     mhutchie.git-graph
     mkhl.direnv
+    ms-azuretools.vscode-docker
     ms-vscode-remote.remote-ssh
     redhat.vscode-yaml
     rust-lang.rust-analyzer
