@@ -227,6 +227,7 @@ in {
     rust-analyzer
     rustup
     sops
+    tmux
     wakatime
     watch
     wget
