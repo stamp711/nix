@@ -210,6 +210,7 @@ in {
   home.packages = with pkgs; [
     assh
     bash
+    cargo-nextest
     fluxcd
     imgcat
     just
