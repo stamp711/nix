@@ -211,6 +211,8 @@ in {
     fluxcd
     imgcat
     just
+    kubectl
+    kubectx
     mkcert
     netcat
     nil
