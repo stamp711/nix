@@ -153,7 +153,7 @@ in {
     redhat.vscode-yaml
     rust-lang.rust-analyzer
     tamasfe.even-better-toml
-    vadimcn.vscode-lldb
+    # vadimcn.vscode-lldb # error on darwin
     vscodevim.vim
     wakatime.vscode-wakatime
     zxh404.vscode-proto3
