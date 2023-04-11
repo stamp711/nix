@@ -211,11 +211,13 @@ in {
     assh
     bash
     cargo-nextest
+    cargo-semver-checks
     fluxcd
     imgcat
     just
     kubectl
     kubectx
+    mdbook
     mkcert
     netcat
     nil
