@@ -144,13 +144,16 @@ in {
   programs.vscode.enable = true;
   programs.vscode.extensions = with pkgs.vscode-extensions; [
     brettm12345.nixfmt-vscode
+    eamodio.gitlens
     github.copilot
     jnoortheen.nix-ide
+    mhutchie.git-graph
     mkhl.direnv
     ms-vscode-remote.remote-ssh
     redhat.vscode-yaml
     rust-lang.rust-analyzer
     tamasfe.even-better-toml
+    vadimcn.vscode-lldb
     vscodevim.vim
     wakatime.vscode-wakatime
     zxh404.vscode-proto3
