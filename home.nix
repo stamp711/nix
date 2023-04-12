@@ -142,6 +142,8 @@ in {
   }];
 
   programs.vscode.enable = true;
+  programs.vscode.enableUpdateCheck = false;
+  programs.vscode.enableExtensionUpdateCheck = false;
   programs.vscode.extensions = with pkgs.vscode-extensions; [
     brettm12345.nixfmt-vscode
     eamodio.gitlens
