@@ -167,6 +167,7 @@ in {
     "editor.inlineSuggest.enabled" = true;
     "[nix]"."editor.defaultFormatter" = "brettm12345.nixfmt-vscode";
     "redhat.telemetry.enabled" = false;
+    "security.workspace.trust.enabled" = false;
     "workbench.colorTheme" = "Default Light+ Experimental";
   };
 
