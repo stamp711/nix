@@ -96,7 +96,6 @@ in {
   home.sessionVariables = {
     VISUAL = "hx";
     EDITOR = "hx";
-    WAKATIME_HOME = "${config.xdg.configHome}/wakatime";
     ZSH_WAKATIME_BIN = "wakatime-cli";
   };
 
