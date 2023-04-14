@@ -162,7 +162,8 @@ in {
     zxh404.vscode-proto3
   ];
   programs.vscode.userSettings = {
-    "editor.fontFamily" = "Menlo, Monaco, 'Courier New', monospace, Hack Nerd Font";
+    "editor.fontFamily" =
+      "Menlo, Monaco, 'Courier New', monospace, Hack Nerd Font";
     "editor.formatOnSave" = true;
     "editor.inlineSuggest.enabled" = true;
     "[nix]"."editor.defaultFormatter" = "brettm12345.nixfmt-vscode";
