@@ -164,6 +164,7 @@ in {
     zxh404.vscode-proto3
   ]) ++ (with pkgs.vscode-marketplace; [
     conradludgate.rust-playground
+    odiriuss.rust-macro-expand
     rescuetime.rescuetime
   ]);
   programs.vscode.userSettings = {
