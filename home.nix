@@ -219,6 +219,7 @@ in {
   home.packages = with pkgs; [
     assh
     bash
+    cargo-expand
     cargo-nextest
     cargo-semver-checks
     cargo-workspaces
