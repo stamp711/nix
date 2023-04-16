@@ -1,4 +1,4 @@
-{ pkgs, config, nix-colors, ... }:
+{ pkgs, config, nix-vscode-extensions, nix-colors, ... }:
 
 let nix-colors-lib = nix-colors.lib-contrib { inherit pkgs; };
 in {
@@ -11,6 +11,7 @@ in {
 
   nixpkgs.config.allowUnfree = true;
   nixpkgs.config.allowUnfreePredicate = (pkg: true);
+  nixpkgs.overlays = [ nix-vscode-extensions.overlays.default ];
 
   colorScheme = nix-colors.colorSchemes.dracula;
 
@@ -144,10 +145,9 @@ in {
   programs.vscode.enableUpdateCheck = false;
   programs.vscode.enableExtensionUpdateCheck = false;
   programs.vscode.mutableExtensionsDir = false;
-  programs.vscode.extensions = with pkgs.vscode-extensions; [
+  programs.vscode.extensions = (with pkgs.vscode-extensions; [
     brettm12345.nixfmt-vscode
     eamodio.gitlens
-    github.copilot
     jnoortheen.nix-ide
     mhutchie.git-graph
     mkhl.direnv
@@ -155,12 +155,16 @@ in {
     ms-vscode-remote.remote-ssh
     redhat.vscode-yaml
     rust-lang.rust-analyzer
+    serayuzgur.crates
     tamasfe.even-better-toml
-    # vadimcn.vscode-lldb # error on darwin
+    # vadimcn.vscode-lldb error on darwin
     vscodevim.vim
     wakatime.vscode-wakatime
     zxh404.vscode-proto3
-  ];
+  ]) ++ (with pkgs.vscode-marketplace; [
+    conradludgate.rust-playground
+    rescuetime.rescuetime
+  ]);
   programs.vscode.userSettings = {
     "editor.fontFamily" =
       "Menlo, Monaco, 'Courier New', monospace, Hack Nerd Font";

@@ -1,5 +1,5 @@
 {
-  description = "You new nix config";
+  description = "My nix config";
 
   inputs = {
     # Nixpkgs
@@ -10,46 +10,41 @@
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
+    # VSCode extensions
+    nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
+    nix-vscode-extensions.inputs.nixpkgs.follows = "nixpkgs";
+
     nix-colors.url = "github:misterio77/nix-colors";
   };
 
-  outputs = { nixpkgs, home-manager, nix-colors, ... }@inputs: rec {
+  outputs = { nixpkgs, home-manager, nix-vscode-extensions, nix-colors, ...
+    }@inputs: rec {
+      homeConfigurations."stamp@darwin" =
 
-    homeConfigurations."stamp@darwin" = home-manager.lib.homeManagerConfiguration {
-      pkgs = nixpkgs.legacyPackages."x86_64-darwin";
-      extraSpecialArgs = { inherit nix-colors; };
-      modules = [
-        {
-          home.username = "stamp";
-          home.homeDirectory = "/Users/stamp";
-        }
-        ./home.nix
-      ];
+        home-manager.lib.homeManagerConfiguration {
+          pkgs = nixpkgs.legacyPackages."x86_64-darwin";
+          extraSpecialArgs = { inherit nix-vscode-extensions nix-colors; };
+          modules = [
+            {
+              home.username = "stamp";
+              home.homeDirectory = "/Users/stamp";
+            }
+            ./home.nix
+          ];
+        };
+
+      homeConfigurations."stamp@linux" =
+        home-manager.lib.homeManagerConfiguration {
+          pkgs = nixpkgs.legacyPackages."x86_64-linux";
+          extraSpecialArgs = { inherit nix-vscode-extensions nix-colors; };
+          modules = [
+            {
+              home.username = "stamp";
+              home.homeDirectory = "/home/stamp";
+            }
+            ./home.nix
+          ];
+        };
+
     };
-
-    homeConfigurations."stamp@linux" = home-manager.lib.homeManagerConfiguration {
-      pkgs = nixpkgs.legacyPackages."x86_64-linux";
-      extraSpecialArgs = { inherit nix-colors; };
-      modules = [
-        {
-          home.username = "stamp";
-          home.homeDirectory = "/home/stamp";
-        }
-        ./home.nix
-      ];
-    };
-
-    homeConfigurations."REDACTED@linux" = home-manager.lib.homeManagerConfiguration {
-      pkgs = nixpkgs.legacyPackages."x86_64-linux";
-      extraSpecialArgs = { inherit nix-colors; };
-      modules = [
-        {
-          home.username = "REDACTED";
-          home.homeDirectory = "/home/REDACTED";
-        }
-        ./home.nix
-      ];
-    };
-
-  };
 }
