@@ -220,6 +220,7 @@ in {
     bash
     cargo-nextest
     cargo-semver-checks
+    cargo-workspaces
     fluxcd
     imgcat
     just
