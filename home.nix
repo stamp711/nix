@@ -148,6 +148,7 @@ in {
   programs.vscode.extensions = (with pkgs.vscode-extensions; [
     brettm12345.nixfmt-vscode
     eamodio.gitlens
+    github.copilot
     jnoortheen.nix-ide
     mhutchie.git-graph
     mkhl.direnv
