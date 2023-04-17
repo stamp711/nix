@@ -236,6 +236,7 @@ in {
     cargo-expand
     cargo-nextest
     cargo-semver-checks
+    cargo-watch
     cargo-workspaces
     fluxcd
     imgcat
