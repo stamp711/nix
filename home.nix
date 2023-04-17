@@ -163,6 +163,7 @@ in {
     wakatime.vscode-wakatime
     zxh404.vscode-proto3
   ]) ++ (with pkgs.vscode-marketplace; [
+    aaqaishtyaq.themes-go-acme
     conradludgate.rust-playground
     odiriuss.rust-macro-expand
     rescuetime.rescuetime
@@ -175,7 +176,7 @@ in {
     "[nix]"."editor.defaultFormatter" = "brettm12345.nixfmt-vscode";
     "redhat.telemetry.enabled" = false;
     "security.workspace.trust.enabled" = false;
-    "workbench.colorTheme" = "Default Light+ Experimental";
+    "workbench.colorTheme" = "Acme";
   };
 
   programs.zoxide.enable = true;
