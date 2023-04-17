@@ -164,6 +164,7 @@ in {
     zxh404.vscode-proto3
   ]) ++ (with pkgs.vscode-marketplace; [
     aaqaishtyaq.themes-go-acme
+    alefragnani.separators
     conradludgate.rust-playground
     odiriuss.rust-macro-expand
     rescuetime.rescuetime
@@ -177,6 +178,16 @@ in {
     "redhat.telemetry.enabled" = false;
     "security.workspace.trust.enabled" = false;
     "workbench.colorTheme" = "Acme";
+    "separators.enabledSymbols" = [
+      "Classes"
+      "Constructors"
+      "Enums"
+      # "Functions"
+      "Interfaces"
+      # "Methods"
+      "Namespaces"
+      "Structs"
+    ];
   };
 
   programs.zoxide.enable = true;
