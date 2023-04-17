@@ -175,6 +175,7 @@ in {
       "Menlo, Monaco, 'Courier New', monospace, Hack Nerd Font";
     "editor.formatOnSave" = true;
     "editor.inlineSuggest.enabled" = true;
+    "editor.scrollBeyondLastLine" = false;
     "[nix]"."editor.defaultFormatter" = "brettm12345.nixfmt-vscode";
     "redhat.telemetry.enabled" = false;
     "security.workspace.trust.enabled" = false;
