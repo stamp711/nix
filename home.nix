@@ -166,6 +166,7 @@ in {
     aaqaishtyaq.themes-go-acme
     alefragnani.separators
     conradludgate.rust-playground
+    jscearcy.rust-doc-viewer
     odiriuss.rust-macro-expand
     rescuetime.rescuetime
   ]);
