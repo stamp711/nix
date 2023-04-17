@@ -163,9 +163,9 @@ in {
     wakatime.vscode-wakatime
     zxh404.vscode-proto3
   ]) ++ (with pkgs.vscode-marketplace; [
-    aaqaishtyaq.themes-go-acme
     alefragnani.separators
     conradludgate.rust-playground
+    foolusion.acme-theme
     jscearcy.rust-doc-viewer
     odiriuss.rust-macro-expand
     rescuetime.rescuetime
@@ -178,7 +178,7 @@ in {
     "[nix]"."editor.defaultFormatter" = "brettm12345.nixfmt-vscode";
     "redhat.telemetry.enabled" = false;
     "security.workspace.trust.enabled" = false;
-    "workbench.colorTheme" = "Acme";
+    "workbench.colorTheme" = "acme";
     "separators.enabledSymbols" = [
       "Classes"
       "Constructors"
