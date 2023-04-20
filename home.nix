@@ -242,8 +242,10 @@ in {
     fluxcd
     imgcat
     just
+    k9s
     kubectl
     kubectx
+    kubernetes-helm
     mdbook
     mkcert
     netcat
