@@ -22,6 +22,20 @@
       homeConfigurations."stamp@darwin" =
 
         home-manager.lib.homeManagerConfiguration {
+          pkgs = nixpkgs.legacyPackages."aarch64-darwin";
+          extraSpecialArgs = { inherit nix-vscode-extensions nix-colors; };
+          modules = [
+            {
+              home.username = "stamp";
+              home.homeDirectory = "/Users/stamp";
+            }
+            ./home.nix
+          ];
+        };
+
+      homeConfigurations."stamp@darwin-intel" =
+
+        home-manager.lib.homeManagerConfiguration {
           pkgs = nixpkgs.legacyPackages."x86_64-darwin";
           extraSpecialArgs = { inherit nix-vscode-extensions nix-colors; };
           modules = [
