@@ -173,6 +173,9 @@ in {
     wakatime.vscode-wakatime
   ]);
   programs.vscode.userSettings = {
+    "clangd.arguments" = [ "-log=verbose" "-pretty" "--background-index" ];
+    "cmake.buildDirectory" = "\${workspaceFolder}/build/\${buildKit}/\${buildType}";
+    "cmake.copyCompileCommands" = "\${workspaceFolder}/compile_commands.json";
     "editor.cursorBlinking" = "solid";
     "editor.fontFamily" =
       "Menlo, Monaco, 'Courier New', monospace, Hack Nerd Font";
