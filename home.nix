@@ -171,6 +171,7 @@ in {
     wakatime.vscode-wakatime
   ]);
   programs.vscode.userSettings = {
+    "editor.cursorBlinking" = "solid";
     "editor.fontFamily" =
       "Menlo, Monaco, 'Courier New', monospace, Hack Nerd Font";
     "editor.formatOnSave" = true;
