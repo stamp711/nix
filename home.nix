@@ -179,10 +179,10 @@ in {
     "editor.inlineSuggest.enabled" = true;
     "editor.lineNumbers" = "relative";
     "editor.scrollBeyondLastLine" = false;
+    "gitlens.telemetry.enabled" = false;
     "[nix]"."editor.defaultFormatter" = "brettm12345.nixfmt-vscode";
     "redhat.telemetry.enabled" = false;
     "security.workspace.trust.enabled" = false;
-    "workbench.colorTheme" = "Default Light+ Experimental";
     "separators.enabledSymbols" = [
       "Classes"
       "Constructors"
@@ -193,6 +193,8 @@ in {
       "Namespaces"
       "Structs"
     ];
+    "telemetry.telemetryLevel" = "off";
+    "workbench.colorTheme" = "Default Light+ Experimental";
   };
 
   programs.zoxide.enable = true;
