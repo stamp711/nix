@@ -33,7 +33,7 @@
           ];
         };
 
-      homeConfigurations."stamp@darwin-intel" =
+      homeConfigurations."stamp@x86_64-darwin" =
 
         home-manager.lib.homeManagerConfiguration {
           pkgs = nixpkgs.legacyPackages."x86_64-darwin";
