@@ -149,6 +149,7 @@ in {
     brettm12345.nixfmt-vscode
     github.copilot
     jnoortheen.nix-ide
+    llvm-vs-code-extensions.vscode-clangd
     mhutchie.git-graph
     mkhl.direnv
     ms-azuretools.vscode-docker
