@@ -153,6 +153,7 @@ in {
     mhutchie.git-graph
     mkhl.direnv
     ms-azuretools.vscode-docker
+    ms-vscode.cmake-tools
     ms-vscode-remote.remote-ssh
     redhat.vscode-yaml
     rust-lang.rust-analyzer
