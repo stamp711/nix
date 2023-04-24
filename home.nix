@@ -245,6 +245,7 @@ in {
     assh
     bash
     cargo-expand
+    cargo-feature
     cargo-nextest
     cargo-semver-checks
     cargo-watch
