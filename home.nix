@@ -211,7 +211,7 @@ in {
   programs.bat.enable = true;
 
   programs.git.enable = true;
-  programs.git.userName = "stamp711";
+  programs.git.userName = "Apricity";
   programs.git.userEmail = "REDACTED";
   programs.git.signing.key =
     "ssh-ed25519 REDACTED";
