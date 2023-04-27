@@ -91,6 +91,7 @@ in {
   };
 
   programs.direnv.enable = true;
+  programs.direnv.nix-direnv.enable = true;
 
   home.sessionPath = [ "$HOME/.cargo/bin" ];
 
