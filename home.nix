@@ -120,7 +120,7 @@ in {
 
   programs.helix.enable = true;
   programs.helix.settings = {
-    theme = "flatwhite";
+    theme = "acme";
     # editor.line-number = "relative";
     editor.true-color = true;
     editor.color-modes = true;
@@ -168,6 +168,7 @@ in {
     eamodio.gitlens
     foolusion.acme-theme
     jscearcy.rust-doc-viewer
+    lumiknit.parchment
     odiriuss.rust-macro-expand
     rescuetime.rescuetime
     wakatime.vscode-wakatime
@@ -198,7 +199,7 @@ in {
       "Structs"
     ];
     "telemetry.telemetryLevel" = "off";
-    "workbench.colorTheme" = "Default Light+ Experimental";
+    "workbench.colorTheme" = "Parchment";
   };
 
   programs.zoxide.enable = true;
