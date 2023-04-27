@@ -234,7 +234,12 @@ in {
     gpg.ssh.allowedSignersFile = "${config.xdg.configHome}/git/allowed_signers";
     gpg.ssh.program = "${pkgs.openssh}/bin/ssh-keygen";
   };
-  programs.git.ignores = [ ".cache/" ];
+  programs.git.ignores = [
+    ".cache/"
+    # direnv
+    ".direnv"
+    ".envrc"
+   ];
   home.file."${config.xdg.configHome}/git/allowed_signers".source =
     ./git_allowed_signers;
 
