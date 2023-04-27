@@ -200,8 +200,9 @@ in {
       "Structs"
     ];
     "telemetry.telemetryLevel" = "off";
-    "workbench.colorTheme" = "Parchment";
+    "workbench.colorTheme" = "Visual Studio Light";
     "workbench.colorCustomizations" = {
+      "editor.background" = "#FFFFEA";
       "editorInlayHint.background" = "#00000000";
       "editorInlayHint.foreground" = "#BBBBBBFF";
     };
