@@ -175,7 +175,8 @@ in {
   ]);
   programs.vscode.userSettings = {
     "clangd.arguments" = [ "-log=verbose" "-pretty" "--background-index" ];
-    "cmake.buildDirectory" = "\${workspaceFolder}/build/\${buildKit}/\${buildType}";
+    "cmake.buildDirectory" =
+      "\${workspaceFolder}/build/\${buildKit}/\${buildType}";
     "cmake.copyCompileCommands" = "\${workspaceFolder}/compile_commands.json";
     "editor.cursorBlinking" = "solid";
     "editor.fontFamily" =
@@ -200,6 +201,10 @@ in {
     ];
     "telemetry.telemetryLevel" = "off";
     "workbench.colorTheme" = "Parchment";
+    "workbench.colorCustomizations" = {
+      "editorInlayHint.background" = "#00000000";
+      "editorInlayHint.foreground" = "#BBBBBBFF";
+    };
   };
 
   programs.zoxide.enable = true;
