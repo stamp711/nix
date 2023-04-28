@@ -148,6 +148,7 @@ in {
   programs.vscode.mutableExtensionsDir = false;
   programs.vscode.extensions = (with pkgs.vscode-extensions; [
     brettm12345.nixfmt-vscode
+    eamodio.gitlens
     github.copilot
     jnoortheen.nix-ide
     llvm-vs-code-extensions.vscode-clangd
@@ -162,17 +163,15 @@ in {
     tamasfe.even-better-toml
     # vadimcn.vscode-lldb error on darwin
     vscodevim.vim
+    wakatime.vscode-wakatime
     zxh404.vscode-proto3
   ]) ++ (with pkgs.vscode-marketplace; [
     alefragnani.separators
-    conradludgate.rust-playground
-    eamodio.gitlens
-    foolusion.acme-theme
+    ms-vscode-remote.remote-containers
     jscearcy.rust-doc-viewer
     lumiknit.parchment
     odiriuss.rust-macro-expand
     rescuetime.rescuetime
-    wakatime.vscode-wakatime
   ]);
   programs.vscode.userSettings = {
     "clangd.arguments" = [ "-log=verbose" "-pretty" "--background-index" ];
