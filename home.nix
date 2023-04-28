@@ -264,6 +264,7 @@ in {
     cargo-watch
     cargo-workspaces
     fluxcd
+    glab
     imgcat
     just
     k9s
