@@ -236,8 +236,10 @@ in {
   programs.git.ignores = [
     ".cache/"
     # direnv
-    ".direnv"
+    ".direnv/"
     ".envrc"
+    # vscode devcontainer
+    ".devcontainer/"
    ];
   home.file."${config.xdg.configHome}/git/allowed_signers".source =
     ./git_allowed_signers;
