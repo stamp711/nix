@@ -1,7 +1,11 @@
-{ pkgs, config, nix-vscode-extensions, nix-colors, ... }:
-
-let nix-colors-lib = nix-colors.lib-contrib { inherit pkgs; };
+{ inputs, pkgs, config, ... }:
+let
+  inherit (inputs) nix-colors;
+  nix-colors-lib = nix-colors.lib-contrib { inherit pkgs; };
 in {
+
+  home.username = "stamp";
+  home.homeDirectory = "/Users/stamp";
 
   imports = [ nix-colors.homeManagerModule ];
 
@@ -9,14 +13,10 @@ in {
 
   programs.home-manager.enable = true;
 
-  nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.allowUnfreePredicate = (pkg: true);
-  nixpkgs.overlays = [ nix-vscode-extensions.overlays.default ];
-
   colorScheme = nix-colors.colorSchemes.dracula;
 
-  nix.package = pkgs.nix;
-  nix.settings = { experimental-features = [ "nix-command" "flakes" ]; };
+  # nix.package = pkgs.nix;
+  # nix.settings = { experimental-features = [ "nix-command" "flakes" ]; };
 
   programs.bash.enable = true;
 
@@ -186,6 +186,8 @@ in {
     "editor.lineNumbers" = "relative";
     "editor.scrollBeyondLastLine" = false;
     "gitlens.telemetry.enabled" = false;
+    "nix.enableLanguageServer" = true;
+    "nix.serverPath" = "nil";
     "[nix]"."editor.defaultFormatter" = "brettm12345.nixfmt-vscode";
     "redhat.telemetry.enabled" = false;
     "security.workspace.trust.enabled" = false;
@@ -240,7 +242,7 @@ in {
     ".envrc"
     # vscode devcontainer
     ".devcontainer/"
-   ];
+  ];
   home.file."${config.xdg.configHome}/git/allowed_signers".source =
     ./git_allowed_signers;
 
@@ -276,6 +278,7 @@ in {
     mkcert
     netcat
     nil
+    niv
     nix
     nixfmt
     nixpkgs-fmt
