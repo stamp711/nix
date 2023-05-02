@@ -48,11 +48,11 @@
       };
 
       darwinConfigurations = {
-        "lius-macbook" = darwin.lib.darwinSystem {
+        "Lius-MacBook" = darwin.lib.darwinSystem {
           system = "aarch64-darwin";
           specialArgs = { inherit inputs; };
           modules = [
-            ./configuration.nix
+            ./darwin.nix
             home-manager.darwinModules.home-manager
             {
               nixpkgs = nixpkgsConfig;
