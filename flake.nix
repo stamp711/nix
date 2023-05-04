@@ -31,52 +31,61 @@
 
   outputs = { self, nixpkgs, darwin, home-manager, ... }@inputs:
     let
-      inherit (nixpkgs.lib) attrValues optionalAttrs;
+      inherit (self) outputs lib;
 
       nixpkgsConfig = {
-        config.allowUnfree = true;
-        # Somehow I have to add this to get vscode to install
-        config.allowUnfreePredicate = (pkg: true);
-        overlays = attrValues self.overlays;
-        # Can be used to substitute in x86_64 packages on Apple Silicon
-        # ++ nixpkgs.lib.singleton (self: super: { inherit (self.pkgs-x86_64) vim; });
+        allowUnfree = true;
+        # Workaround for https://github.com/nix-community/home-manager/issues/2942
+        allowUnfreePredicate = (_: true);
       };
 
-      darwinConfigurationForSystem = system:
-        darwin.lib.darwinSystem {
-          system = system;
-          specialArgs = { inherit inputs; };
-          modules = [
-            ./darwin.nix
-            home-manager.darwinModules.home-manager
-            {
-              nixpkgs = nixpkgsConfig;
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.extraSpecialArgs = { inherit inputs; };
-              home-manager.users."stamp".imports =
-                [ inputs.nix-index-database.hmModules.nix-index ./home.nix ];
-            }
-          ];
-        };
-    in {
+      nixpkgsOverlays = lib.attrValues outputs.overlays ++ [
+        inputs.comma.overlays.default
+        inputs.nix-vscode-extensions.overlays.default
+      ];
+      # # Can be used to substitute in x86_64 packages on Apple Silicon
+      # ++ nixpkgs.lib.singleton (self: super: { inherit (self.pkgs-x86_64) vim; });
 
-      overlays = {
-        apple-silicon-x86_64-packages = self: super:
-          optionalAttrs (super.stdenv.system == "aarch64-darwin") {
-            # Add access to x86_64 packages on Apple Silicon
-            pkgs-x86_64 = import nixpkgs {
-              system = "x86_64-darwin";
-              inherit (nixpkgsConfig) config;
-            };
+    in rec {
+
+      lib = nixpkgs.lib // {
+        darwinConfigurationForSystem = system:
+          darwin.lib.darwinSystem {
+            system = system;
+            specialArgs = { inherit inputs outputs; };
+            modules = [
+              ./darwin.nix
+              home-manager.darwinModules.home-manager
+              {
+                nixpkgs.config = nixpkgsConfig;
+                nixpkgs.overlays = nixpkgsOverlays;
+                home-manager.useGlobalPkgs = true;
+                home-manager.useUserPackages = true;
+                home-manager.extraSpecialArgs = { inherit inputs outputs; };
+                home-manager.users."stamp".imports = [ ./home.nix ];
+              }
+            ];
           };
-        commma = inputs.comma.overlays.default;
-        vscode-extensions = inputs.nix-vscode-extensions.overlays.default;
       };
+
+      overlays = import ./overlays { inherit inputs outputs lib; };
+
+      # overlays = {
+      #   apple-silicon-x86_64-packages = self: super:
+      #     optionalAttrs (super.stdenv.system == "aarch64-darwin") {
+      #       # Add access to x86_64 packages on Apple Silicon
+      #       pkgs-x86_64 = import nixpkgs {
+      #         system = "x86_64-darwin";
+      #         inherit (nixpkgsConfig) config;
+      #       };
+      #     };
+      #   commma = inputs.comma.overlays.default;
+      #   vscode-extensions = inputs.nix-vscode-extensions.overlays.default;
+      # };
 
       darwinConfigurations = {
-        stamp = darwinConfigurationForSystem "x86_64-darwin";
-        Lius-MacBook = darwinConfigurationForSystem "aarch64-darwin";
+        stamp = lib.darwinConfigurationForSystem "x86_64-darwin";
+        Lius-MacBook = lib.darwinConfigurationForSystem "aarch64-darwin";
       };
 
       homeConfigurations."stamp@linux" =
