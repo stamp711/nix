@@ -133,14 +133,20 @@ in {
     };
     editor.whitespace.render = { tab = "all"; };
   };
-  programs.helix.languages = [{
-    name = "yaml";
-    formatter = {
-      command = "prettier";
-      args = [ "--parser" "yaml" ];
-    };
-    config.yaml.schemas = { Kubernetes = "*"; };
-  }];
+  programs.helix.languages = [
+    {
+      name = "yaml";
+      formatter = {
+        command = "prettier";
+        args = [ "--parser" "yaml" ];
+      };
+      config.yaml.schemas = { Kubernetes = "*"; };
+    }
+    {
+      name = "nix";
+      formatter.command = "nixfmt";
+    }
+  ];
 
   programs.vscode.enable = true;
   programs.vscode.enableUpdateCheck = false;
