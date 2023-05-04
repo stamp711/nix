@@ -266,6 +266,7 @@ in {
     cargo-semver-checks
     cargo-watch
     cargo-workspaces
+    comma
     fluxcd
     glab
     imgcat
