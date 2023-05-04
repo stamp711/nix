@@ -76,34 +76,6 @@
             ];
           });
 
-      homeConfigurations."stamp@darwin" =
-        home-manager.lib.homeManagerConfiguration {
-          pkgs = nixpkgs.legacyPackages."aarch64-darwin";
-          extraSpecialArgs = { inherit (inputs) nix-colors; };
-          modules = [
-            {
-              nixpkgs = nixpkgsConfig;
-              home.username = "stamp";
-              home.homeDirectory = "/Users/stamp";
-            }
-            ./home.nix
-          ];
-        };
-
-      homeConfigurations."stamp@x86_64-darwin" =
-        home-manager.lib.homeManagerConfiguration {
-          pkgs = nixpkgs.legacyPackages."x86_64-darwin";
-          extraSpecialArgs = { inherit (inputs) nix-colors; };
-          modules = [
-            {
-              nixpkgs = nixpkgsConfig;
-              home.username = "stamp";
-              home.homeDirectory = "/Users/stamp";
-            }
-            ./home.nix
-          ];
-        };
-
       homeConfigurations."stamp@linux" =
         home-manager.lib.homeManagerConfiguration {
           pkgs = nixpkgs.legacyPackages."x86_64-linux";
