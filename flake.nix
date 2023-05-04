@@ -42,6 +42,23 @@
         # ++ nixpkgs.lib.singleton (self: super: { inherit (self.pkgs-x86_64) vim; });
       };
 
+      darwinConfigurationForSystem = system:
+        darwin.lib.darwinSystem {
+          system = system;
+          specialArgs = { inherit inputs; };
+          modules = [
+            ./darwin.nix
+            home-manager.darwinModules.home-manager
+            {
+              nixpkgs = nixpkgsConfig;
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.extraSpecialArgs = { inherit inputs; };
+              home-manager.users."stamp".imports =
+                [ inputs.nix-index-database.hmModules.nix-index ./home.nix ];
+            }
+          ];
+        };
     in {
 
       overlays = {
@@ -57,24 +74,10 @@
         vscode-extensions = inputs.nix-vscode-extensions.overlays.default;
       };
 
-      darwinConfigurations =
-        nixpkgs.lib.genAttrs [ "aarch64-darwin" "x86_64-darwin" ] (system:
-          darwin.lib.darwinSystem {
-            system = system;
-            specialArgs = { inherit inputs; };
-            modules = [
-              ./darwin.nix
-              home-manager.darwinModules.home-manager
-              {
-                nixpkgs = nixpkgsConfig;
-                home-manager.useGlobalPkgs = true;
-                home-manager.useUserPackages = true;
-                home-manager.extraSpecialArgs = { inherit inputs; };
-                home-manager.users."stamp".imports =
-                  [ inputs.nix-index-database.hmModules.nix-index ./home.nix ];
-              }
-            ];
-          });
+      darwinConfigurations = {
+        stamp = darwinConfigurationForSystem "x86_64-darwin";
+        Lius-MacBook = darwinConfigurationForSystem "aarch64-darwin";
+      };
 
       homeConfigurations."stamp@linux" =
         home-manager.lib.homeManagerConfiguration {
