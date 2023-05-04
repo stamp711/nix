@@ -47,13 +47,15 @@
     left_padding = 0;
     right_padding = 0;
     window_gap = 6;
-    layout = "bsp";
+    # layout = "bsp";
     mouse_modifier = "fn";
     mouse_action1 = "move";
     mouse_action2 = "resize";
     mouse_drop_action = "swap";
   };
   services.yabai.extraConfig = ''
+    # Space 3 is for development
+    yabai --space 3 layout bsp
     yabai -m rule --add app='System Settings' manage=off
     yabai -m rule --add app='OrbStack' manage=off
     # TODO: this two lines should be at the top of the configuration file.

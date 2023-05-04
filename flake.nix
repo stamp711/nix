@@ -48,8 +48,24 @@
       };
 
       darwinConfigurations = {
-        "Lius-MacBook" = darwin.lib.darwinSystem {
+        "darwin" = darwin.lib.darwinSystem {
           system = "aarch64-darwin";
+          specialArgs = { inherit inputs; };
+          modules = [
+            ./darwin.nix
+            home-manager.darwinModules.home-manager
+            {
+              nixpkgs = nixpkgsConfig;
+              home-manager.useGlobalPkgs = true;
+              home-manager.useUserPackages = true;
+              home-manager.users."stamp" = { imports = [ ./home.nix ]; };
+              home-manager.extraSpecialArgs = { inherit inputs; };
+            }
+          ];
+        };
+
+        "darwin-x86_64" = darwin.lib.darwinSystem {
+          system = "x86_64-darwin";
           specialArgs = { inherit inputs; };
           modules = [
             ./darwin.nix
