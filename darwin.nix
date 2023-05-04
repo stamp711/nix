@@ -55,9 +55,10 @@
   };
   services.yabai.extraConfig = ''
     # Space 3 is for development
-    yabai --space 3 layout bsp
+    yabai -m config --space 3 layout bsp
     yabai -m rule --add app='System Settings' manage=off
     yabai -m rule --add app='OrbStack' manage=off
+    yabai -m rule --add app='Surge' manage=off
     # TODO: this two lines should be at the top of the configuration file.
     yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
     sudo yabai --load-sa
