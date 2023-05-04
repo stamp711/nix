@@ -33,64 +33,48 @@
     let
       inherit (self) outputs lib;
 
-      nixpkgsConfig = {
-        allowUnfree = true;
-        # Workaround for https://github.com/nix-community/home-manager/issues/2942
-        allowUnfreePredicate = (_: true);
-      };
-
-      nixpkgsOverlays = lib.attrValues outputs.overlays ++ [
-        inputs.comma.overlays.default
-        inputs.nix-vscode-extensions.overlays.default
-      ];
-      # # Can be used to substitute in x86_64 packages on Apple Silicon
-      # ++ nixpkgs.lib.singleton (self: super: { inherit (self.pkgs-x86_64) vim; });
-
-    in {
-
-      lib = nixpkgs.lib // {
-
-        mkDarwinConfigWithHomeManager = { system, user ? "stamp"
-          , specialArgs ? { inherit self inputs outputs; }
-          , baseDarwinModules ? [ self.darwinModules.base ]
-          , extraDarwinModules ? [ ] }:
-          darwin.lib.darwinSystem {
-            inherit system specialArgs;
-            modules = baseDarwinModules ++ extraDarwinModules ++ [
-              {
-                nixpkgs.config = nixpkgsConfig;
-                nixpkgs.overlays = nixpkgsOverlays;
-              }
-              (self.darwinModules.setUserHome user)
-              inputs.home-manager.darwinModules.home-manager
-              {
-                home-manager.useGlobalPkgs = true;
-                home-manager.useUserPackages = true;
-                home-manager.extraSpecialArgs = specialArgs;
-                home-manager.users.${user}.imports = [ ./home.nix ];
-              }
-            ];
+      mkPkgs = system:
+        import inputs.nixpkgs {
+          inherit system;
+          config = {
+            allowUnfree = true;
+            # Workaround for https://github.com/nix-community/home-manager/issues/2942
+            allowUnfreePredicate = (_: true);
           };
+          overlays = lib.attrValues outputs.overlays ++ [
+            inputs.comma.overlays.default
+            inputs.nix-vscode-extensions.overlays.default
+          ];
+          # # Can be used to substitute in x86_64 packages on Apple Silicon
+          # ++ nixpkgs.lib.singleton (self: super: { inherit (self.pkgs-x86_64) vim; });
+        };
 
-        mkDarwinConfig = { system }:
-          darwin.lib.darwinSystem {
-            system = system;
-            specialArgs = { inherit inputs outputs; };
-            modules = [
-              ./darwin.nix
-              {
-                nixpkgs.config = nixpkgsConfig;
-                nixpkgs.overlays = nixpkgsOverlays;
-              }
-              home-manager.darwinModules.home-manager
-              {
-                home-manager.useGlobalPkgs = true;
-                home-manager.useUserPackages = true;
-                home-manager.extraSpecialArgs = { inherit inputs outputs; };
-                home-manager.users."stamp".imports = [ ./home.nix ];
-              }
-            ];
-          };
+      mkHome = { username, system, pkgs ? mkPkgs system, lib ? self.lib
+        , extraSpecialArgs ? { inherit self inputs nixpkgs; }, modules }:
+        inputs.home-manager.lib.homeManagerConfiguration {
+          inherit pkgs lib extraSpecialArgs;
+          modules = [{
+            home = {
+              inherit username;
+              homeDirectory = "${lib.homePrefix system}/${username}";
+            };
+          }] ++ modules;
+          # modules = baseModules ++ extraModules;
+        };
+
+      mkDarwin = { system, pkgs ? mkPkgs system, lib ? self.lib
+        , specialArgs ? { inherit self inputs outputs; }, modules
+        , baseModules ? [ outputs.darwinModules.base ], extraModules ? [ ] }:
+        inputs.darwin.lib.darwinSystem {
+          inherit system pkgs lib specialArgs modules;
+        };
+
+    in rec {
+
+      lib = nixpkgs.lib // rec {
+        isDarwin = system:
+          (builtins.elem system inputs.nixpkgs.lib.platforms.darwin);
+        homePrefix = system: if isDarwin system then "/Users" else "/home";
       };
 
       overlays = import ./overlays { inherit inputs outputs lib; };
@@ -100,22 +84,39 @@
       darwinConfigurations = {
         stamp = lib.mkDarwinConfig { system = "x86_64-darwin"; };
         Lius-MacBook = lib.mkDarwinConfig { system = "aarch64-darwin"; };
-        exp = lib.mkDarwinConfigWithHomeManager { system = "aarch64-darwin"; };
+        test = mkDarwin {
+          system = "aarch64-darwin";
+          modules = [ ./darwin.nix ];
+        };
       };
 
-      homeConfigurations."stamp@linux" =
-        home-manager.lib.homeManagerConfiguration {
-          pkgs = nixpkgs.legacyPackages."x86_64-linux";
-          extraSpecialArgs = { inherit (inputs) nix-colors; };
-          modules = [
-            {
-              nixpkgs = nixpkgsConfig;
-              home.username = "stamp";
-              home.homeDirectory = "/home/stamp";
-            }
-            ./home.nix
-          ];
+      homeConfigurations = {
+
+        "stamp@aarch64-darwin" = lib.mkHome {
+          system = "aarch64-darwin";
+          username = "stamp";
+          modules = [ ./home.nix ];
         };
 
+        "stamp@x86_64-linux" = lib.mkHome {
+          system = "x86_64-linux";
+          username = "stamp";
+          modules = [ ./home.nix ];
+        };
+
+        # "stamp@x86_64-linux" = home-manager.lib.homeManagerConfiguration {
+        #   pkgs = nixpkgs.legacyPackages."x86_64-linux";
+        #   extraSpecialArgs = { inherit (inputs) nix-colors; };
+        #   modules = [
+        #     {
+        #       nixpkgs = nixpkgsConfig;
+        #       home.username = "stamp";
+        #       home.homeDirectory = "/home/stamp";
+        #     }
+        #     ./home.nix
+        #   ];
+        # };
+
+      };
     };
 }
