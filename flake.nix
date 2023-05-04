@@ -46,19 +46,44 @@
       # # Can be used to substitute in x86_64 packages on Apple Silicon
       # ++ nixpkgs.lib.singleton (self: super: { inherit (self.pkgs-x86_64) vim; });
 
-    in rec {
+    in {
 
       lib = nixpkgs.lib // {
-        darwinConfigurationForSystem = system:
+
+        mkDarwinConfigWithHomeManager = { system, user ? "stamp"
+          , specialArgs ? { inherit self inputs outputs; }
+          , baseDarwinModules ? [ self.darwinModules.base ]
+          , extraDarwinModules ? [ ] }:
+          darwin.lib.darwinSystem {
+            inherit system specialArgs;
+            modules = baseDarwinModules ++ extraDarwinModules ++ [
+              {
+                nixpkgs.config = nixpkgsConfig;
+                nixpkgs.overlays = nixpkgsOverlays;
+              }
+              (self.darwinModules.setUserHome user)
+              inputs.home-manager.darwinModules.home-manager
+              {
+                home-manager.useGlobalPkgs = true;
+                home-manager.useUserPackages = true;
+                home-manager.extraSpecialArgs = specialArgs;
+                home-manager.users.${user}.imports = [ ./home.nix ];
+              }
+            ];
+          };
+
+        mkDarwinConfig = { system }:
           darwin.lib.darwinSystem {
             system = system;
             specialArgs = { inherit inputs outputs; };
             modules = [
               ./darwin.nix
-              home-manager.darwinModules.home-manager
               {
                 nixpkgs.config = nixpkgsConfig;
                 nixpkgs.overlays = nixpkgsOverlays;
+              }
+              home-manager.darwinModules.home-manager
+              {
                 home-manager.useGlobalPkgs = true;
                 home-manager.useUserPackages = true;
                 home-manager.extraSpecialArgs = { inherit inputs outputs; };
@@ -70,22 +95,12 @@
 
       overlays = import ./overlays { inherit inputs outputs lib; };
 
-      # overlays = {
-      #   apple-silicon-x86_64-packages = self: super:
-      #     optionalAttrs (super.stdenv.system == "aarch64-darwin") {
-      #       # Add access to x86_64 packages on Apple Silicon
-      #       pkgs-x86_64 = import nixpkgs {
-      #         system = "x86_64-darwin";
-      #         inherit (nixpkgsConfig) config;
-      #       };
-      #     };
-      #   commma = inputs.comma.overlays.default;
-      #   vscode-extensions = inputs.nix-vscode-extensions.overlays.default;
-      # };
+      darwinModules = import ./modules/darwin { inherit lib; };
 
       darwinConfigurations = {
-        stamp = lib.darwinConfigurationForSystem "x86_64-darwin";
-        Lius-MacBook = lib.darwinConfigurationForSystem "aarch64-darwin";
+        stamp = lib.mkDarwinConfig { system = "x86_64-darwin"; };
+        Lius-MacBook = lib.mkDarwinConfig { system = "aarch64-darwin"; };
+        exp = lib.mkDarwinConfigWithHomeManager { system = "aarch64-darwin"; };
       };
 
       homeConfigurations."stamp@linux" =
