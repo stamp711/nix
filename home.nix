@@ -121,7 +121,7 @@ in {
 
   programs.helix.enable = true;
   programs.helix.settings = {
-    theme = "acme";
+    theme = "monokai";
     # editor.line-number = "relative";
     editor.true-color = true;
     editor.color-modes = true;
