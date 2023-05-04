@@ -1,13 +1,13 @@
-{ inputs, pkgs, config, ... }:
+{ inputs, outputs, pkgs, lib, config, ... }:
 let
   inherit (inputs) nix-colors;
   nix-colors-lib = nix-colors.lib-contrib { inherit pkgs; };
 in {
 
-  home.username = "stamp";
-  home.homeDirectory = "/Users/stamp";
-
-  imports = [ nix-colors.homeManagerModule ];
+  imports = [
+    inputs.nix-colors.homeManagerModule
+    inputs.nix-index-database.hmModules.nix-index
+  ];
 
   home.stateVersion = "22.11";
 
