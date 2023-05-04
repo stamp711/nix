@@ -122,7 +122,8 @@ in {
   programs.helix.enable = true;
   programs.helix.settings = {
     theme = "monokai";
-    # editor.line-number = "relative";
+    editor.line-number = "relative";
+    editor.auto-format = true;
     editor.true-color = true;
     editor.color-modes = true;
     editor.lsp.display-messages = true;
