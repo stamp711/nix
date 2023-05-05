@@ -1,11 +1,14 @@
-{ ... }: rec {
+{...}: rec {
+  base = {imports = [core];};
 
-  base = { imports = [ core ]; };
-
-  core = { pkgs, lib, ... }: {
+  core = {
+    pkgs,
+    lib,
+    ...
+  }: {
     system.stateVersion = 4;
     programs.zsh.enable = true;
   };
 
-  setUserHome = user: { ... }: { users.users.${user}.home = "/Users/" + user; };
+  setUserHome = user: {...}: {users.users.${user}.home = "/Users/" + user;};
 }
