@@ -10,7 +10,7 @@ in {
   imports = [
     inputs.nix-colors.homeManagerModule
     inputs.nix-index-database.hmModules.nix-index
-    ./terminal.nix
+    ./terminal
     ./helix.nix
     ./vscode.nix
   ];
@@ -25,43 +25,6 @@ in {
   programs.neovim.enable = true;
   programs.neovim.defaultEditor = true;
   programs.neovim = {};
-
-  programs.git.enable = true;
-  programs.git.userName = "Apricity";
-  programs.git.userEmail = "REDACTED";
-  programs.git.signing.key = "ssh-ed25519 REDACTED";
-  programs.git.signing.signByDefault = true;
-  programs.git.difftastic.enable = true;
-  programs.git.lfs.enable = true;
-  programs.git.extraConfig = {
-    init.defaultBranch = "master";
-    pull.ff = "only";
-    push.autoSetupRemote = true;
-    gpg.format = "ssh";
-    gpg.ssh.allowedSignersFile = "${config.xdg.configHome}/git/allowed_signers";
-    gpg.ssh.program = "${pkgs.openssh}/bin/ssh-keygen";
-  };
-  programs.git.ignores = [
-    ".cache/"
-    # direnv
-    ".direnv/"
-    ".envrc"
-    # vscode devcontainer
-    ".devcontainer/"
-  ];
-  home.file."${config.xdg.configHome}/git/allowed_signers".source =
-    ./git_allowed_signers;
-
-  programs.gh.enable = true;
-  programs.gh.extensions = [pkgs.gh-eco];
-  programs.gh.settings = {
-    git_protocol = "ssh";
-    prompt = "enabled";
-    aliases = {
-      co = "pr checkout";
-      pv = "pr view";
-    };
-  };
 
   home.packages = with pkgs; [
     alejandra
