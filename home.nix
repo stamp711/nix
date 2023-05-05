@@ -101,15 +101,15 @@ in {
   home.sessionPath = ["$HOME/.cargo/bin"];
 
   home.sessionVariables = {
-    VISUAL = "hx";
-    EDITOR = "hx";
+    # VISUAL = "hx";
+    # EDITOR = "hx";
     ZSH_WAKATIME_BIN = "wakatime-cli";
   };
 
   home.shellAliases = {
     k = "kubectl";
-    vi = "hx";
-    vim = "hx";
+    vi = "nvim";
+    vim = "nvim";
   };
 
   programs.gpg.enable = true;
@@ -223,6 +223,9 @@ in {
       "editorInlayHint.foreground" = "#BBBBBBFF";
     };
   };
+
+  programs.neovim.enable = true;
+  programs.neovim.defaultEditor = true;
 
   programs.zoxide.enable = true;
   programs.zellij.enable = true;
