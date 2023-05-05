@@ -145,7 +145,7 @@ in {
     }
     {
       name = "nix";
-      formatter.command = "nixfmt";
+      formatter.command = "alejandra";
     }
   ];
 
@@ -265,6 +265,7 @@ in {
   };
 
   home.packages = with pkgs; [
+    alejandra
     assh
     bash
     cargo-expand
