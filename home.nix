@@ -1,9 +1,14 @@
-{ inputs, outputs, pkgs, lib, config, ... }:
-let
+{
+  inputs,
+  outputs,
+  pkgs,
+  lib,
+  config,
+  ...
+}: let
   inherit (inputs) nix-colors;
-  nix-colors-lib = nix-colors.lib-contrib { inherit pkgs; };
+  nix-colors-lib = nix-colors.lib-contrib {inherit pkgs;};
 in {
-
   imports = [
     inputs.nix-colors.homeManagerModule
     inputs.nix-index-database.hmModules.nix-index
@@ -79,7 +84,7 @@ in {
     else
       unset http_proxy https_proxy all_proxy
     fi
-    # sh ${nix-colors-lib.shellThemeFromScheme { scheme = config.colorScheme; }}
+    # sh ${nix-colors-lib.shellThemeFromScheme {scheme = config.colorScheme;}}
   '';
 
   programs.starship.enable = true;
@@ -93,7 +98,7 @@ in {
   programs.direnv.enable = true;
   programs.direnv.nix-direnv.enable = true;
 
-  home.sessionPath = [ "$HOME/.cargo/bin" ];
+  home.sessionPath = ["$HOME/.cargo/bin"];
 
   home.sessionVariables = {
     VISUAL = "hx";
@@ -110,11 +115,13 @@ in {
   programs.gpg.enable = true;
   programs.gpg.mutableKeys = false;
   programs.gpg.mutableTrust = false;
-  programs.gpg.scdaemonSettings = { disable-ccid = true; };
-  programs.gpg.publicKeys = [{
-    source = ./pgp_keys/Apricity.asc;
-    trust = "ultimate";
-  }];
+  programs.gpg.scdaemonSettings = {disable-ccid = true;};
+  programs.gpg.publicKeys = [
+    {
+      source = ./pgp_keys/Apricity.asc;
+      trust = "ultimate";
+    }
+  ];
 
   programs.lsd.enable = true;
   programs.lsd.enableAliases = true;
@@ -132,16 +139,16 @@ in {
       insert = "bar";
       select = "bar";
     };
-    editor.whitespace.render = { tab = "all"; };
+    editor.whitespace.render = {tab = "all";};
   };
   programs.helix.languages = [
     {
       name = "yaml";
       formatter = {
         command = "prettier";
-        args = [ "--parser" "yaml" ];
+        args = ["--parser" "yaml"];
       };
-      config.yaml.schemas = { Kubernetes = "*"; };
+      config.yaml.schemas = {Kubernetes = "*";};
     }
     {
       name = "nix";
@@ -153,41 +160,41 @@ in {
   programs.vscode.enableUpdateCheck = false;
   programs.vscode.enableExtensionUpdateCheck = false;
   programs.vscode.mutableExtensionsDir = false;
-  programs.vscode.extensions = (with pkgs.vscode-extensions; [
-    brettm12345.nixfmt-vscode
-    eamodio.gitlens
-    github.copilot
-    jnoortheen.nix-ide
-    llvm-vs-code-extensions.vscode-clangd
-    mhutchie.git-graph
-    mkhl.direnv
-    ms-azuretools.vscode-docker
-    ms-vscode.cmake-tools
-    ms-vscode-remote.remote-ssh
-    redhat.vscode-yaml
-    rust-lang.rust-analyzer
-    serayuzgur.crates
-    tamasfe.even-better-toml
-    # vadimcn.vscode-lldb error on darwin
-    vscodevim.vim
-    wakatime.vscode-wakatime
-    zxh404.vscode-proto3
-  ]) ++ (with pkgs.vscode-marketplace; [
-    alefragnani.separators
-    ms-vscode-remote.remote-containers
-    jscearcy.rust-doc-viewer
-    lumiknit.parchment
-    odiriuss.rust-macro-expand
-    rescuetime.rescuetime
-  ]);
+  programs.vscode.extensions =
+    (with pkgs.vscode-extensions; [
+      brettm12345.nixfmt-vscode
+      eamodio.gitlens
+      github.copilot
+      jnoortheen.nix-ide
+      llvm-vs-code-extensions.vscode-clangd
+      mhutchie.git-graph
+      mkhl.direnv
+      ms-azuretools.vscode-docker
+      ms-vscode.cmake-tools
+      ms-vscode-remote.remote-ssh
+      redhat.vscode-yaml
+      rust-lang.rust-analyzer
+      serayuzgur.crates
+      tamasfe.even-better-toml
+      # vadimcn.vscode-lldb error on darwin
+      vscodevim.vim
+      wakatime.vscode-wakatime
+      zxh404.vscode-proto3
+    ])
+    ++ (with pkgs.vscode-marketplace; [
+      alefragnani.separators
+      ms-vscode-remote.remote-containers
+      jscearcy.rust-doc-viewer
+      lumiknit.parchment
+      odiriuss.rust-macro-expand
+      rescuetime.rescuetime
+    ]);
   programs.vscode.userSettings = {
-    "clangd.arguments" = [ "-log=verbose" "-pretty" "--background-index" ];
-    "cmake.buildDirectory" =
-      "\${workspaceFolder}/build/\${buildKit}/\${buildType}";
+    "clangd.arguments" = ["-log=verbose" "-pretty" "--background-index"];
+    "cmake.buildDirectory" = "\${workspaceFolder}/build/\${buildKit}/\${buildType}";
     "cmake.copyCompileCommands" = "\${workspaceFolder}/compile_commands.json";
     "editor.cursorBlinking" = "solid";
-    "editor.fontFamily" =
-      "Menlo, Monaco, 'Courier New', monospace, Hack Nerd Font";
+    "editor.fontFamily" = "Menlo, Monaco, 'Courier New', monospace, Hack Nerd Font";
     "editor.formatOnSave" = true;
     "editor.inlineSuggest.enabled" = true;
     "editor.lineNumbers" = "relative";
@@ -229,8 +236,7 @@ in {
   programs.git.enable = true;
   programs.git.userName = "Apricity";
   programs.git.userEmail = "REDACTED";
-  programs.git.signing.key =
-    "ssh-ed25519 REDACTED";
+  programs.git.signing.key = "ssh-ed25519 REDACTED";
   programs.git.signing.signByDefault = true;
   programs.git.difftastic.enable = true;
   programs.git.lfs.enable = true;
@@ -254,7 +260,7 @@ in {
     ./git_allowed_signers;
 
   programs.gh.enable = true;
-  programs.gh.extensions = [ pkgs.gh-eco ];
+  programs.gh.extensions = [pkgs.gh-eco];
   programs.gh.settings = {
     git_protocol = "ssh";
     prompt = "enabled";

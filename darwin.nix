@@ -1,4 +1,8 @@
-{ pkgs, lib, ... }: {
+{
+  pkgs,
+  lib,
+  ...
+}: {
   system.stateVersion = 4;
   programs.zsh.enable = true;
 
@@ -7,13 +11,15 @@
   services.nix-daemon.enable = true;
   nix.settings = {
     auto-optimise-store = true;
-    trusted-users = [ "@admin" ];
+    trusted-users = ["@admin"];
   };
-  nix.extraOptions = ''
-    experimental-features = nix-command flakes
-  '' + lib.optionalString (pkgs.system == "aarch64-darwin") ''
-    extra-platforms = x86_64-darwin aarch64-darwin
-  '';
+  nix.extraOptions =
+    ''
+      experimental-features = nix-command flakes
+    ''
+    + lib.optionalString (pkgs.system == "aarch64-darwin") ''
+      extra-platforms = x86_64-darwin aarch64-darwin
+    '';
 
   services.yabai.enable = true;
   services.yabai.enableScriptingAddition = true;
