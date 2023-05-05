@@ -21,6 +21,9 @@
     nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
     nix-vscode-extensions.inputs.nixpkgs.follows = "nixpkgs";
 
+    nixvim.url = "github:pta2002/nixvim";
+    nixvim.inputs.nixpkgs.follows = "nixpkgs";
+
     nix-index-database.url = "github:Mic92/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
 
