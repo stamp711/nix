@@ -61,7 +61,7 @@
       pkgs ? mkPkgs system,
       lib ? self.lib,
       extraSpecialArgs ? {inherit self inputs nixpkgs;},
-      modules,
+      modules ? [./home],
     }:
       inputs.home-manager.lib.homeManagerConfiguration {
         inherit pkgs lib extraSpecialArgs;
@@ -130,7 +130,6 @@
       legacyPackages.homeConfigurations."stamp" = mkHome {
         inherit system;
         username = "stamp";
-        modules = [./home.nix];
       };
     });
 }
