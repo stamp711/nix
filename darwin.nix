@@ -1,6 +1,5 @@
 { pkgs, lib, ... }: {
   system.stateVersion = 4;
-  users.users.stamp = { home = "/Users/stamp"; };
   programs.zsh.enable = true;
 
   programs.nix-index.enable = true;
