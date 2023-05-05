@@ -11,6 +11,7 @@ in {
     inputs.nix-colors.homeManagerModule
     inputs.nix-index-database.hmModules.nix-index
     ./terminal
+    ./neovim
     ./helix.nix
     ./vscode.nix
   ];
@@ -37,6 +38,7 @@ in {
     cargo-watch
     cargo-workspaces
     comma
+    fd
     fluxcd
     glab
     imgcat
@@ -55,10 +57,12 @@ in {
     nixpkgs-fmt
     nodePackages.prettier
     rage
+    ripgrep
     rnix-lsp
     rust-analyzer
     rustup
     sops
+    tree-sitter
     tmux
     wakatime
     watch
