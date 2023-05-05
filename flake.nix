@@ -3,6 +3,7 @@
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
+    flake-parts.url = "github:hercules-ci/flake-parts";
 
     # Nixpkgs
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
@@ -29,7 +30,7 @@
     comma.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, darwin, home-manager, ... }@inputs:
+  outputs = inputs@{ self, nixpkgs, ... }:
     let
       inherit (self) outputs lib;
 
@@ -69,7 +70,21 @@
           inherit system pkgs lib specialArgs modules;
         };
 
-    in rec {
+      systems =
+        [ "aarch64-darwin" "x86_64-darwin" "aarch64-linux" "x86_64-linux" ];
+
+    in inputs.flake-utils.lib.eachSystem systems (system: {
+      formatter = (mkPkgs system).alejandra;
+
+      legacyPackages.homeConfigurations."stamp" = mkHome {
+        inherit system;
+        username = "stamp";
+        modules = [ ./home.nix ];
+      };
+
+    }) //
+
+    {
 
       lib = nixpkgs.lib // rec {
         isDarwin = system:
@@ -82,41 +97,15 @@
       darwinModules = import ./modules/darwin { inherit lib; };
 
       darwinConfigurations = {
-        stamp = lib.mkDarwinConfig { system = "x86_64-darwin"; };
-        Lius-MacBook = lib.mkDarwinConfig { system = "aarch64-darwin"; };
-        test = mkDarwin {
+        Lius-MacBook = lib.mkDarwin {
           system = "aarch64-darwin";
+          modules = [ ./darwin.nix ];
+        };
+        stamp = mkDarwin {
+          system = "x86_64-darwin";
           modules = [ ./darwin.nix ];
         };
       };
 
-      homeConfigurations = {
-
-        "stamp@aarch64-darwin" = lib.mkHome {
-          system = "aarch64-darwin";
-          username = "stamp";
-          modules = [ ./home.nix ];
-        };
-
-        "stamp@x86_64-linux" = lib.mkHome {
-          system = "x86_64-linux";
-          username = "stamp";
-          modules = [ ./home.nix ];
-        };
-
-        # "stamp@x86_64-linux" = home-manager.lib.homeManagerConfiguration {
-        #   pkgs = nixpkgs.legacyPackages."x86_64-linux";
-        #   extraSpecialArgs = { inherit (inputs) nix-colors; };
-        #   modules = [
-        #     {
-        #       nixpkgs = nixpkgsConfig;
-        #       home.username = "stamp";
-        #       home.homeDirectory = "/home/stamp";
-        #     }
-        #     ./home.nix
-        #   ];
-        # };
-
-      };
     };
 }
