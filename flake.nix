@@ -115,7 +115,7 @@
       darwinModules = import ./modules/darwin {inherit lib;};
 
       darwinConfigurations = {
-        Lius-MacBook = lib.mkDarwin {
+        Lius-MacBook = mkDarwin {
           system = "aarch64-darwin";
           modules = [./darwin.nix];
         };
