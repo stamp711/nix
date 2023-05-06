@@ -67,6 +67,7 @@
     yabai -m rule --add app='Surge' manage=off
     yabai -m rule --add app='1Password' manage=off
     yabai -m rule --add app='Garmin Express' manage=off
+    yabai -m rule --add app='Bartender' manage=off
     # TODO: this two lines should be at the top of the configuration file.
     yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
     sudo yabai --load-sa
