@@ -1,1 +1,2 @@
-require "options"
+require("user/options")
+require("user/lazy")
