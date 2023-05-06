@@ -65,7 +65,6 @@ in {
     rustup
     sops
     tree-sitter
-    tmux
     wakatime
     watch
     wget
