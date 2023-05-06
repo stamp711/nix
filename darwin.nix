@@ -53,7 +53,7 @@
     left_padding = 0;
     right_padding = 0;
     window_gap = 6;
-    # layout = "bsp";
+    layout = "bsp";
     mouse_modifier = "fn";
     mouse_action1 = "move";
     mouse_action2 = "resize";
@@ -61,7 +61,7 @@
   };
   services.yabai.extraConfig = ''
     # Space 3 is for development
-    yabai -m config --space 3 layout bsp
+    # yabai -m config --space 3 layout bsp
     yabai -m rule --add app='System Settings' manage=off
     yabai -m rule --add app='OrbStack' manage=off
     yabai -m rule --add app='Surge' manage=off
