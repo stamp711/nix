@@ -25,10 +25,6 @@ in {
   nix.package = pkgs.nix;
   nix.settings = { experimental-features = [ "nix-command" "flakes" ]; };
 
-  programs.neovim.enable = true;
-  programs.neovim.defaultEditor = true;
-  programs.neovim = {};
-
   home.packages = with pkgs; [
     alejandra
     assh
