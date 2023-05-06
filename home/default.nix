@@ -55,6 +55,7 @@ in {
     nix
     nixfmt
     nixpkgs-fmt
+    nodejs
     nodePackages.prettier
     rage
     ripgrep
