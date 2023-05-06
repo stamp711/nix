@@ -18,12 +18,13 @@ in {
 
   home.stateVersion = "22.11";
 
-  programs.home-manager.enable = true;
+  nix.package = pkgs.nix;
+  nix.settings = {experimental-features = ["nix-command" "flakes"];};
 
   xdg.enable = true;
 
-  nix.package = pkgs.nix;
-  nix.settings = { experimental-features = [ "nix-command" "flakes" ]; };
+  programs.home-manager.enable = true;
+  programs.lazygit.enable = true;
 
   home.packages = with pkgs; [
     alejandra
