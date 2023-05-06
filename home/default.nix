@@ -22,8 +22,8 @@ in {
 
   xdg.enable = true;
 
-  # nix.package = pkgs.nix;
-  # nix.settings = { experimental-features = [ "nix-command" "flakes" ]; };
+  nix.package = pkgs.nix;
+  nix.settings = { experimental-features = [ "nix-command" "flakes" ]; };
 
   programs.neovim.enable = true;
   programs.neovim.defaultEditor = true;
@@ -49,6 +49,7 @@ in {
     kubectl
     kubectx
     kubernetes-helm
+    lua-language-server
     mdbook
     mkcert
     netcat
