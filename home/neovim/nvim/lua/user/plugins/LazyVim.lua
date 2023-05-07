@@ -1,3 +1,3 @@
 return {
-	{ "LazyVim/LazyVim", import = "lazyvim.plugins" },
+	-- { "LazyVim/LazyVim", import = "lazyvim.plugins" },
 }
