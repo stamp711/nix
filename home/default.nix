@@ -5,15 +5,14 @@
   lib,
   config,
   ...
-}: let
-in {
+}: {
   imports = [
     inputs.nix-colors.homeManagerModule
     inputs.nix-index-database.hmModules.nix-index
     ./terminal
     ./neovim
     ./helix.nix
-    ./vscode.nix
+    # ./vscode.nix
   ];
 
   home.stateVersion = "22.11";
