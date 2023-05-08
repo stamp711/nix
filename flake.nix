@@ -58,27 +58,35 @@
         # ++ nixpkgs.lib.singleton (self: super: { inherit (self.pkgs-x86_64) vim; });
       };
 
+    mkUserInfo = {
+      username,
+      system,
+    }: rec {
+      inherit username;
+      homeDirectory = "${lib.homePrefix system}/${username}";
+      nixConfigDirectory = "${homeDirectory}/.config/nixpkgs";
+    };
+
+    moduleExtraArgs = {inherit self inputs outputs;};
+
     mkHome = {
       username,
       system,
-      pkgs ? mkPkgs system,
-      lib ? self.lib,
-      extraSpecialArgs ? {inherit self inputs nixpkgs;},
       modules ? [./home],
     }:
       inputs.home-manager.lib.homeManagerConfiguration {
-        inherit pkgs lib extraSpecialArgs;
+        pkgs = mkPkgs system;
+        lib = self.lib;
+        extraSpecialArgs = moduleExtraArgs;
         modules =
-          [
-            {
-              home = {
-                inherit username;
-                homeDirectory = "${lib.homePrefix system}/${username}";
-              };
-            }
-          ]
+          lib.attrValues outputs.homeManagerModules
+          ++ lib.singleton {
+            home.user-info = mkUserInfo {
+              inherit system;
+              inherit username;
+            };
+          }
           ++ modules;
-        # modules = baseModules ++ extraModules;
       };
 
     mkDarwin = {
@@ -87,11 +95,13 @@
       lib ? self.lib,
       specialArgs ? {inherit self inputs outputs;},
       modules,
-      baseModules ? [outputs.darwinModules.base],
-      extraModules ? [],
     }:
       inputs.darwin.lib.darwinSystem {
-        inherit system pkgs lib specialArgs modules;
+        inherit system;
+        pkgs = mkPkgs system;
+        lib = self.lib;
+        specialArgs = moduleExtraArgs;
+        inherit modules;
       };
 
     systems = ["aarch64-darwin" "x86_64-darwin" "aarch64-linux" "x86_64-linux"];
@@ -115,7 +125,9 @@
 
       overlays = import ./overlays {inherit inputs outputs lib;};
 
-      darwinModules = import ./modules/darwin {inherit lib;};
+      darwinModules = import ./modules/darwin;
+
+      homeManagerModules = import ./modules/home;
 
       darwinConfigurations = {
         Lius-MacBook = mkDarwin {

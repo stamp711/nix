@@ -36,8 +36,8 @@
   };
 
   # Add access to x86_64 packages on Apple Silicon
-  apple-silicon-x86_64-packages = self: super:
-    lib.optionalAttrs (super.stdenv.system == "aarch64-darwin") {
+  apple-silicon-x86_64-packages = final: prev:
+    lib.optionalAttrs (prev.stdenv.system == "aarch64-darwin") {
       pkgs-x86_64 = import inputs.nixpkgs {
         system = "x86_64-darwin";
         inherit (outputs.nixpkgsConfig) config;
