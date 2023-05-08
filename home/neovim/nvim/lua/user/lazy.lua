@@ -10,7 +10,6 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup("user/plugins", {
   defaults = {
-    lazy = true,
     version = false,
   },
   install = {
