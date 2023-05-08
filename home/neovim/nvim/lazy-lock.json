@@ -1,0 +1,8 @@
+{
+  "auto-dark-mode.nvim": { "branch": "master", "commit": "a02ff9ee4630dd8e81dc097b486b7c7f468b9db7" },
+  "lazy.nvim": { "branch": "main", "commit": "9ac19880b677d08f416c5189ffc2dc023084a159" },
+  "neo-tree.nvim": { "branch": "v2.x", "commit": "8d485aab32da9b8841d4af977f992b82b14af469" },
+  "nui.nvim": { "branch": "main", "commit": "698e75814cd7c56b0dd8af4936bcef2d13807f3c" },
+  "nvim-web-devicons": { "branch": "master", "commit": "986875b7364095d6535e28bd4aac3a9357e91bbe" },
+  "plenary.nvim": { "branch": "master", "commit": "9ac3e9541bbabd9d73663d757e4fe48a675bb054" }
+}
