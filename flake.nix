@@ -72,7 +72,7 @@
     mkHome = {
       username,
       system,
-      modules ? [./home],
+      modules,
     }:
       inputs.home-manager.lib.homeManagerConfiguration {
         pkgs = mkPkgs system;
@@ -145,6 +145,7 @@
       legacyPackages.homeConfigurations."stamp" = mkHome {
         inherit system;
         username = "stamp";
+        modules = [./home];
       };
     });
 }

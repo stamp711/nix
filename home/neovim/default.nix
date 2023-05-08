@@ -1,6 +1,9 @@
-{...}: {
+{config, ...}: let
+  inherit (config.home.user-info) nixConfigDirectory;
+  nvim = "${nixConfigDirectory}/home/neovim/nvim";
+  symlink = (config.lib.file).mkOutOfStoreSymlink;
+in {
   programs.neovim.enable = true;
   programs.neovim.defaultEditor = true;
-  xdg.configFile."nvim/init.lua".source = ./nvim/init.lua;
-  xdg.configFile."nvim/lua".source = ./nvim/lua;
+  xdg.configFile."nvim".source = symlink nvim;
 }
