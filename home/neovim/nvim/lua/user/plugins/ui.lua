@@ -36,5 +36,10 @@ return {
         lsp_doc_border = true,
       },
     },
+  },
+  {
+    'nvim-telescope/telescope.nvim',
+    cmd = "Telescope",
+    dependencies = { 'nvim-lua/plenary.nvim' }
   }
 }
