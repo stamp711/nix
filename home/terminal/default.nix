@@ -115,6 +115,7 @@ in {
   programs.zoxide.enable = true;
   programs.zellij.enable = true;
   programs.tmux.enable = true;
+  programs.tmux.terminal = "xterm-256color";
 
   programs.tealdeer.enable = true;
   programs.tealdeer.settings.updates.auto_update = true;
