@@ -132,12 +132,12 @@
       darwinConfigurations = {
         Lius-MacBook = mkDarwin {
           system = "aarch64-darwin";
-          modules = [./darwin.nix];
+          modules = [./darwin];
         };
 
         stamp = mkDarwin {
           system = "x86_64-darwin";
-          modules = [./darwin.nix];
+          modules = [./darwin];
         };
       };
     }

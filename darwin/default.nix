@@ -6,6 +6,8 @@
   system.stateVersion = 4;
   programs.zsh.enable = true;
 
+  imports = [./homebrew.nix];
+
   programs.nix-index.enable = true;
 
   services.nix-daemon.enable = true;
@@ -22,7 +24,7 @@
     '';
 
   system.defaults.NSGlobalDomain = {
-    AppleFontSmoothing = 0;
+    # AppleFontSmoothing = 0;
     InitialKeyRepeat = 10;
     KeyRepeat = 1;
     NSAutomaticSpellingCorrectionEnabled = false;
