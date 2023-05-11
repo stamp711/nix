@@ -22,8 +22,10 @@
     '';
 
   system.defaults.NSGlobalDomain = {
+    AppleFontSmoothing = 0;
     InitialKeyRepeat = 10;
     KeyRepeat = 1;
+    NSAutomaticSpellingCorrectionEnabled = false;
   };
 
   services.yabai.enable = true;
