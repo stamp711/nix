@@ -21,6 +21,11 @@
       extra-platforms = x86_64-darwin aarch64-darwin
     '';
 
+  system.defaults.NSGlobalDomain = {
+    InitialKeyRepeat = 10;
+    KeyRepeat = 1;
+  };
+
   services.yabai.enable = true;
   services.yabai.enableScriptingAddition = true;
   services.yabai.config = {
