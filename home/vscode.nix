@@ -36,6 +36,7 @@
     "clangd.arguments" = ["-log=verbose" "-pretty" "--background-index"];
     "cmake.buildDirectory" = "\${workspaceFolder}/build/\${buildKit}/\${buildType}";
     "cmake.copyCompileCommands" = "\${workspaceFolder}/compile_commands.json";
+    "editor.accessibilitySupport" = "off";
     "editor.cursorBlinking" = "solid";
     "editor.fontFamily" = "Menlo, Monaco, 'Courier New', monospace, Hack Nerd Font";
     "editor.formatOnSave" = true;
