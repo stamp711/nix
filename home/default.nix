@@ -9,7 +9,7 @@
     ./terminal
     ./neovim
     ./helix.nix
-    # ./vscode.nix
+    ./vscode.nix
   ];
 
   home.stateVersion = "22.11";
