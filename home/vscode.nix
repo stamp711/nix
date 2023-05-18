@@ -66,5 +66,6 @@
       "editorInlayHint.background" = "#00000000";
       "editorInlayHint.foreground" = "#BBBBBBFF";
     };
+    "workbench.sideBar.location" = "right";
   };
 }
