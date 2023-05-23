@@ -39,6 +39,7 @@
     "editor.accessibilitySupport" = "off";
     "editor.cursorBlinking" = "solid";
     "editor.fontFamily" = "Menlo, Monaco, 'Courier New', monospace, Hack Nerd Font";
+    "editor.fontSize" = 14;
     "editor.formatOnSave" = true;
     "editor.inlineSuggest.enabled" = true;
     "editor.lineNumbers" = "relative";
@@ -66,6 +67,5 @@
       "editorInlayHint.background" = "#00000000";
       "editorInlayHint.foreground" = "#BBBBBBFF";
     };
-    "workbench.sideBar.location" = "right";
   };
 }
