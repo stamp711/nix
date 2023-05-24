@@ -56,7 +56,6 @@
     rage
     ripgrep
     rnix-lsp
-    rust-analyzer
     rustup
     sops
     tree-sitter
