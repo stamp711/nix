@@ -3,6 +3,6 @@
   pwd = "${nixConfigDirectory}/home/yabai";
   symlink = (config.lib.file).mkOutOfStoreSymlink;
 in {
-  xdg.configFile."yabai/yabairc".source = symlink "${pwd}/yabairc";
-  xdg.configFile."skhd/skhdrc".source = symlink "${pwd}/skhdrc";
+  xdg.configFile."yabai".source = symlink "${pwd}/yabai";
+  xdg.configFile."skhd".source = symlink "${pwd}/skhd";
 }
