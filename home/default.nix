@@ -8,6 +8,7 @@
     inputs.nix-index-database.hmModules.nix-index
     ./terminal
     ./neovim
+    ./yabai
     ./helix.nix
     ./vscode.nix
   ];
