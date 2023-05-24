@@ -14,18 +14,20 @@
     };
     editor.whitespace.render = {tab = "all";};
   };
-  programs.helix.languages = [
-    {
-      name = "yaml";
-      formatter = {
-        command = "prettier";
-        args = ["--parser" "yaml"];
-      };
-      config.yaml.schemas = {Kubernetes = "*";};
-    }
-    {
-      name = "nix";
-      formatter.command = "alejandra";
-    }
-  ];
+  programs.helix.languages = {
+    language = [
+      {
+        name = "yaml";
+        formatter = {
+          command = "prettier";
+          args = ["--parser" "yaml"];
+        };
+        config.yaml.schemas = {Kubernetes = "*";};
+      }
+      {
+        name = "nix";
+        formatter.command = "alejandra";
+      }
+    ];
+  };
 }
