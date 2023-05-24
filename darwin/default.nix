@@ -12,7 +12,7 @@
 
   services.nix-daemon.enable = true;
   nix.settings = {
-    auto-optimise-store = true;
+    # auto-optimise-store = true; # https://github.com/NixOS/nix/issues/7273
     trusted-users = ["@admin"];
   };
   nix.extraOptions =
