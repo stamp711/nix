@@ -62,7 +62,8 @@
     ];
     "telemetry.telemetryLevel" = "off";
     # "workbench.colorTheme" = "Visual Studio Light";
-    "workbench.colorTheme" = "Default Dark+ Experimental";
+    # "workbench.colorTheme" = "Default Dark+ Experimental";
+    "workbench.colorTheme" = "Parchment";
     "workbench.colorCustomizations" = {
       # "editor.background" = "#FFFFEA";
       "editorInlayHint.background" = "#00000000";
