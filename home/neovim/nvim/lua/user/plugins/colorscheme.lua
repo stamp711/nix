@@ -1,1 +1,1 @@
-return { "f-person/auto-dark-mode.nvim" }
+return { "f-person/auto-dark-mode.nvim", "sainnhe/everforest" }
