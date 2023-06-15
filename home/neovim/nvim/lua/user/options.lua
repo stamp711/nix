@@ -2,6 +2,10 @@ vim.g.mapleader = " "
 
 local opt = vim.opt
 
+-- disable netrw
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
 opt.termguicolors = true
 
 opt.expandtab = true
