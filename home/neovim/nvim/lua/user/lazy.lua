@@ -13,7 +13,7 @@ require("lazy").setup("user/plugins", {
     version = false,
   },
   install = {
-    colorscheme = { "habamax" },
+    colorscheme = { "everforest" },
   },
   checker = { enabled = true },
   diff = { cmd = "diffview.nvim" }
