@@ -8,6 +8,7 @@
       brettm12345.nixfmt-vscode
       eamodio.gitlens
       github.copilot
+      github.github-vscode-theme
       jnoortheen.nix-ide
       llvm-vs-code-extensions.vscode-clangd
       mhutchie.git-graph
@@ -26,6 +27,7 @@
     ])
     ++ (with pkgs.vscode-marketplace; [
       alefragnani.separators
+      monokai.theme-monokai-pro-vscode
       ms-vscode-remote.remote-containers
       jscearcy.rust-doc-viewer
       lumiknit.parchment
@@ -63,7 +65,7 @@
     "telemetry.telemetryLevel" = "off";
     # "workbench.colorTheme" = "Visual Studio Light";
     # "workbench.colorTheme" = "Default Dark+ Experimental";
-    "workbench.colorTheme" = "Quiet Light";
+    "workbench.colorTheme" = "Monokai Pro";
     "workbench.colorCustomizations" = {
       # "editor.background" = "#FFFFEA";
       "editorInlayHint.background" = "#00000000";
