@@ -18,7 +18,7 @@ return {
   {
     "nvim-tree/nvim-tree.lua",
     dependencies = "nvim-tree/nvim-web-devicons",
-    config = true,
+    opts = {},
     keys = {
       { "<leader>fe", "<cmd>NvimTreeToggle<cr>", desc = "NvimTree" },
     },
@@ -66,7 +66,13 @@ return {
     dependencies = "nvim-lua/plenary.nvim",
   },
 
-  { "williamboman/mason.nvim", cmd = "Mason", config = true },
+  {
+    "folke/trouble.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    opts = {},
+  },
+
+  { "williamboman/mason.nvim", cmd = "Mason", opts = {} },
 
   {
     "neovim/nvim-lspconfig",
