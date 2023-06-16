@@ -1,26 +1,19 @@
 return {
-  {
-    "folke/lazy.nvim",
-    version = "*"
-  },
+  { "folke/lazy.nvim", version = "*" },
 
-  {
-    "wakatime/vim-wakatime",
-    event = "VeryLazy"
-  },
+  { "wakatime/vim-wakatime", event = "VeryLazy" },
 
   "f-person/auto-dark-mode.nvim",
 
   {
     "sainnhe/everforest",
-    lazy = false,    -- make sure we load this during startup if it is your main colorscheme
+    lazy = false, -- make sure we load this during startup if it is your main colorscheme
     priority = 1000, -- make sure to load this before all the other start plugins
     config = function()
       vim.g.everforest_transparent_background = 1
       vim.cmd([[colorscheme everforest]])
     end,
   },
-
 
   {
     "nvim-tree/nvim-tree.lua",
@@ -68,9 +61,9 @@ return {
   },
 
   {
-    'nvim-telescope/telescope.nvim',
+    "nvim-telescope/telescope.nvim",
     cmd = "Telescope",
-    dependencies = { 'nvim-lua/plenary.nvim' }
+    dependencies = "nvim-lua/plenary.nvim",
   },
 
   { "williamboman/mason.nvim", cmd = "Mason", config = true },
@@ -78,22 +71,70 @@ return {
   {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
-    dependencies = { "mason.nvim", "williamboman/mason-lspconfig.nvim", "simrat39/rust-tools.nvim" },
+    dependencies = {
+      "williamboman/mason.nvim",
+      "williamboman/mason-lspconfig.nvim",
+      "jose-elias-alvarez/null-ls.nvim",
+      "jay-babu/mason-null-ls.nvim",
+      "simrat39/rust-tools.nvim",
+    },
     -- TODO: write the setup function which takes opts merged from different files (for different languages)
     -- refer: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/plugins/extras/lang/typescript.lua
     opts = {},
     config = function(_, opts)
-      local mlsp = require("mason-lspconfig");
-      mlsp.setup { automatic_installation = true };
-      mlsp.setup_handlers {
-        function(server_name) -- default handler (optional)
-          require("lspconfig")[server_name].setup {}
-        end,
-        ["rust_analyzer"] = function() -- override for `rust_analyzer`
-          require("rust-tools").setup {}
-        end
-      }
-    end
-  },
+      local lspconfig = require("lspconfig")
 
+      -- mason-lspconfig
+      local mlsp = require("mason-lspconfig")
+      mlsp.setup({
+        ensure_installed = { "lua_ls", "rust_analyzer" },
+        automatic_installation = true,
+        handlers = {
+          function(server_name) -- default handler (optional)
+            require("lspconfig")[server_name].setup({})
+          end,
+
+          ["rust_analyzer"] = function() -- override for `rust_analyzer`
+            require("rust-tools").setup({})
+          end,
+
+          ["lua_ls"] = function()
+            lspconfig.lua_ls.setup({
+              settings = {
+                Lua = {
+                  runtime = {
+                    -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
+                    version = "LuaJIT",
+                  },
+                  diagnostics = {
+                    -- Get the language server to recognize the `vim` global
+                    globals = { "vim" },
+                  },
+                  workspace = {
+                    -- Make the server aware of Neovim runtime files
+                    library = vim.api.nvim_get_runtime_file("", true),
+                    checkThirdParty = false,
+                  },
+                  -- Do not send telemetry data containing a randomized but unique identifier
+                  telemetry = {
+                    enable = false,
+                  },
+                },
+              },
+            })
+          end,
+        },
+      })
+
+      -- null-ls
+      require("null-ls").setup()
+      local mnls = require("mason-null-ls")
+      mnls.setup({
+        ensure_installed = { "stylua" },
+        automatic_installation = true,
+        automatic_setup = true,
+        handlers = {},
+      })
+    end,
+  },
 }
