@@ -3,9 +3,9 @@ return {
 
   { "wakatime/vim-wakatime", event = "VeryLazy" },
 
-  "f-person/auto-dark-mode.nvim",
-
   { "nmac427/guess-indent.nvim", opts = {} },
+
+  "f-person/auto-dark-mode.nvim",
 
   {
     "sainnhe/everforest",
@@ -14,6 +14,18 @@ return {
     config = function()
       vim.g.everforest_transparent_background = 1
       vim.cmd([[colorscheme everforest]])
+    end,
+  },
+
+  {
+    "svermeulen/text-to-colorscheme.nvim",
+    config = function()
+      require("text-to-colorscheme").setup({
+        ai = {
+          openai_api_key = os.getenv("OPENAI_API_KEY"),
+          gpt_model = "gpt-3.5-turbo-0613",
+        },
+      })
     end,
   },
 
