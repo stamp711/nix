@@ -25,8 +25,9 @@
 
   system.defaults.NSGlobalDomain = {
     # AppleFontSmoothing = 0;
-    InitialKeyRepeat = 15;
-    KeyRepeat = 2;
+    ApplePressAndHoldEnabled = false;
+    InitialKeyRepeat = 15; # normal minimum is 15
+    KeyRepeat = 1; # normal minimum is 2
     NSAutomaticSpellingCorrectionEnabled = false;
   };
 }
