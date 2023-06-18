@@ -39,6 +39,13 @@ return {
   },
 
   {
+    "akinsho/bufferline.nvim",
+    version = "*",
+    dependencies = "nvim-tree/nvim-web-devicons",
+    opts = {},
+  },
+
+  {
     "folke/which-key.nvim",
     event = "VeryLazy",
     config = function()
@@ -106,7 +113,7 @@ return {
     -- TODO: write the setup function which takes opts merged from different files (for different languages)
     -- refer: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/plugins/extras/lang/typescript.lua
     opts = {},
-    config = function(_, opts)
+    config = function()
       local lspconfig = require("lspconfig")
 
       -- mason-lspconfig
