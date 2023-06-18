@@ -5,6 +5,8 @@ return {
 
   "f-person/auto-dark-mode.nvim",
 
+  { "nmac427/guess-indent.nvim", opts = {} },
+
   {
     "sainnhe/everforest",
     lazy = false, -- make sure we load this during startup if it is your main colorscheme
@@ -14,6 +16,18 @@ return {
       vim.cmd([[colorscheme everforest]])
     end,
   },
+
+  {
+    "goolord/alpha-nvim",
+    event = "VimEnter",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    config = function()
+      local config = require("alpha.themes.startify").config
+      require("alpha").setup(config)
+    end,
+  },
+
+  { "nvim-lualine/lualine.nvim", event = "VeryLazy", opts = {} },
 
   {
     "nvim-tree/nvim-tree.lua",
@@ -62,8 +76,12 @@ return {
 
   {
     "nvim-telescope/telescope.nvim",
-    cmd = "Telescope",
     dependencies = "nvim-lua/plenary.nvim",
+    version = "*",
+    cmd = "Telescope",
+    keys = {
+      { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "🔭 find_files" },
+    },
   },
 
   {
