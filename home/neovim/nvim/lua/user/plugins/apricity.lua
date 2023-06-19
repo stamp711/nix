@@ -117,7 +117,6 @@ return {
   {
     "nvim-telescope/telescope.nvim",
     dependencies = {
-      "harpoon",
       "natecraddock/telescope-zf-native.nvim",
       "nvim-lua/plenary.nvim",
     },
@@ -129,7 +128,6 @@ return {
     },
     config = function()
       local t = require("telescope")
-      t.load_extension("harpoon")
       t.load_extension("zf-native")
     end,
   },
