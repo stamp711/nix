@@ -69,6 +69,13 @@ return {
   },
 
   {
+    "ThePrimeagen/harpoon",
+    dependencies = "nvim-lua/plenary.nvim",
+    event = "VeryLazy",
+    opts = {},
+  },
+
+  {
     "folke/noice.nvim",
     event = "VeryLazy",
     dependencies = {
@@ -96,13 +103,16 @@ return {
 
   {
     "nvim-telescope/telescope.nvim",
-    dependencies = "nvim-lua/plenary.nvim",
+    dependencies = { "nvim-lua/plenary.nvim", "harpoon" },
     version = "*",
     cmd = "Telescope",
     keys = {
       { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "🔭 find_files" },
       { "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "🔭 oldfiles" },
     },
+    config = function()
+      require("telescope").load_extension("harpoon")
+    end,
   },
 
   {
@@ -134,9 +144,13 @@ return {
     event = "LspAttach",
     opts = {},
     dependencies = {
-      { "nvim-tree/nvim-web-devicons" },
-      --Please make sure you install markdown and markdown_inline parser
-      { "nvim-treesitter/nvim-treesitter" },
+      "nvim-tree/nvim-web-devicons",
+      -- requires markdown and markdown_inline parser
+      "nvim-treesitter/nvim-treesitter",
+      "neovim/nvim-lspconfig",
+    },
+    keys = {
+      { "gd", "<cmd>Lspsaga goto_definition<CR>", desc = "goto definition" },
     },
   },
 
@@ -154,44 +168,67 @@ return {
     -- refer: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/plugins/extras/lang/typescript.lua
     opts = {},
     config = function()
-      local lspconfig = require("lspconfig")
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+
+      -- format on save setup callback
+      local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
+      local on_attach = function(client, bufnr)
+        if client.supports_method("textDocument/formatting") then
+          vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
+          vim.api.nvim_create_autocmd("BufWritePre", {
+            group = augroup,
+            buffer = bufnr,
+            callback = function()
+              vim.lsp.buf.format({ async = false })
+            end,
+          })
+        end
+      end
+
+      local server_settings = {
+        lua_ls = {
+          Lua = {
+            runtime = {
+              -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
+              version = "LuaJIT",
+            },
+            diagnostics = {
+              -- Get the language server to recognize the `vim` global
+              globals = { "vim" },
+            },
+            workspace = {
+              -- Make the server aware of Neovim runtime files
+              library = vim.api.nvim_get_runtime_file("", true),
+              checkThirdParty = false,
+            },
+            -- Do not send telemetry data containing a randomized but unique identifier
+            telemetry = {
+              enable = false,
+            },
+          },
+        },
+      }
 
       -- mason-lspconfig
       local mlsp = require("mason-lspconfig")
       mlsp.setup({
-        ensure_installed = { "lua_ls", "rust_analyzer" },
         automatic_installation = true,
+        ensure_installed = { "lua_ls", "rust_analyzer" },
         handlers = {
-          function(server_name) -- default handler (optional)
-            require("lspconfig")[server_name].setup()
+          function(server_name)
+            require("lspconfig")[server_name].setup({
+              capabilities = capabilities,
+              on_attach = on_attach,
+              settings = server_settings[server_name],
+            })
           end,
 
-          ["rust_analyzer"] = function() -- override for `rust_analyzer`
-            require("rust-tools").setup()
-          end,
-
-          ["lua_ls"] = function()
-            lspconfig.lua_ls.setup({
-              settings = {
-                Lua = {
-                  runtime = {
-                    -- Tell the language server which version of Lua you're using (most likely LuaJIT in the case of Neovim)
-                    version = "LuaJIT",
-                  },
-                  diagnostics = {
-                    -- Get the language server to recognize the `vim` global
-                    globals = { "vim" },
-                  },
-                  workspace = {
-                    -- Make the server aware of Neovim runtime files
-                    library = vim.api.nvim_get_runtime_file("", true),
-                    checkThirdParty = false,
-                  },
-                  -- Do not send telemetry data containing a randomized but unique identifier
-                  telemetry = {
-                    enable = false,
-                  },
-                },
+          -- rust_analyzer override
+          ["rust_analyzer"] = function()
+            require("rust-tools").setup({
+              server = {
+                capabilities = capabilities,
+                on_attach = on_attach,
               },
             })
           end,
@@ -200,12 +237,12 @@ return {
 
       -- null-ls
       require("null-ls").setup()
-      local mnls = require("mason-null-ls")
-      mnls.setup({
-        ensure_installed = { "stylua" },
+      require("mason-null-ls").setup({
         automatic_installation = true,
         automatic_setup = true,
+        ensure_installed = { "stylua" },
         handlers = {},
+        on_attach = on_attach,
       })
     end,
   },
