@@ -95,6 +95,8 @@ return {
     },
   },
 
+  -- Motion
+
   {
     "ggandor/leap.nvim",
     dependencies = "tpope/vim-repeat",
@@ -114,23 +116,47 @@ return {
     opts = {},
   },
 
+  -- Telescope & related
+
   {
     "nvim-telescope/telescope.nvim",
+
     dependencies = {
-      "natecraddock/telescope-zf-native.nvim",
       "nvim-lua/plenary.nvim",
+
+      "prochri/telescope-all-recent.nvim",
+      "kkharji/sqlite.lua",
+
+      "danielfalk/smart-open.nvim",
+      "nvim-telescope/telescope-fzy-native.nvim",
+
+      "nvim-telescope/telescope-file-browser.nvim",
+      "nvim-tree/nvim-web-devicons",
+
+      "tsakirist/telescope-lazy.nvim",
+
+      "natecraddock/telescope-zf-native.nvim",
     },
+
     version = "*",
     cmd = "Telescope",
     keys = {
-      { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "🔭 find_files" },
+      { "<leader>fb", "<cmd>Telescope file_browser<cr>", desc = "🔭 file browser" },
+      { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "🔭 find files" },
       { "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "🔭 oldfiles" },
     },
     config = function()
       local t = require("telescope")
       t.load_extension("zf-native")
+      t.load_extension("smart_open")
+      t.load_extension("lazy")
+      t.load_extension("file_browser")
+      -- hack to apply frecency sorting to telescope pickers
+      require("telescope-all-recent").setup({})
     end,
   },
+
+  -- LSP & coding
 
   {
     "folke/trouble.nvim",
