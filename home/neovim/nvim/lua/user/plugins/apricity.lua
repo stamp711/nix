@@ -96,9 +96,21 @@ return {
   },
 
   {
-    "ThePrimeagen/harpoon",
-    dependencies = "nvim-lua/plenary.nvim",
-    event = "VeryLazy",
+    "ggandor/leap.nvim",
+    dependencies = "tpope/vim-repeat",
+    config = function()
+      require("leap").add_default_mappings()
+    end,
+  },
+
+  {
+    "ggandor/flit.nvim",
+    dependencies = "ggandor/leap.nvim",
+    opts = {},
+  },
+
+  {
+    "LeonHeidelbach/trailblazer.nvim",
     opts = {},
   },
 
