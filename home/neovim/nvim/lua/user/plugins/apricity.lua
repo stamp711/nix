@@ -115,6 +115,32 @@ return {
   { "williamboman/mason.nvim", cmd = "Mason", opts = {} },
 
   {
+    "nvim-treesitter/nvim-treesitter",
+    dependencies = "nvim-treesitter/nvim-treesitter-textobjects",
+    event = { "BufReadPost", "BufNewFile" },
+    build = ":TSUpdate",
+    config = function()
+      require("nvim-treesitter.configs").setup({
+        ensure_installed = {
+          "markdown",
+          "markdown_inline",
+        },
+      })
+    end,
+  },
+
+  {
+    "glepnir/lspsaga.nvim",
+    event = "LspAttach",
+    opts = {},
+    dependencies = {
+      { "nvim-tree/nvim-web-devicons" },
+      --Please make sure you install markdown and markdown_inline parser
+      { "nvim-treesitter/nvim-treesitter" },
+    },
+  },
+
+  {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
@@ -137,11 +163,11 @@ return {
         automatic_installation = true,
         handlers = {
           function(server_name) -- default handler (optional)
-            require("lspconfig")[server_name].setup({})
+            require("lspconfig")[server_name].setup()
           end,
 
           ["rust_analyzer"] = function() -- override for `rust_analyzer`
-            require("rust-tools").setup({})
+            require("rust-tools").setup()
           end,
 
           ["lua_ls"] = function()
