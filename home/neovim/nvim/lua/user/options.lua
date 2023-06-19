@@ -56,3 +56,14 @@ if vim.fn.has("nvim-0.9.0") == 1 then
 end
 
 opt.jumpoptions = "stack,view"
+
+-- Command line window because of q:
+vim.api.nvim_set_keymap("n", "q:", "", { noremap = true })
+local augroup = vim.api.nvim_create_augroup("CommandLineWindow", {})
+vim.api.nvim_create_autocmd("CmdwinEnter", {
+  group = augroup,
+  -- buffer = vim.fn.bufnr(),
+  callback = function()
+    vim.api.nvim_buf_set_keymap(0, "n", "<esc>", ":q<cr>", { noremap = true })
+  end,
+})
