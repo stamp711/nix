@@ -19,6 +19,7 @@ return {
 
   {
     "svermeulen/text-to-colorscheme.nvim",
+    event = "VeryLazy",
     config = function()
       require("text-to-colorscheme").setup({
         ai = {
@@ -106,6 +107,7 @@ return {
 
   {
     "folke/trouble.nvim",
+    event = "VeryLazy",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     opts = {},
   },
