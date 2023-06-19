@@ -69,13 +69,6 @@ return {
   },
 
   {
-    "ThePrimeagen/harpoon",
-    dependencies = "nvim-lua/plenary.nvim",
-    event = "VeryLazy",
-    opts = {},
-  },
-
-  {
     "folke/noice.nvim",
     version = "*",
     event = "VeryLazy",
@@ -103,8 +96,19 @@ return {
   },
 
   {
+    "ThePrimeagen/harpoon",
+    dependencies = "nvim-lua/plenary.nvim",
+    event = "VeryLazy",
+    opts = {},
+  },
+
+  {
     "nvim-telescope/telescope.nvim",
-    dependencies = { "nvim-lua/plenary.nvim", "harpoon" },
+    dependencies = {
+      "harpoon",
+      "natecraddock/telescope-zf-native.nvim",
+      "nvim-lua/plenary.nvim",
+    },
     version = "*",
     cmd = "Telescope",
     keys = {
@@ -112,7 +116,9 @@ return {
       { "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "🔭 oldfiles" },
     },
     config = function()
-      require("telescope").load_extension("harpoon")
+      local t = require("telescope")
+      t.load_extension("harpoon")
+      t.load_extension("zf-native")
     end,
   },
 
