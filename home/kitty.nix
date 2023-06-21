@@ -7,9 +7,10 @@
   };
   programs.kitty.shellIntegration.mode = "no-cursor";
   programs.kitty.settings = {
+    background_opacity = "0.8";
     cursor_blink_interval = 0;
     initial_window_width = "150c";
     initial_window_height = "45c";
-    background_opacity = "0.8";
+    macos_option_as_alt = "left";
   };
 }
