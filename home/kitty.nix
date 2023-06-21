@@ -3,7 +3,7 @@
   programs.kitty.font = {
     package = pkgs.nerdfonts.override { fonts = [ "UbuntuMono" ]; };
     name = "UbuntuMono Nerd Font";
-    size = 15;
+    size = 16;
   };
   programs.kitty.shellIntegration.mode = "no-cursor";
   programs.kitty.settings = {
