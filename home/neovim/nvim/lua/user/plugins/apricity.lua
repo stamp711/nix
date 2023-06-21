@@ -198,6 +198,55 @@ return {
   },
 
   {
+    "kevinhwang91/nvim-ufo",
+    dependencies = {
+      "kevinhwang91/promise-async",
+      "nvim-treesitter",
+      "anuvyklack/pretty-fold.nvim",
+    },
+    config = function()
+      -- persistent folds
+      local save_fold = vim.api.nvim_create_augroup("Persistent Folds", { clear = true })
+      vim.api.nvim_create_autocmd("BufWinLeave", {
+        group = save_fold,
+        pattern = "*.*",
+        callback = function()
+          vim.cmd.mkview()
+        end,
+      })
+      vim.api.nvim_create_autocmd("BufWinEnter", {
+        group = save_fold,
+        pattern = "*.*",
+        callback = function()
+          vim.cmd.loadview({ mods = { emsg_silent = true } })
+        end,
+      })
+
+      vim.o.foldcolumn = "0" -- '0' is not bad
+      vim.o.foldlevel = 99 -- Using ufo provider need a large value, feel free to decrease the value
+      vim.o.foldlevelstart = 99
+      vim.o.foldenable = true
+
+      -- Using ufo provider need remap `zR` and `zM`. If Neovim is 0.6.1, remap yourself
+      vim.keymap.set("n", "zR", require("ufo").openAllFolds)
+      vim.keymap.set("n", "zM", require("ufo").closeAllFolds)
+
+      -- Option 3: treesitter as a main provider instead
+      -- Only depend on `nvim-treesitter/queries/filetype/folds.scm`,
+      -- performance and stability are better than `foldmethod=nvim_treesitter#foldexpr()`
+      require("ufo").setup({
+        provider_selector = function()
+          return { "treesitter", "indent" }
+        end,
+      })
+
+      require("pretty-fold").setup({
+        fill_char = "·",
+      })
+    end,
+  },
+
+  {
     "neovim/nvim-lspconfig",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
