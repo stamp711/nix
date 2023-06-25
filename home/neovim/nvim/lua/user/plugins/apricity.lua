@@ -166,6 +166,10 @@ return {
 
   -- Editor
 
+  "tpope/vim-fugitive",
+
+  "tpope/vim-rhubarb",
+
   { "lewis6991/gitsigns.nvim", opts = {} },
 
   {
@@ -174,5 +178,35 @@ return {
     config = function(_, opts)
       require("illuminate").configure(opts)
     end,
+  },
+
+  {
+    -- Add indentation guides even on blank lines
+    "lukas-reineke/indent-blankline.nvim",
+    -- Enable `lukas-reineke/indent-blankline.nvim`
+    -- See `:help indent_blankline.txt`
+    opts = {
+      char = "┊",
+      show_trailing_blankline_indent = false,
+    },
+  },
+
+  { "romainl/vim-cool" },
+
+  {
+    "gelguy/wilder.nvim",
+    opts = {
+      modes = { ":", "/", "?" },
+    },
+  },
+
+  -- Terminal
+  {
+    "akinsho/toggleterm.nvim",
+    version = "*",
+    opts = {
+      open_mapping = "<c-`>",
+      direction = "float",
+    },
   },
 }
