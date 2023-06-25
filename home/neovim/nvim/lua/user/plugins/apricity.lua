@@ -7,6 +7,22 @@ return {
 
   "f-person/auto-dark-mode.nvim",
 
+  {
+    "ribru17/bamboo.nvim",
+    lazy = false,
+    priority = 1000,
+    config = function(_, opts)
+      require("bamboo").setup(opts)
+      require("bamboo").load()
+    end,
+    opts = {
+      transparent = true,
+      lualine = {
+        transparent = true,
+      },
+    },
+  },
+
   { "ishan9299/modus-theme-vim", priority = 1000 },
 
   {
@@ -14,7 +30,7 @@ return {
     priority = 1000,
     config = function(_, opts)
       require("tokyonight").setup(opts)
-      vim.cmd([[colorscheme tokyonight]])
+      -- vim.cmd([[colorscheme tokyonight]])
     end,
     opts = {
       transparent = true,
