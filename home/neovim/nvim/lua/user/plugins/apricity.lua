@@ -16,6 +16,7 @@ return {
       require("bamboo").load()
     end,
     opts = {
+      style = "multiplex",
       transparent = true,
       lualine = {
         transparent = true,
