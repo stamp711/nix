@@ -15,6 +15,7 @@ opt.shiftround = true
 opt.smartindent = true
 
 opt.wrap = false -- Disable line wrap
+opt.breakindent = true
 
 opt.list = true -- show some invisible characters
 
