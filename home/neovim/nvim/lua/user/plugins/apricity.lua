@@ -77,22 +77,27 @@ return {
       "rcarriga/nvim-notify",
       "nvim-treesitter/nvim-treesitter",
     },
-    opts = {
-      lsp = {
-        override = {
-          ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-          ["vim.lsp.util.stylize_markdown"] = true,
-          ["cmp.entry.get_documentation"] = true,
+    config = function()
+      require("notify").setup({
+        background_colour = "#000000",
+      })
+      require("noice").setup({
+        lsp = {
+          override = {
+            ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+            ["vim.lsp.util.stylize_markdown"] = true,
+            ["cmp.entry.get_documentation"] = true,
+          },
         },
-      },
-      presets = {
-        bottom_search = true,
-        command_palette = true,
-        long_message_to_split = true,
-        inc_rename = true,
-        lsp_doc_border = true,
-      },
-    },
+        presets = {
+          bottom_search = true,
+          command_palette = true,
+          long_message_to_split = true,
+          inc_rename = true,
+          lsp_doc_border = true,
+        },
+      })
+    end,
   },
 
   -- Motion
@@ -160,6 +165,8 @@ return {
   },
 
   -- LSP & coding
+
+  { "numToStr/Comment.nvim", opts = {} },
 
   {
     "folke/trouble.nvim",
