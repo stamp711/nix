@@ -7,13 +7,27 @@ return {
 
   "f-person/auto-dark-mode.nvim",
 
+  { "ishan9299/modus-theme-vim", priority = 1000 },
+
+  {
+    "folke/tokyonight.nvim",
+    priority = 1000,
+    config = function(_, opts)
+      require("tokyonight").setup(opts)
+      vim.cmd([[colorscheme tokyonight]])
+    end,
+    opts = {
+      transparent = true,
+    },
+  },
+
   {
     "sainnhe/everforest",
     lazy = false, -- make sure we load this during startup if it is your main colorscheme
     priority = 1000, -- make sure to load this before all the other start plugins
     config = function()
       vim.g.everforest_transparent_background = 1
-      vim.cmd([[colorscheme everforest]])
+      -- vim.cmd([[colorscheme everforest]])
     end,
   },
 
@@ -191,14 +205,8 @@ return {
     },
   },
 
+  -- remove highlight after search
   { "romainl/vim-cool" },
-
-  {
-    "gelguy/wilder.nvim",
-    opts = {
-      modes = { ":", "/", "?" },
-    },
-  },
 
   -- Terminal
   {
