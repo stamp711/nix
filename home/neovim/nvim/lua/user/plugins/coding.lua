@@ -175,6 +175,11 @@ return {
               server = {
                 capabilities = capabilities,
                 on_attach = on_attach,
+                diagnostics = {
+                  enable = true,
+                  disabled = { "unresolved-proc-macro" },
+                  experimental = { enable = true },
+                },
               },
             }
             if vim.fn.executable("ra-multiplex") == 1 then
