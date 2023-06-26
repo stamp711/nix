@@ -175,6 +175,14 @@ return {
       "tsakirist/telescope-lazy.nvim",
 
       "natecraddock/telescope-zf-native.nvim",
+
+      {
+        "ahmedkhalf/project.nvim",
+        config = function(_, opts)
+          require("project_nvim").setup(opts)
+        end,
+        opts = {},
+      },
     },
 
     version = "*",
@@ -190,6 +198,7 @@ return {
       t.load_extension("smart_open")
       t.load_extension("lazy")
       t.load_extension("file_browser")
+      t.load_extension("projects")
       -- hack to apply frecency sorting to telescope pickers
       require("telescope-all-recent").setup({})
     end,
