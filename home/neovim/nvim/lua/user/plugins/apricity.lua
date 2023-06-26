@@ -210,7 +210,10 @@ return {
 
   "tpope/vim-rhubarb",
 
-  { "lewis6991/gitsigns.nvim", opts = {} },
+  {
+    "lewis6991/gitsigns.nvim",
+    opts = { current_line_blame = true },
+  },
 
   {
     "RRethy/vim-illuminate",
