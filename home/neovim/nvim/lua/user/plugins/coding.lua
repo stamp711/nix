@@ -171,16 +171,16 @@ return {
 
           -- rust_analyzer override
           ["rust_analyzer"] = function()
-            local opts = {
+            local rt_opts = {
               server = {
                 capabilities = capabilities,
                 on_attach = on_attach,
               },
             }
             if vim.fn.executable("ra-multiplex") == 1 then
-              opts.server.cmd = { "ra-multiplex" }
+              rt_opts.server.cmd = { "ra-multiplex" }
             end
-            require("rust-tools").setup(opts)
+            require("rust-tools").setup(rt_opts)
           end,
         },
       })
