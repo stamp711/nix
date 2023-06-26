@@ -1,0 +1,15 @@
+import:
+ - ~/.config/alacritty/themes/monokai_charcoal.yaml
+
+window:
+  opacity: 0.7
+
+font:
+  normal:
+    family: UbuntuMono Nerd Font
+  size: 16
+
+colors:
+  primary:
+    background: '#000000'
+  # transparent_background_colors: true
