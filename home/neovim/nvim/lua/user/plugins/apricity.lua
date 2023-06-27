@@ -1,7 +1,7 @@
 return {
-  { "folke/lazy.nvim", version = "*" },
+  { "folke/lazy.nvim",           version = "*" },
 
-  { "wakatime/vim-wakatime", event = "VeryLazy" },
+  { "wakatime/vim-wakatime",     event = "VeryLazy" },
 
   { "nmac427/guess-indent.nvim", opts = {} },
 
@@ -13,7 +13,7 @@ return {
     priority = 1000,
     config = function(_, opts)
       require("bamboo").setup(opts)
-      require("bamboo").load()
+      -- require("bamboo").load()
     end,
     opts = {
       style = "multiplex",
@@ -40,11 +40,11 @@ return {
 
   {
     "sainnhe/everforest",
-    lazy = false, -- make sure we load this during startup if it is your main colorscheme
+    lazy = false,    -- make sure we load this during startup if it is your main colorscheme
     priority = 1000, -- make sure to load this before all the other start plugins
     config = function()
       vim.g.everforest_transparent_background = 1
-      -- vim.cmd([[colorscheme everforest]])
+      vim.cmd([[colorscheme everforest]])
     end,
   },
 
@@ -189,8 +189,8 @@ return {
     cmd = "Telescope",
     keys = {
       { "<leader>fb", "<cmd>Telescope file_browser<cr>", desc = "🔭 file browser" },
-      { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "🔭 find files" },
-      { "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "🔭 oldfiles" },
+      { "<leader>ff", "<cmd>Telescope find_files<cr>",   desc = "🔭 find files" },
+      { "<leader>fr", "<cmd>Telescope oldfiles<cr>",     desc = "🔭 oldfiles" },
     },
     config = function()
       local t = require("telescope")
