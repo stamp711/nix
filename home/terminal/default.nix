@@ -14,8 +14,8 @@ in {
   programs.zsh.enable = true;
 
   programs.zsh.enableAutosuggestions = true;
-  programs.zsh.enableSyntaxHighlighting = true;
   programs.zsh.enableVteIntegration = true;
+  programs.zsh.syntaxHighlighting.enable = true;
 
   programs.zsh.oh-my-zsh.enable = true;
   programs.zsh.oh-my-zsh.theme = "af-magic";
