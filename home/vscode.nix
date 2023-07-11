@@ -40,7 +40,7 @@
     "cmake.copyCompileCommands" = "\${workspaceFolder}/compile_commands.json";
     "editor.accessibilitySupport" = "off";
     "editor.cursorBlinking" = "solid";
-    "editor.fontFamily" = "Menlo, Monaco, 'Courier New', monospace, Hack Nerd Font";
+    "editor.fontFamily" = "UbuntuMono Nerd Font, Menlo, Monaco, 'Courier New', monospace, Hack Nerd Font";
     "editor.fontSize" = 14;
     "editor.formatOnSave" = true;
     "editor.inlineSuggest.enabled" = true;
