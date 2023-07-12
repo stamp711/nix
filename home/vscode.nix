@@ -67,7 +67,7 @@
     # "workbench.colorTheme" = "Visual Studio Light";
     # "workbench.colorTheme" = "Default Dark+ Experimental";
     # "workbench.colorTheme" = "Monokai Pro";
-    "workbench.colorTheme" = "Github Dark Default";
+    "workbench.colorTheme" = "GitHub Dark Default";
     "workbench.colorCustomizations" = {
       # "editor.background" = "#FFFFEA";
       "editorInlayHint.background" = "#00000000";
