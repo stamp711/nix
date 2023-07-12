@@ -38,6 +38,7 @@
     "clangd.arguments" = ["-log=verbose" "-pretty" "--background-index"];
     "cmake.buildDirectory" = "\${workspaceFolder}/build/\${buildKit}/\${buildType}";
     "cmake.copyCompileCommands" = "\${workspaceFolder}/compile_commands.json";
+    "diffEditor.ignoreTrimWhitespace" = false;
     "editor.accessibilitySupport" = "off";
     "editor.cursorBlinking" = "solid";
     "editor.fontFamily" = "UbuntuMono Nerd Font, Menlo, Monaco, 'Courier New', monospace, Hack Nerd Font";
@@ -65,7 +66,8 @@
     "telemetry.telemetryLevel" = "off";
     # "workbench.colorTheme" = "Visual Studio Light";
     # "workbench.colorTheme" = "Default Dark+ Experimental";
-    "workbench.colorTheme" = "Monokai Pro";
+    # "workbench.colorTheme" = "Monokai Pro";
+    "workbench.colorTheme" = "Github Dark Default";
     "workbench.colorCustomizations" = {
       # "editor.background" = "#FFFFEA";
       "editorInlayHint.background" = "#00000000";
