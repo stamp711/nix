@@ -71,6 +71,8 @@ in {
       unset http_proxy https_proxy all_proxy
     fi
     # sh ${nix-colors-lib.shellThemeFromScheme {scheme = config.colorScheme;}}
+    # source extra rc in home dir if found
+    [ -f ~/.zshrc_extra ] && source ~/.zshrc_extra
   '';
 
   programs.starship.enable = true;
