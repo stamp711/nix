@@ -2,9 +2,7 @@
   homebrew = {
     enable = true;
     brews = [];
-    casks = [
-      "kitty"
-    ];
+    casks = [];
     taps = [
       "buo/cask-upgrade"
       "homebrew/cask-fonts"
