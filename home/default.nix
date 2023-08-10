@@ -33,6 +33,7 @@
     cargo-semver-checks
     cargo-watch
     cargo-workspaces
+    clang-tools
     comma
     fd
     fluxcd
