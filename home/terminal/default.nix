@@ -147,6 +147,7 @@ in {
     ".envrc"
     # vscode devcontainer
     ".devcontainer/"
+    ".vscode/"
   ];
   home.file."${config.xdg.configHome}/git/allowed_signers".source =
     ./git_allowed_signers;
