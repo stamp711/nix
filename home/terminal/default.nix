@@ -98,6 +98,7 @@ in {
     k = "kubectl";
     vi = "nvim";
     vim = "nvim";
+    ssh = "assh wrapper ssh --";
   };
 
   programs.gpg.enable = true;
