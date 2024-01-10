@@ -65,6 +65,7 @@
     tree-sitter
     wakatime
     watch
+    wrangler
     wget
     yaml-language-server
     zsh
