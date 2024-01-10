@@ -23,6 +23,10 @@
   programs.home-manager.enable = true;
   programs.lazygit.enable = true;
 
+  programs.nix-index-database.comma.enable = true;
+  programs.nix-index.symlinkToCacheHome = true;
+  #programs.nix-index.enable = true;
+
   home.packages = with pkgs; [
     alejandra
     assh
@@ -33,7 +37,6 @@
     cargo-semver-checks
     cargo-watch
     clang-tools
-    comma
     fd
     fluxcd
     glab
