@@ -24,13 +24,11 @@
     nixvim.url = "github:pta2002/nixvim";
     nixvim.inputs.nixpkgs.follows = "nixpkgs";
 
+    # comma
     nix-index-database.url = "github:Mic92/nix-index-database";
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
 
     nix-colors.url = "github:misterio77/nix-colors";
-
-    comma.url = "github:nix-community/comma";
-    comma.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = inputs @ {
@@ -51,7 +49,6 @@
         overlays =
           lib.attrValues outputs.overlays
           ++ [
-            inputs.comma.overlays.default
             inputs.nix-vscode-extensions.overlays.default
           ];
         # # Can be used to substitute in x86_64 packages on Apple Silicon
