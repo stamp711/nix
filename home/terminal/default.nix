@@ -75,7 +75,7 @@ in {
     [ -f ~/.zshrc_extra ] && source ~/.zshrc_extra
   '';
 
-  programs.starship.enable = true;
+  programs.starship.enable = false;
   programs.starship.settings = {
     git_metrics.disabled = false;
     # kubernetes.disabled = false;
@@ -114,6 +114,7 @@ in {
 
   programs.lsd.enable = true;
   programs.lsd.enableAliases = true;
+  programs.lsd.settings.icons.theme = "unicode";
 
   programs.zoxide.enable = true;
   programs.zellij.enable = true;
