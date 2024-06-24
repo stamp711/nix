@@ -53,13 +53,11 @@
     nil
     niv
     nix
-    nixfmt
     nixpkgs-fmt
     nodejs
     nodePackages.prettier
     rage
     ripgrep
-    rnix-lsp
     rustup
     sops
     tree-sitter
