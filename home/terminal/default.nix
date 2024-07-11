@@ -9,7 +9,7 @@
 in {
   colorScheme = nix-colors.colorSchemes.dracula;
 
-  programs.bash.enable = true;
+  # programs.bash.enable = true;
 
   programs.zsh.enable = true;
 
