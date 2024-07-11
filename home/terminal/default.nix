@@ -18,7 +18,7 @@ in {
   programs.zsh.syntaxHighlighting.enable = true;
 
   programs.zsh.oh-my-zsh.enable = true;
-  programs.zsh.oh-my-zsh.theme = "af-magic";
+  programs.zsh.oh-my-zsh.theme = "robbyrussell";
   programs.zsh.oh-my-zsh.plugins = [
     # Productivity
     "command-not-found"
@@ -75,10 +75,10 @@ in {
     [ -f ~/.zshrc_extra ] && source ~/.zshrc_extra
   '';
 
-  programs.starship.enable = false;
+  programs.starship.enable = true;
   programs.starship.settings = {
     git_metrics.disabled = false;
-    # kubernetes.disabled = false;
+    kubernetes.disabled = false;
     # status.disabled = false;
     # shlvl.disabled = false;
   };
