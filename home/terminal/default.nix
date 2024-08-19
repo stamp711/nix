@@ -79,6 +79,7 @@ in {
   programs.starship.settings = {
     git_metrics.disabled = false;
     kubernetes.disabled = false;
+    container.disabled = true;
     # status.disabled = false;
     # shlvl.disabled = false;
   };
