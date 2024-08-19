@@ -83,8 +83,8 @@ in
   home.sessionPath = [ "$HOME/.cargo/bin" ];
 
   home.sessionVariables = {
-    # VISUAL = "hx";
-    # EDITOR = "hx";
+    VISUAL = "vim";
+    EDITOR = "vim";
   };
 
   home.shellAliases = {
@@ -144,4 +144,5 @@ in
       pv = "pr view";
     };
   };
+
 }
