@@ -108,7 +108,7 @@
     genForEachPkgs = f: genForEachSystem (system: (f (mkPkgs system)));
   in
     {
-      formatter = genForEachPkgs (pkgs: pkgs.alejandra);
+      formatter = genForEachPkgs (pkgs: pkgs.nixfmt-rfc-style);
 
       lib =
         nixpkgs.lib
