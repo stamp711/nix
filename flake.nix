@@ -111,6 +111,7 @@
       forEachSystem = inputs.flake-utils.lib.eachSystem systems;
       genForEachSystem = f: nixpkgs.lib.attrsets.genAttrs systems f;
       genForEachPkgs = f: genForEachSystem (system: (f (mkPkgs system)));
+
     in
     {
       formatter = genForEachPkgs (pkgs: pkgs.nixfmt-rfc-style);
@@ -121,8 +122,6 @@
       };
 
       overlays = import ./overlays { inherit inputs outputs lib; };
-
-      darwinModules = import ./modules/darwin;
 
       homeManagerModules = import ./modules/home;
 
@@ -138,6 +137,7 @@
         };
       };
     }
+
     // forEachSystem (system: {
       legacyPackages.homeConfigurations."stamp" = mkHome {
         inherit system;
@@ -145,4 +145,5 @@
         modules = [ ./home ];
       };
     });
+
 }
