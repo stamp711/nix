@@ -44,8 +44,6 @@
           inherit system;
           config = {
             allowUnfree = true;
-            # Workaround for https://github.com/nix-community/home-manager/issues/2942
-            allowUnfreePredicate = _: true;
           };
           overlays = lib.attrValues outputs.overlays ++ [ inputs.nix-vscode-extensions.overlays.default ];
           # # Can be used to substitute in x86_64 packages on Apple Silicon
