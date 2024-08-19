@@ -3,8 +3,8 @@
   imports = [
     inputs.nix-colors.homeManagerModule
     inputs.nix-index-database.hmModules.nix-index
-    ./terminal
-    ./neovim
+    ./terminal.nix
+    ./neovim.nix
   ];
 
   home.stateVersion = "22.11";
