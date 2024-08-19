@@ -54,6 +54,7 @@
     niv
     nix
     nixpkgs-fmt
+    nixfmt-rfc-style
     nodejs
     nodePackages.prettier
     rage
