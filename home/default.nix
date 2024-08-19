@@ -1,8 +1,5 @@
+{ inputs, pkgs, ... }:
 {
-  inputs,
-  pkgs,
-  ...
-}: {
   imports = [
     inputs.nix-colors.homeManagerModule
     inputs.nix-index-database.hmModules.nix-index
@@ -16,7 +13,12 @@
   home.stateVersion = "22.11";
 
   nix.package = pkgs.nix;
-  nix.settings = {experimental-features = ["nix-command" "flakes"];};
+  nix.settings = {
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
+  };
 
   xdg.enable = true;
 

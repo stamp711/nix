@@ -1,4 +1,5 @@
-{ pkgs, ... }: {
+{ pkgs, ... }:
+{
   programs.kitty.enable = true;
   programs.kitty.font = {
     package = pkgs.nerdfonts.override { fonts = [ "UbuntuMono" ]; };

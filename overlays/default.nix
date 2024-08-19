@@ -4,14 +4,15 @@
   outputs,
   lib,
   ...
-}: {
+}:
+{
   # For every flake input, aliases 'pkgs.inputs.${flake}' to
   # 'inputs.${flake}.packages.${pkgs.system}' or
   # 'inputs.${flake}.legacyPackages.${pkgs.system}' or
   flake-inputs = final: _: {
-    inputs = builtins.mapAttrs (_: flake:
-      (flake.legacyPackages or flake.packages or {}).${final.system} or {})
-    inputs;
+    inputs = builtins.mapAttrs (
+      _: flake: (flake.legacyPackages or flake.packages or { }).${final.system} or { }
+    ) inputs;
   };
 
   # This one brings our custom packages from the 'pkgs' directory
@@ -36,7 +37,8 @@
   };
 
   # Add access to x86_64 packages on Apple Silicon
-  apple-silicon-x86_64-packages = final: prev:
+  apple-silicon-x86_64-packages =
+    final: prev:
     lib.optionalAttrs (prev.stdenv.system == "aarch64-darwin") {
       pkgs-x86_64 = import inputs.nixpkgs {
         system = "x86_64-darwin";
