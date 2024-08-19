@@ -98,9 +98,8 @@ in
   };
 
   home.shellAliases = {
-    k = "kubectl";
-    vi = "nvim";
-    vim = "nvim";
+    # vi = "nvim";
+    # vim = "nvim";
     ssh = "assh wrapper ssh --";
   };
 

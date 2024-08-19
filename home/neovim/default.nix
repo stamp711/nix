@@ -5,6 +5,7 @@ let
   symlink = (config.lib.file).mkOutOfStoreSymlink;
 in
 {
+  imports = [ ./homeCat.nix ];
   programs.neovim.enable = true;
   programs.neovim.defaultEditor = true;
   #xdg.configFile."nvim/init.lua".source = symlink "${pwd}/nvim/init.lua";
