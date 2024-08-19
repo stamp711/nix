@@ -103,19 +103,6 @@ in
     ssh = "assh wrapper ssh --";
   };
 
-  programs.gpg.enable = true;
-  programs.gpg.mutableKeys = false;
-  programs.gpg.mutableTrust = false;
-  programs.gpg.scdaemonSettings = {
-    disable-ccid = true;
-  };
-  programs.gpg.publicKeys = [
-    {
-      source = ./pgp_keys/Apricity.asc;
-      trust = "ultimate";
-    }
-  ];
-
   programs.lsd.enable = true;
   programs.lsd.enableAliases = true;
   programs.lsd.settings.icons.theme = "unicode";
