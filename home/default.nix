@@ -5,7 +5,6 @@
     inputs.nix-index-database.hmModules.nix-index
     ./terminal
     ./neovim
-    # ./vscode.nix
   ];
 
   home.stateVersion = "22.11";
