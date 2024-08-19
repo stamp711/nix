@@ -1,4 +1,5 @@
-{pkgs, ...}: {
+{ pkgs, ... }:
+{
   programs.vscode.enable = true;
   programs.vscode.enableUpdateCheck = false;
   programs.vscode.enableExtensionUpdateCheck = false;
@@ -35,7 +36,11 @@
       rescuetime.rescuetime
     ]);
   programs.vscode.userSettings = {
-    "clangd.arguments" = ["-log=verbose" "-pretty" "--background-index"];
+    "clangd.arguments" = [
+      "-log=verbose"
+      "-pretty"
+      "--background-index"
+    ];
     "cmake.buildDirectory" = "\${workspaceFolder}/build/\${buildKit}/\${buildType}";
     "cmake.copyCompileCommands" = "\${workspaceFolder}/compile_commands.json";
     "diffEditor.ignoreTrimWhitespace" = false;

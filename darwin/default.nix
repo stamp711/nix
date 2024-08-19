@@ -1,19 +1,16 @@
+{ pkgs, lib, ... }:
 {
-  pkgs,
-  lib,
-  ...
-}: {
   system.stateVersion = 4;
   programs.zsh.enable = true;
 
-  imports = [./homebrew.nix];
+  imports = [ ./homebrew.nix ];
 
   programs.nix-index.enable = true;
 
   services.nix-daemon.enable = true;
   nix.settings = {
     # auto-optimise-store = true; # https://github.com/NixOS/nix/issues/7273
-    trusted-users = ["@admin"];
+    trusted-users = [ "@admin" ];
   };
   nix.extraOptions =
     ''

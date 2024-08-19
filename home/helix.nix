@@ -1,4 +1,5 @@
-{...}: {
+{ ... }:
+{
   programs.helix.enable = true;
   programs.helix.settings = {
     theme = "monokai";
@@ -12,7 +13,9 @@
       insert = "bar";
       select = "bar";
     };
-    editor.whitespace.render = {tab = "all";};
+    editor.whitespace.render = {
+      tab = "all";
+    };
   };
   programs.helix.languages = {
     language = [
@@ -20,9 +23,14 @@
         name = "yaml";
         formatter = {
           command = "prettier";
-          args = ["--parser" "yaml"];
+          args = [
+            "--parser"
+            "yaml"
+          ];
         };
-        config.yaml.schemas = {Kubernetes = "*";};
+        config.yaml.schemas = {
+          Kubernetes = "*";
+        };
       }
       {
         name = "nix";

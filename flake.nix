@@ -31,96 +31,96 @@
     nix-colors.url = "github:misterio77/nix-colors";
   };
 
-  outputs = inputs @ {
-    self,
-    nixpkgs,
-    ...
-  }: let
-    inherit (self) outputs lib;
+  outputs =
+    inputs@{ self, nixpkgs, ... }:
+    let
+      inherit (self) outputs lib;
 
-    mkPkgs = system:
-      import inputs.nixpkgs {
-        inherit system;
-        config = {
-          allowUnfree = true;
-          # Workaround for https://github.com/nix-community/home-manager/issues/2942
-          allowUnfreePredicate = _: true;
+      mkPkgs =
+        system:
+        import inputs.nixpkgs {
+          inherit system;
+          config = {
+            allowUnfree = true;
+            # Workaround for https://github.com/nix-community/home-manager/issues/2942
+            allowUnfreePredicate = _: true;
+          };
+          overlays = lib.attrValues outputs.overlays ++ [ inputs.nix-vscode-extensions.overlays.default ];
+          # # Can be used to substitute in x86_64 packages on Apple Silicon
+          # ++ nixpkgs.lib.singleton (self: super: { inherit (self.pkgs-x86_64) vim; });
         };
-        overlays =
-          lib.attrValues outputs.overlays
-          ++ [
-            inputs.nix-vscode-extensions.overlays.default
-          ];
-        # # Can be used to substitute in x86_64 packages on Apple Silicon
-        # ++ nixpkgs.lib.singleton (self: super: { inherit (self.pkgs-x86_64) vim; });
+
+      mkUserInfo =
+        { username, system }:
+        rec {
+          inherit username;
+          homeDirectory = "${lib.homePrefix system}/${username}";
+          nixConfigDirectory = "${homeDirectory}/.config/nixpkgs";
+        };
+
+      moduleExtraArgs = {
+        inherit self inputs outputs;
       };
 
-    mkUserInfo = {
-      username,
-      system,
-    }: rec {
-      inherit username;
-      homeDirectory = "${lib.homePrefix system}/${username}";
-      nixConfigDirectory = "${homeDirectory}/.config/nixpkgs";
-    };
+      mkHome =
+        {
+          username,
+          system,
+          modules,
+        }:
+        inputs.home-manager.lib.homeManagerConfiguration {
+          pkgs = mkPkgs system;
+          lib = self.lib;
+          extraSpecialArgs = moduleExtraArgs;
+          modules =
+            lib.attrValues outputs.homeManagerModules
+            ++ lib.singleton {
+              home.user-info = mkUserInfo {
+                inherit system;
+                inherit username;
+              };
+            }
+            ++ modules;
+        };
 
-    moduleExtraArgs = {inherit self inputs outputs;};
+      mkDarwin =
+        {
+          system,
+          pkgs ? mkPkgs system,
+          lib ? self.lib,
+          specialArgs ? {
+            inherit self inputs outputs;
+          },
+          modules,
+        }:
+        inputs.darwin.lib.darwinSystem {
+          inherit system;
+          pkgs = mkPkgs system;
+          lib = self.lib;
+          specialArgs = moduleExtraArgs;
+          inherit modules;
+        };
 
-    mkHome = {
-      username,
-      system,
-      modules,
-    }:
-      inputs.home-manager.lib.homeManagerConfiguration {
-        pkgs = mkPkgs system;
-        lib = self.lib;
-        extraSpecialArgs = moduleExtraArgs;
-        modules =
-          lib.attrValues outputs.homeManagerModules
-          ++ lib.singleton {
-            home.user-info = mkUserInfo {
-              inherit system;
-              inherit username;
-            };
-          }
-          ++ modules;
-      };
+      systems = [
+        "aarch64-darwin"
+        "x86_64-darwin"
+        "aarch64-linux"
+        "x86_64-linux"
+      ];
 
-    mkDarwin = {
-      system,
-      pkgs ? mkPkgs system,
-      lib ? self.lib,
-      specialArgs ? {inherit self inputs outputs;},
-      modules,
-    }:
-      inputs.darwin.lib.darwinSystem {
-        inherit system;
-        pkgs = mkPkgs system;
-        lib = self.lib;
-        specialArgs = moduleExtraArgs;
-        inherit modules;
-      };
-
-    systems = ["aarch64-darwin" "x86_64-darwin" "aarch64-linux" "x86_64-linux"];
-
-    forEachSystem = inputs.flake-utils.lib.eachSystem systems;
-    genForEachSystem = f: nixpkgs.lib.attrsets.genAttrs systems f;
-    genForEachPkgs = f: genForEachSystem (system: (f (mkPkgs system)));
-  in
+      forEachSystem = inputs.flake-utils.lib.eachSystem systems;
+      genForEachSystem = f: nixpkgs.lib.attrsets.genAttrs systems f;
+      genForEachPkgs = f: genForEachSystem (system: (f (mkPkgs system)));
+    in
     {
       formatter = genForEachPkgs (pkgs: pkgs.nixfmt-rfc-style);
 
-      lib =
-        nixpkgs.lib
-        // rec {
-          isDarwin = system: (builtins.elem system inputs.nixpkgs.lib.platforms.darwin);
-          homePrefix = system:
-            if isDarwin system
-            then "/Users"
-            else "/home";
-        };
+      lib = nixpkgs.lib // rec {
+        isDarwin = system: (builtins.elem system inputs.nixpkgs.lib.platforms.darwin);
+        homePrefix = system: if isDarwin system then "/Users" else "/home";
+      };
 
-      overlays = import ./overlays {inherit inputs outputs lib;};
+      overlays = import ./overlays { inherit inputs outputs lib; };
 
       darwinModules = import ./modules/darwin;
 
@@ -129,12 +129,12 @@
       darwinConfigurations = {
         Lius-MacBook = mkDarwin {
           system = "aarch64-darwin";
-          modules = [./darwin];
+          modules = [ ./darwin ];
         };
 
         stamp = mkDarwin {
           system = "x86_64-darwin";
-          modules = [./darwin];
+          modules = [ ./darwin ];
         };
       };
     }
@@ -142,7 +142,7 @@
       legacyPackages.homeConfigurations."stamp" = mkHome {
         inherit system;
         username = "stamp";
-        modules = [./home];
+        modules = [ ./home ];
       };
     });
 }

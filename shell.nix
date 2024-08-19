@@ -1,5 +1,4 @@
-{pkgs, ...}: {
-  default =
-    pkgs.mkShell {
-    };
+{ pkgs, ... }:
+{
+  default = pkgs.mkShell { };
 }

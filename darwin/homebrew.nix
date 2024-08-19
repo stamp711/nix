@@ -1,8 +1,9 @@
-{...}: {
+{ ... }:
+{
   homebrew = {
     enable = true;
-    brews = [];
-    casks = [];
+    brews = [ ];
+    casks = [ ];
     taps = [
       "buo/cask-upgrade"
       "homebrew/cask-fonts"

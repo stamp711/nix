@@ -3,10 +3,12 @@
   config,
   inputs,
   ...
-}: let
+}:
+let
   inherit (inputs) nix-colors;
-  nix-colors-lib = nix-colors.lib.contrib {inherit pkgs;};
-in {
+  nix-colors-lib = nix-colors.lib.contrib { inherit pkgs; };
+in
+{
   colorScheme = nix-colors.colorSchemes.dracula;
 
   # programs.bash.enable = true;
@@ -70,7 +72,7 @@ in {
     else
       unset http_proxy https_proxy all_proxy
     fi
-    # sh ${nix-colors-lib.shellThemeFromScheme {scheme = config.colorScheme;}}
+    # sh ${nix-colors-lib.shellThemeFromScheme { scheme = config.colorScheme; }}
     # source extra rc in home dir if found
     [ -f ~/.zshrc_extra ] && source ~/.zshrc_extra
   '';
@@ -87,7 +89,7 @@ in {
   programs.direnv.enable = true;
   programs.direnv.nix-direnv.enable = true;
 
-  home.sessionPath = ["$HOME/.cargo/bin"];
+  home.sessionPath = [ "$HOME/.cargo/bin" ];
 
   home.sessionVariables = {
     # VISUAL = "hx";
@@ -105,7 +107,9 @@ in {
   programs.gpg.enable = true;
   programs.gpg.mutableKeys = false;
   programs.gpg.mutableTrust = false;
-  programs.gpg.scdaemonSettings = {disable-ccid = true;};
+  programs.gpg.scdaemonSettings = {
+    disable-ccid = true;
+  };
   programs.gpg.publicKeys = [
     {
       source = ./pgp_keys/Apricity.asc;
@@ -152,11 +156,10 @@ in {
     ".devcontainer/"
     ".vscode/"
   ];
-  home.file."${config.xdg.configHome}/git/allowed_signers".source =
-    ./git_allowed_signers;
+  home.file."${config.xdg.configHome}/git/allowed_signers".source = ./git_allowed_signers;
 
   programs.gh.enable = true;
-  programs.gh.extensions = [pkgs.gh-eco];
+  programs.gh.extensions = [ pkgs.gh-eco ];
   programs.gh.settings = {
     git_protocol = "ssh";
     prompt = "enabled";
