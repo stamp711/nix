@@ -23,7 +23,6 @@
       tamasfe.even-better-toml
       # vadimcn.vscode-lldb error on darwin
       vscodevim.vim
-      wakatime.vscode-wakatime
       zxh404.vscode-proto3
     ])
     ++ (with pkgs.vscode-marketplace; [

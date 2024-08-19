@@ -64,7 +64,6 @@
     rustup
     sops
     tree-sitter
-    wakatime
     watch
     wget
     yaml-language-server

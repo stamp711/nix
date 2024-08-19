@@ -51,15 +51,6 @@ in
       src = pkgs.zsh-nix-shell;
       file = "share/zsh-nix-shell/nix-shell.plugin.zsh";
     }
-    # TODO use flake inputs for this
-    {
-      name = "wakatime-zsh-plugin";
-      file = "wakatime.plugin.zsh";
-      src = builtins.fetchGit {
-        url = "https://github.com/sobolevn/wakatime-zsh-plugin";
-        rev = "69c6028b0c8f72e2afcfa5135b1af29afb49764a";
-      };
-    }
   ];
 
   programs.zsh.initExtra = ''
@@ -94,7 +85,6 @@ in
   home.sessionVariables = {
     # VISUAL = "hx";
     # EDITOR = "hx";
-    ZSH_WAKATIME_BIN = "wakatime-cli";
   };
 
   home.shellAliases = {

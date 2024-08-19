@@ -1,8 +1,6 @@
 return {
   { "folke/lazy.nvim",           version = "*" },
 
-  { "wakatime/vim-wakatime",     event = "VeryLazy" },
-
   { "nmac427/guess-indent.nvim", opts = {} },
 
   "f-person/auto-dark-mode.nvim",
