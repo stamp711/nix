@@ -5,8 +5,6 @@
     inputs.nix-index-database.hmModules.nix-index
     ./terminal
     ./neovim
-    # ./kitty.nix
-    ./helix.nix
     # ./vscode.nix
   ];
 
@@ -30,40 +28,28 @@
   #programs.nix-index.enable = true;
 
   home.packages = with pkgs; [
-    alejandra
     assh
-    bash
     cargo-expand
     cargo-feature
     cargo-nextest
-    cargo-semver-checks
     cargo-watch
     clang-tools
     fd
     fluxcd
-    glab
     imgcat
     just
-    k9s
     kubectl
     kubectx
     kubernetes-helm
     lua-language-server
-    mdbook
-    mkcert
     netcat
     nil
     niv
     nix
     nixpkgs-fmt
     nixfmt-rfc-style
-    nodejs
-    nodePackages.prettier
-    rage
     ripgrep
     rustup
-    sops
-    tree-sitter
     watch
     wget
     yaml-language-server

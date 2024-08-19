@@ -6,8 +6,8 @@ let
 in
 {
   imports = [ ./homeCat.nix ];
-  programs.neovim.enable = true;
-  programs.neovim.defaultEditor = true;
+  # programs.neovim.enable = true;
+  # programs.neovim.defaultEditor = true;
   #xdg.configFile."nvim/init.lua".source = symlink "${pwd}/nvim/init.lua";
   #xdg.configFile."nvim/lua".source = symlink "${pwd}/nvim/lua";
 }
