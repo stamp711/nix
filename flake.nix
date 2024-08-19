@@ -29,6 +29,8 @@
     nix-index-database.inputs.nixpkgs.follows = "nixpkgs";
 
     nix-colors.url = "github:misterio77/nix-colors";
+
+    nixCats.url = "github:BirdeeHub/nixCats-nvim";
   };
 
   outputs =
