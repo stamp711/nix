@@ -32,7 +32,6 @@
     cargo-feature
     cargo-nextest
     cargo-watch
-    clang-tools
     fd
     fluxcd
     imgcat
