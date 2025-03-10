@@ -17,6 +17,8 @@
     ];
   };
 
+  targets.genericLinux.enable = true;
+
   xdg.enable = true;
 
   programs.home-manager.enable = true;
