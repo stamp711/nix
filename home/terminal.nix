@@ -98,7 +98,6 @@ in
   programs.lsd.settings.icons.theme = "unicode";
 
   programs.zoxide.enable = true;
-  programs.zellij.enable = true;
   programs.tmux.enable = true;
   programs.tmux.terminal = "xterm-256color";
 
