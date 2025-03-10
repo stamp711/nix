@@ -4,7 +4,7 @@
     inputs.nix-colors.homeManagerModule
     inputs.nix-index-database.hmModules.nix-index
     ./terminal.nix
-    ./neovim.nix
+    #./neovim.nix
   ];
 
   home.stateVersion = "22.11";

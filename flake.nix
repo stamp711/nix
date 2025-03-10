@@ -15,7 +15,6 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     nixCats.url = "github:BirdeeHub/nixCats-nvim";
-    nixCats.inputs.nixpkgs.follows = "nixpkgs";
 
     # comma
     nix-index-database.url = "github:Mic92/nix-index-database";
