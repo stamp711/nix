@@ -56,13 +56,6 @@ in
   programs.zsh.initExtra = ''
     unset __HM_SESS_VARS_SOURCED # workaround for orbstack shells
     [ -f ~/.config/op/plugins.sh ] && source ~/.config/op/plugins.sh
-    if nc -z localhost 6152 &>/dev/null; then
-      export http_proxy=http://127.0.0.1:6152
-      export https_proxy=http://127.0.0.1:6152
-      export all_proxy=socks5://127.0.0.1:6153
-    else
-      unset http_proxy https_proxy all_proxy
-    fi
     # sh ${nix-colors-lib.shellThemeFromScheme { scheme = config.colorScheme; }}
     # source extra rc in home dir if found
     [ -f ~/.zshrc_extra ] && source ~/.zshrc_extra
