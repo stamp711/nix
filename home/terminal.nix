@@ -87,7 +87,7 @@ in
   };
 
   programs.lsd.enable = true;
-  programs.lsd.enableAliases = true;
+  programs.lsd.enableZshIntegration = true;
   programs.lsd.settings.icons.theme = "unicode";
 
   programs.zoxide.enable = true;
