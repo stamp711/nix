@@ -53,7 +53,7 @@ in
     }
   ];
 
-  programs.zsh.initExtra = ''
+  programs.zsh.initContent = ''
     unset __HM_SESS_VARS_SOURCED # workaround for orbstack shells
     [ -f ~/.config/op/plugins.sh ] && source ~/.config/op/plugins.sh
     # sh ${nix-colors-lib.shellThemeFromScheme { scheme = config.colorScheme; }}
