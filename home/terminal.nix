@@ -105,7 +105,7 @@ in
   programs.git.userEmail = "stamp1024@gmail.com";
   programs.git.signing.key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG0Zuk/bYRvsX5WypXgY7aopBeoTNjma1rr6Txtp87JS";
   programs.git.signing.signByDefault = true;
-  programs.git.difftastic.enable = true;
+  programs.git.delta.enable = true;
   programs.git.lfs.enable = true;
   programs.git.extraConfig = {
     init.defaultBranch = "master";
