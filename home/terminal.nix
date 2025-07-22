@@ -106,6 +106,7 @@ in
   programs.git.signing.key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG0Zuk/bYRvsX5WypXgY7aopBeoTNjma1rr6Txtp87JS";
   programs.git.signing.signByDefault = true;
   programs.git.delta.enable = true;
+  programs.git.delta.options.side-by-side = true;
   programs.git.lfs.enable = true;
   programs.git.extraConfig = {
     init.defaultBranch = "master";
