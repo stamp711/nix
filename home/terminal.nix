@@ -94,6 +94,8 @@ in
   programs.tmux.enable = true;
   programs.tmux.terminal = "xterm-256color";
 
+  programs.zellij.enable = true;
+
   programs.tealdeer.enable = true;
   programs.tealdeer.settings.updates.auto_update = true;
 
