@@ -1,8 +1,7 @@
 { config, ... }:
 let
-  inherit (config.home.user-info) nixConfigDirectory;
-  pwd = "${nixConfigDirectory}/home/neovim";
-  symlink = (config.lib.file).mkOutOfStoreSymlink;
+  pwd = "${config.home.homeDirectory}/.config/nixpkgs/home/neovim";
+  symlink = config.lib.file.mkOutOfStoreSymlink;
 in
 {
   # programs.neovim.enable = true;
