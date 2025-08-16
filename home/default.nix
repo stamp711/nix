@@ -2,12 +2,18 @@
 {
   imports = [
     inputs.nix-colors.homeManagerModule
-    inputs.nix-index-database.hmModules.nix-index
-    ./terminal.nix
-    #./neovim.nix
+    inputs.nix-index-database.homeModules.nix-index
+
+    # Modular configuration files
+    ./shell.nix
+    ./cli-tools.nix
+    ./git
+    ./packages.nix
   ];
 
-  home.stateVersion = "22.11";
+  home.stateVersion = "25.05";
+  home.username = "stamp";
+  home.homeDirectory = if pkgs.stdenv.isDarwin then "/Users/stamp" else "/home/stamp";
 
   nix.package = pkgs.nix;
   nix.settings = {
@@ -17,42 +23,7 @@
     ];
   };
 
-  targets.genericLinux.enable = true;
-
   xdg.enable = true;
 
   programs.home-manager.enable = true;
-  programs.lazygit.enable = true;
-
-  programs.nix-index-database.comma.enable = true;
-  programs.nix-index.symlinkToCacheHome = true;
-  #programs.nix-index.enable = true;
-
-  home.packages = with pkgs; [
-    assh
-    cargo-expand
-    cargo-feature
-    cargo-nextest
-    cargo-watch
-    fd
-    fluxcd
-    imgcat
-    just
-    kubectl
-    kubectx
-    kubernetes-helm
-    lua-language-server
-    netcat
-    nil
-    niv
-    nix
-    nixpkgs-fmt
-    nixfmt-rfc-style
-    ripgrep
-    rustup
-    watch
-    wget
-    yaml-language-server
-    zsh
-  ];
 }
