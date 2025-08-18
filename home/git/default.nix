@@ -38,6 +38,7 @@
       # vscode devcontainer
       ".devcontainer/"
       ".vscode/"
+      ".claude/"
       "CLAUDE.local.md"
     ];
   };
