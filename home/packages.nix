@@ -2,7 +2,7 @@
 let
   nix-clean = pkgs.writeShellScriptBin "nix-clean" ''
     echo "Expire home-manager generations..."
-    home-manager expire-generations 1s
+    home-manager expire-generations 0s
     echo "Wiping nix profile history..."
     nix profile wipe-history
     echo "Running garbage collection..."

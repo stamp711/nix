@@ -26,9 +26,10 @@ nix --experimental-features 'nix-command flakes' run home-manager -- switch --fl
 # Updates
 nix flake update
 home-manager switch --flake .
+# Or: nh home switch
 
 # Purge old generations
-nix-clean
+nh clean user
 ```
 
 ## Quick Commands
