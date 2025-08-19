@@ -76,7 +76,10 @@ in
   };
 
   # Shell environment
-  home.sessionPath = [ "$HOME/.cargo/bin" ];
+  home.sessionPath = [
+    "$HOME/.local/bin"
+    "$HOME/.cargo/bin"
+  ];
   home.sessionVariables = {
     VISUAL = "vim";
     EDITOR = "vim";
