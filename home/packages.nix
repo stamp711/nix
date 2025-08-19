@@ -43,6 +43,7 @@ in
     yaml-language-server
 
     # Nix tools
+    nh
     niv
     nix
     nixfmt
