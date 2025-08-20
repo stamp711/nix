@@ -16,6 +16,9 @@ in
     # Custom tools
     nix-clean
 
+    # Security
+    _1password-cli
+
     # SSH tools
     assh
 
