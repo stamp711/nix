@@ -11,11 +11,15 @@
       url = "github:Mic92/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    deploy-rs = {
+      url = "github:serokell/deploy-rs";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # nixCats.url = "github:BirdeeHub/nixCats-nvim";
   };
 
   outputs =
-    inputs@{ flake-parts, ... }:
+    inputs@{ self, flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       # systems = inputs.nixpkgs.lib.systems.flakeExposed;
       systems = [
@@ -29,7 +33,7 @@
           _module.args.pkgs = import inputs.nixpkgs {
             inherit system;
             config.allowUnfree = true;
-            overlays = builtins.attrValues (import ./overlays.nix { inherit inputs; });
+            overlays = builtins.attrValues self.overlays;
           };
           formatter = pkgs.nixfmt-tree;
           devShells.default = import ./shell.nix { inherit pkgs; };
@@ -43,6 +47,16 @@
         };
 
       flake = {
+        deploy = {
+          remoteBuild = true;
+          nodes.wsl = {
+            hostname = "wsl";
+            profiles.stamp = {
+              user = "stamp";
+              path = inputs.deploy-rs.lib.x86_64-linux.activate.home-manager self.legacyPackages.x86_64-linux.homeConfigurations.stamp;
+            };
+          };
+        };
         overlays = import ./overlays.nix { inherit inputs; };
         templates = {
           default = {
