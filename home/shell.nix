@@ -1,13 +1,16 @@
 {
+  inputs,
   pkgs,
   config,
-  inputs,
   ...
 }:
 let
   nix-colors-lib = inputs.nix-colors.lib.contrib { inherit pkgs; };
 in
 {
+
+  imports = [ inputs._1password-shell-plugins.hmModules.default ];
+
   # Color scheme
   colorScheme = inputs.nix-colors.colorSchemes.dracula;
 
@@ -86,5 +89,9 @@ in
   };
   home.shellAliases = {
     ssh = "assh wrapper ssh --";
+  };
+  programs._1password-shell-plugins = {
+    enable = true;
+    plugins = with pkgs; [ gh ];
   };
 }
