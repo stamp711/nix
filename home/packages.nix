@@ -29,6 +29,9 @@ in
     cargo-watch
     rustup
 
+    # Python
+    uv
+
     # Search tools
     fd
     ripgrep
