@@ -45,7 +45,6 @@ in
     # Nix tools
     nh
     niv
-    nix
     nixfmt
     alejandra
 
