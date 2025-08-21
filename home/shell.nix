@@ -82,6 +82,7 @@ in
   home.sessionPath = [
     "$HOME/.local/bin"
     "$HOME/.cargo/bin"
+    "/opt/homebrew/bin"
   ];
   home.sessionVariables = {
     VISUAL = "vim";
