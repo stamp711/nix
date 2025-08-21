@@ -40,6 +40,7 @@
       ".vscode/"
       ".claude/"
       "CLAUDE.local.md"
+      "__local__/"
     ];
   };
 
