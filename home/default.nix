@@ -9,6 +9,7 @@
     ./cli-tools.nix
     ./git
     ./packages.nix
+    ./treefmt.nix
   ];
 
   home.stateVersion = "25.05";
