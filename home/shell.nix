@@ -83,10 +83,12 @@ in
     "$HOME/.local/bin"
     "$HOME/.cargo/bin"
     "/opt/homebrew/bin"
+    "$VOLTA_HOME/bin:$PATH"
   ];
   home.sessionVariables = {
     VISUAL = "vim";
     EDITOR = "vim";
+    VOLTA_HOME = "$HOME/.volta";
   };
   home.shellAliases = {
     ssh = "assh wrapper ssh --";

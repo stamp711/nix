@@ -32,6 +32,9 @@ in
     # Python
     uv
 
+    # NodeJS
+    volta
+
     # Search tools
     fd
     ripgrep
