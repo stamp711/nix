@@ -22,6 +22,9 @@ in
     # SSH tools
     assh
 
+    # C/C++
+    cmake
+
     # Rust development
     cargo-expand
     cargo-feature
