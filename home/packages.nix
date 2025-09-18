@@ -63,6 +63,7 @@ in
 
     # General utilities
     imgcat
+    helix
     just
     netcat
     watch
