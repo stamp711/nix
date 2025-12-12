@@ -2,22 +2,17 @@
 {
   programs.git = {
     enable = true;
-    userName = "Apricity";
-    userEmail = "REDACTED";
 
     signing = {
       key = "ssh-ed25519 REDACTED";
       signByDefault = true;
     };
 
-    delta = {
-      enable = true;
-      options.side-by-side = true;
-    };
-
     lfs.enable = true;
 
-    extraConfig = {
+    settings = {
+      user.name = "Apricity";
+      user.email = "REDACTED";
       init.defaultBranch = "master";
       pull.ff = "only";
       push.autoSetupRemote = true;
@@ -43,6 +38,10 @@
       "__local__/"
     ];
   };
+
+  programs.delta.enable = true;
+  programs.delta.enableGitIntegration = true;
+  programs.delta.options.side-by-side = true;
 
   # GitHub CLI
   programs.gh = {
