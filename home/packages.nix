@@ -67,6 +67,7 @@ in
     just
     netcat
     watch
+    wakatime-cli
     wget
     zsh
   ];
