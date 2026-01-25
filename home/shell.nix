@@ -79,10 +79,10 @@ in
   # Shell environment
   home.sessionPath = [
     "$HOME/.local/bin"
+    "$XDG_DATA_HOME/bob/nvim-bin"
+    "$VOLTA_HOME/bin"
     "$HOME/.cargo/bin"
     "/opt/homebrew/bin"
-    "$VOLTA_HOME/bin"
-    "$XDG_DATA_HOME/bob/nvim-bin"
   ];
   home.sessionVariables = {
     VISUAL = "vim";
