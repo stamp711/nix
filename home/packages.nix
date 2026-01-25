@@ -16,7 +16,7 @@ in
     # Custom tools
     nix-clean
 
-    neovim
+    bob-nvim
 
     # Security
     _1password-cli

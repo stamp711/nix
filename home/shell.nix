@@ -81,7 +81,8 @@ in
     "$HOME/.local/bin"
     "$HOME/.cargo/bin"
     "/opt/homebrew/bin"
-    "$VOLTA_HOME/bin:$PATH"
+    "$VOLTA_HOME/bin"
+    "$XDG_DATA_HOME/bob/nvim-bin"
   ];
   home.sessionVariables = {
     VISUAL = "vim";
