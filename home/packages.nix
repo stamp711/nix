@@ -64,6 +64,7 @@ in
     alejandra
 
     # General utilities
+    eternal-terminal
     imgcat
     helix
     just
