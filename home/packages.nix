@@ -16,7 +16,8 @@ in
     # Custom tools
     nix-clean
 
-    bob-nvim
+    #bob-nvim
+    neovim
 
     # Security
     _1password-cli
@@ -64,6 +65,7 @@ in
     alejandra
 
     # General utilities
+    doxygen
     eternal-terminal
     imgcat
     helix
