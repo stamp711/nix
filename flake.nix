@@ -1,4 +1,6 @@
 {
+  description = "Reusable Nix configuration modules";
+
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
@@ -11,16 +13,12 @@
       url = "github:Mic92/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    deploy-rs = {
-      url = "github:serokell/deploy-rs";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    private.url = "git+ssh://git@github.com/stamp711/nix-private";
   };
 
   outputs =
     inputs@{ self, flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
-      # systems = inputs.nixpkgs.lib.systems.flakeExposed;
       systems = [
         "aarch64-darwin"
         "x86_64-linux"
@@ -36,45 +34,69 @@
           };
           formatter = pkgs.nixfmt-tree;
           devShells.default = import ./shell.nix { inherit pkgs; };
-          legacyPackages.homeConfigurations.stamp = inputs.home-manager.lib.homeManagerConfiguration {
-            inherit pkgs;
-            extraSpecialArgs = {
-              inherit inputs;
-            };
-            modules = [ ./home ];
-          };
         };
 
-      flake = {
-        deploy = {
-          remoteBuild = true;
-          nodes.wsl = {
-            hostname = "wsl";
-            profiles.stamp = {
-              user = "stamp";
-              path = inputs.deploy-rs.lib.x86_64-linux.activate.home-manager self.legacyPackages.x86_64-linux.homeConfigurations.stamp;
+      flake =
+        let
+          # Load host definitions
+          hosts = self.lib.loadDir ./hosts { inherit self inputs; };
+
+          # Generate named host-specific configs from host files
+          hostConfigs = inputs.nixpkgs.lib.mapAttrs' (
+            _: host: inputs.nixpkgs.lib.nameValuePair "${host.username}@${host.hostname}" host.homeConfiguration
+          ) hosts;
+
+          # Manual template configs for common cases
+          templateConfigs = {
+            # Generic work devbox configuration (Linux)
+            work-devbox = inputs.home-manager.lib.homeManagerConfiguration {
+              pkgs = import inputs.nixpkgs {
+                system = "x86_64-linux";
+                config.allowUnfree = true;
+              };
+              extraSpecialArgs = { inherit self inputs; };
+              modules = [ self.homeProfiles.work-devbox ];
+            };
+          };
+
+          # Combine both automatic and manual configs
+          homeConfigurations = hostConfigs // templateConfigs;
+        in
+        {
+          # Library functions
+          lib = import ./lib { lib = inputs.nixpkgs.lib; };
+
+          # Home Manager
+          homeModules = self.lib.importDir ./modules/home;
+          homePersonalModules = self.lib.importDir ./modules/home-personal;
+          homeWorkModules = self.lib.importDir ./modules/home-work;
+          homeProfiles = self.lib.importDir ./profiles/home;
+
+          # Overlays
+          overlays = import ./overlays.nix { inherit inputs; };
+
+          # Home configurations
+          inherit homeConfigurations;
+
+          # Templates
+          templates = {
+            default = {
+              path = ./templates/basic;
+              description = "Basic Nix development environment";
+            };
+            rust = {
+              path = ./templates/rust;
+              description = "Rust development environment";
+            };
+            cpp = {
+              path = ./templates/cpp;
+              description = "C++ development environment";
+            };
+            python = {
+              path = ./templates/python;
+              description = "Python development environment with uv";
             };
           };
         };
-        overlays = import ./overlays.nix { inherit inputs; };
-        templates = {
-          default = {
-            path = ./templates/basic;
-            description = "Basic Nix development environment";
-          };
-          rust = {
-            path = ./templates/rust;
-            description = "Rust development environment";
-          };
-          cpp = {
-            path = ./templates/cpp;
-            description = "C++ development environment";
-          };
-          python = {
-            path = ./templates/python;
-            description = "Python development environment with uv";
-          };
-        };
-      };
     };
 }

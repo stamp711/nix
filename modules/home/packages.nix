@@ -69,12 +69,16 @@ in
     alejandra
 
     # General utilities
+    age
+    age-plugin-1p
     doxygen
     eternal-terminal
     imgcat
     helix
     just
     netcat
+    scc
+    sops
     watch
     wakatime-cli
     wget

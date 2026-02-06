@@ -1,8 +1,8 @@
-{ config, ... }:
-let
-  pwd = "${config.home.homeDirectory}/.config/nixpkgs/home/neovim";
-  symlink = config.lib.file.mkOutOfStoreSymlink;
-in
+# { config, ... }:
+# let
+# pwd = "${config.home.homeDirectory}/.config/nixpkgs/home/neovim";
+# symlink = config.lib.file.mkOutOfStoreSymlink;
+# in
 {
   # programs.neovim.enable = true;
   # programs.neovim.defaultEditor = true;

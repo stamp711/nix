@@ -8,7 +8,9 @@ let
   nix-colors-lib = inputs.nix-colors.lib.contrib { inherit pkgs; };
 in
 {
-
+  imports = [
+    inputs.nix-colors.homeManagerModules.default
+  ];
   # Color scheme
   colorScheme = inputs.nix-colors.colorSchemes.dracula;
 
@@ -54,11 +56,14 @@ in
     initContent = ''
       unset __HM_SESS_VARS_SOURCED # workaround for orbstack shells
       [ -f ~/.config/op/plugins.sh ] && source ~/.config/op/plugins.sh
-      # sh ${nix-colors-lib.shellThemeFromScheme { scheme = config.colorScheme; }}
+      # Apply color scheme
+      #${nix-colors-lib.shellThemeFromScheme { scheme = config.colorScheme; }}
       # source extra rc in home dir if found
       [ -f ~/.zshrc_extra ] && source ~/.zshrc_extra
     '';
   };
+
+  programs.hstr.enable = true;
 
   # Starship prompt
   programs.starship = {

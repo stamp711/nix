@@ -1,4 +1,9 @@
+{ inputs, ... }:
 {
+  imports = [
+    inputs.nix-index-database.homeModules.nix-index
+  ];
+
   # Modern ls replacement
   programs.lsd = {
     enable = true;
@@ -28,6 +33,9 @@
 
   # Better cat
   programs.bat.enable = true;
+
+  # Modern alternative to the watch command
+  programs.hwatch.enable = true;
 
   # Nix index for command-not-found
   programs.nix-index-database.comma.enable = true;
