@@ -88,6 +88,7 @@ in
     VISUAL = "vim";
     EDITOR = "vim";
     VOLTA_HOME = "$HOME/.volta";
+    COLORTERM = "truecolor";
   };
   home.shellAliases = {
     ssh = "assh wrapper ssh --";
