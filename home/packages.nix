@@ -16,6 +16,10 @@ in
     # Custom tools
     nix-clean
 
+    # Binary analysis
+    elf-info
+    binsider
+
     #bob-nvim
     neovim
 
