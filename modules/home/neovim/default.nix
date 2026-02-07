@@ -1,11 +1,18 @@
-# { config, ... }:
-# let
-# pwd = "${config.home.homeDirectory}/.config/nixpkgs/home/neovim";
-# symlink = config.lib.file.mkOutOfStoreSymlink;
-# in
+{ pkgs, ... }:
 {
-  # programs.neovim.enable = true;
-  # programs.neovim.defaultEditor = true;
-  # xdg.configFile."nvim/init.lua".source = symlink "${pwd}/nvim/init.lua";
-  # xdg.configFile."nvim/lua".source = symlink "${pwd}/nvim/lua";
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+
+    # Tools LazyVim needs
+    extraPackages = with pkgs; [
+      ripgrep
+      fd
+    ];
+  };
+
+  # Copy LazyVim config
+  xdg.configFile."nvim/init.lua".source = ./nvim/init.lua;
+  xdg.configFile."nvim/lua".source = ./nvim/lua;
+  xdg.configFile."nvim/lazyvim.json".source = ./nvim/lazyvim.json;
 }

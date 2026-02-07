@@ -20,9 +20,6 @@ in
     elf-info
     binsider
 
-    #bob-nvim
-    neovim
-
     # Security
     _1password-cli
 

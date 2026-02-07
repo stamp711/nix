@@ -90,8 +90,6 @@ in
     "/opt/homebrew/bin"
   ];
   home.sessionVariables = {
-    VISUAL = "vim";
-    EDITOR = "vim";
     VOLTA_HOME = "$HOME/.volta";
     COLORTERM = "truecolor";
   };
