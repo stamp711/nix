@@ -13,6 +13,10 @@
       url = "github:Mic92/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     private.url = "git+ssh://git@github.com/stamp711/nix-private";
   };
 
@@ -32,7 +36,24 @@
             config.allowUnfree = true;
             overlays = builtins.attrValues self.overlays;
           };
-          formatter = pkgs.nixfmt-tree;
+
+          formatter =
+            (inputs.treefmt-nix.lib.evalModule pkgs {
+              projectRootFile = "flake.nix";
+              programs.nixfmt.enable = true;
+              programs.stylua.enable = true;
+              programs.prettier.enable = true;
+              programs.clang-format.enable = true;
+              settings.formatter.gersemi = {
+                command = "${pkgs.gersemi}/bin/gersemi";
+                options = [ "-i" ];
+                includes = [
+                  "**/CMakeLists.txt"
+                  "**/*.cmake"
+                ];
+              };
+            }).config.build.wrapper;
+
           devShells.default = import ./shell.nix { inherit pkgs; };
         };
 
