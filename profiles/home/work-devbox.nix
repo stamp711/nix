@@ -1,10 +1,9 @@
-{ self, inputs, ... }:
+{ self, ... }:
 {
   imports =
-    builtins.attrValues self.homeModules
-    ++ (with self.homeWorkModules; [
+    self.lib.collectModules [ self.homeModules.common ]
+    ++ (with self.homeModules.work; [
       git-identity
       devbox-proxy
     ]);
-  home.username = inputs.private.work.username.devbox;
 }

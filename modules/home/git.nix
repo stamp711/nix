@@ -18,6 +18,9 @@
   programs.git.signing.format = "ssh";
   programs.git.signing.signByDefault = true;
   programs.git.settings.gpg.ssh.allowedSignersFile = "${config.xdg.configHome}/git/allowed_signers";
+  home.file."${config.xdg.configHome}/git/allowed_signers".text = with config.programs.git; ''
+    ${settings.user.email} namespaces="git" ${signing.key}
+  '';
 
   # Global ignores
   programs.git.ignores = [

@@ -17,6 +17,10 @@
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    deploy-rs = {
+      url = "github:serokell/deploy-rs";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     private.url = "git+ssh://git@github.com/stamp711/nix-private";
   };
 
@@ -59,16 +63,19 @@
 
       flake =
         let
+          lib = inputs.nixpkgs.lib;
+
           # Load host definitions
           hosts = self.lib.loadDir ./hosts { inherit self inputs; };
 
           # Generate named host-specific configs from host files
-          hostConfigs = inputs.nixpkgs.lib.mapAttrs' (
-            _: host: inputs.nixpkgs.lib.nameValuePair "${host.username}@${host.hostname}" host.homeConfiguration
-          ) hosts;
+          hostsWithHome = lib.filterAttrs (_: host: host.homeConfiguration or null != null) hosts;
+          hostHomeConfigs = lib.mapAttrs' (
+            _: host: lib.nameValuePair "${host.username}@${host.hostname}" host.homeConfiguration
+          ) hostsWithHome;
 
           # Manual template configs for common cases
-          templateConfigs = {
+          templateHomeConfigs = {
             # Generic work devbox configuration (Linux)
             work-devbox = inputs.home-manager.lib.homeManagerConfiguration {
               pkgs = import inputs.nixpkgs {
@@ -76,28 +83,57 @@
                 config.allowUnfree = true;
               };
               extraSpecialArgs = { inherit self inputs; };
-              modules = [ self.homeProfiles.work-devbox ];
+              modules = [
+                { home.username = inputs.private.work.hosts.dev.username; }
+                self.homeProfiles.work-devbox
+              ];
             };
           };
 
-          # Combine both automatic and manual configs
-          homeConfigurations = hostConfigs // templateConfigs;
+          # Generate deploy-rs nodes from hosts with deploy config
+          hostsWithDeploy = lib.filterAttrs (_: host: host.deploy or null != null) hosts;
+          deployNodes = lib.mapAttrs (
+            _: host:
+            let
+              profiles =
+                lib.optionalAttrs (host.homeConfiguration or null != null) {
+                  home-manager = {
+                    user = host.username;
+                    path = inputs.deploy-rs.lib.${host.system}.activate.home-manager host.homeConfiguration;
+                  };
+                }
+                // lib.optionalAttrs (host.nixosConfiguration or null != null) {
+                  system = {
+                    user = "root";
+                    path = inputs.deploy-rs.lib.${host.system}.activate.nixos host.nixosConfiguration;
+                  };
+                };
+            in
+            host.deploy // { inherit profiles; }
+          ) hostsWithDeploy;
         in
         {
           # Library functions
           lib = import ./lib { lib = inputs.nixpkgs.lib; };
 
           # Home Manager
-          homeModules = self.lib.importDir ./modules/home;
-          homePersonalModules = self.lib.importDir ./modules/home-personal;
-          homeWorkModules = self.lib.importDir ./modules/home-work;
+          homeModules = {
+            common = self.lib.importDir ./modules/home;
+            personal = self.lib.importDir ./modules/home-personal;
+            work = self.lib.importDir ./modules/home-work;
+          };
+
           homeProfiles = self.lib.importDir ./profiles/home;
 
           # Overlays
           overlays = import ./overlays.nix { inherit inputs; };
 
           # Home configurations
-          inherit homeConfigurations;
+          # Combine both automatic and manual configs
+          homeConfigurations = hostHomeConfigs // templateHomeConfigs;
+
+          # Deploy-rs
+          deploy.nodes = deployNodes;
 
           # Templates
           templates = {

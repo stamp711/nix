@@ -35,4 +35,7 @@ in
       name = entryName name type;
       value = import (entryPath dir name type) args;
     }) (entries dir);
+
+  # Collect all values from multiple attrsets into a flat list.
+  collectModules = modules: builtins.concatLists (map builtins.attrValues modules);
 }

@@ -1,55 +1,92 @@
 # Nix Configuration
 
-Personal Nix setup with flakes and flake-parts.
+Personal Nix setup using flakes, flake-parts, and home-manager.
 
 ## Structure
 
-- `flake.nix` - Main flake configuration
-- `shell.nix` - Development shell
-- `home/` - Home-manager configuration
-  - `packages.nix` - Standalone packages
-  - `shell.nix` - Zsh + starship
-  - `cli-tools.nix` - CLI utilities
-  - `git/` - Git config + SSH signing
-- `overlays/` - Package overlays (includes `pkgs-intel` for x86 on Apple Silicon)
-- `templates/` - Project starters (basic, rust, cpp, python)
-
-## Setup
-
-```bash
-# Install Nix
-sh <(curl -L https://nixos.org/nix/install) --daemon
-
-# First-time activation
-nix --experimental-features 'nix-command flakes' run home-manager -- switch --flake .
-
-# Updates
-nix flake update
-home-manager switch --flake .
-# Or: nh home switch
-
-# Purge old generations
-nh clean user
+```
+.
+├── flake.nix              # Main flake configuration
+├── shell.nix              # Development shell
+├── lib/                   # Helper functions (importDir, loadDir)
+├── hosts/                 # Host-specific configurations
+├── modules/
+│   ├── home/              # Shared home-manager modules
+│   ├── home-personal/     # Personal-only modules
+│   └── home-work/         # Work-only modules
+├── profiles/home/         # Composable profiles (personal, work-laptop, work-devbox)
+├── overlays.nix           # Package overlays
+└── templates/             # Project starters (basic, rust, cpp, python)
 ```
 
-## Quick Commands
+## Flake Outputs
+
+| Output               | Description                                                  |
+| -------------------- | ------------------------------------------------------------ |
+| `homeConfigurations` | Named configs: `stamp@Lius-MacBook-Pro`, `work-devbox`, etc. |
+| `homeModules`        | Shared home-manager modules                                  |
+| `homeProfiles`       | Composable profiles (personal, work-laptop, work-devbox)     |
+| `formatter`          | treefmt with nixfmt, stylua, prettier, clang-format, gersemi |
+| `deploy`             | deploy-rs configuration for remote hosts                     |
+| `templates`          | Project starters (basic, rust, cpp, python)                  |
+
+## Usage
 
 ```bash
-# Dev shell
-nix develop
+# First-time setup
+nix --experimental-features 'nix-command flakes' run home-manager -- switch --flake .
 
-# Format (uses nixfmt-tree)
+# Switch configuration
+home-manager switch --flake .#stamp@Lius-MacBook-Pro
+
+# Or use a template config (for devboxes)
+home-manager switch --flake .#work-devbox
+
+# Deploy to remote host
+deploy .#dev
+deploy .#work-dev
+
+# Format code (nix, lua, json, c/c++, cmake)
 nix fmt
+# or globally
+treefmt
 
-# Update flakes
+# Update flake inputs
 nix flake update
 
 # New project from template
 nix flake init -t .#python  # or rust, cpp, basic
+
+# Dev shell
+nix develop
 ```
 
-## Notes
+## Adding a New Host
 
-- Add packages: Edit `home/packages.nix`
-- Add configured programs: Edit relevant files in `home/`
-- Systems: aarch64-darwin, x86_64-linux
+1. Create `hosts/<name>.nix`:
+
+```nix
+{ self, inputs }:
+{
+  username = "user";
+  hostname = "hostname";
+
+  homeConfiguration = inputs.home-manager.lib.homeManagerConfiguration {
+    pkgs = import inputs.nixpkgs {
+      system = "x86_64-linux";  # or aarch64-darwin
+      config.allowUnfree = true;
+    };
+    extraSpecialArgs = { inherit self inputs; };
+    modules = [
+      self.homeProfiles.personal  # or work-laptop, work-devbox
+    ];
+  };
+}
+```
+
+2. The host is automatically discovered and added to `homeConfigurations`.
+
+## Systems
+
+- `aarch64-darwin` - Apple Silicon Macs
+- `x86_64-linux` - Linux (devboxes, servers)

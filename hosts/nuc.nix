@@ -1,10 +1,10 @@
-# Personal MacBook
+# Personal devbox
 { self, inputs }:
 let
-  host = inputs.private.personal.hosts.macbook;
+  host = inputs.private.personal.hosts.nuc;
   username = host.username;
   hostname = host.hostname;
-  system = "aarch64-darwin";
+  system = "x86_64-linux";
 in
 {
   inherit username hostname system;
@@ -19,5 +19,10 @@ in
       { home.username = username; }
       self.homeProfiles.personal
     ];
+  };
+
+  deploy = {
+    hostname = host.address;
+    remoteBuild = true;
   };
 }

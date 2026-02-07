@@ -1,22 +1,13 @@
+# Work Git Identity
 { inputs, ... }:
 let
   private = inputs.private;
 in
 {
-  programs.git = {
-    settings = {
-      user.name = private.work.git.name;
-      user.email = private.work.git.email;
-    };
-
-    signing = {
-      key = "";
-      signByDefault = false;
-    };
-
-    ignores = [ ];
+  programs.git.settings = {
+    user.name = private.work.git.name;
+    user.email = private.work.git.email;
   };
 
-  # Work-specific session path
-  home.sessionPath = [ ];
+  programs.git.signing.key = private.work.git.signingKey;
 }

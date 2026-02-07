@@ -1,9 +1,8 @@
-{ self, inputs, ... }:
+{ self, ... }:
 {
   imports =
-    builtins.attrValues self.homeModules
-    ++ (with self.homeWorkModules; [
+    self.lib.collectModules [ self.homeModules.common ]
+    ++ (with self.homeModules.work; [
       git-identity
     ]);
-  home.username = inputs.private.work.username.laptop;
 }

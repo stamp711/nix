@@ -9,7 +9,7 @@ pkgs.mkShell {
     # Nix language tools
     nil
     nixd
-    nixfmt-rfc-style
+    nixfmt
 
     # Nix linters and utilities
     statix
@@ -27,7 +27,7 @@ pkgs.mkShell {
     echo "Nix config development shell"
     echo "Available tools:"
     echo "  - nil/nixd: Nix language servers"
-    echo "  - nixfmt-rfc-style: Format Nix files"
+    echo "  - nixfmt: Format Nix files"
     echo "  - statix: Lint Nix files"
     echo "  - deadnix: Find dead Nix code"
     echo "  - update-flake: Update all flake inputs"
