@@ -11,11 +11,11 @@
       hosts = {
         macbook = {
           username = "user";
-          hostname = "host";
+          hostname = "personal-macbook";
         };
         nuc = {
           username = "user";
-          hostname = "host";
+          hostname = "personal-nuc";
           address = "";
         };
       };
@@ -30,11 +30,11 @@
       hosts = {
         macbook = {
           username = "user";
-          hostname = "host";
+          hostname = "work-macbook";
         };
         dev = {
           username = "user";
-          hostname = "host";
+          hostname = "work-dev";
           address = "";
         };
       };
