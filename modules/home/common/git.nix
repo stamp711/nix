@@ -2,7 +2,15 @@
   description = "Git configuration with signing, delta, and GitHub CLI";
 
   module =
-    { pkgs, config, ... }:
+    {
+      pkgs,
+      config,
+      lib,
+      ...
+    }:
+    let
+      hasSigningKey = config.programs.git.signing.key != null;
+    in
     {
       programs.git.enable = true;
 
@@ -20,11 +28,13 @@
 
       # Signing
       programs.git.signing.format = "ssh";
-      programs.git.signing.signByDefault = true;
+      programs.git.signing.signByDefault = lib.mkIf hasSigningKey true;
       programs.git.settings.gpg.ssh.allowedSignersFile = "${config.xdg.configHome}/git/allowed_signers";
-      home.file."${config.xdg.configHome}/git/allowed_signers".text = with config.programs.git; ''
-        ${settings.user.email} namespaces="git" ${signing.key}
-      '';
+      home.file."${config.xdg.configHome}/git/allowed_signers" = lib.mkIf hasSigningKey {
+        text = with config.programs.git; ''
+          ${settings.user.email} namespaces="git" ${signing.key}
+        '';
+      };
 
       # Global ignores
       programs.git.ignores = [
