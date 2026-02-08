@@ -1,3 +1,4 @@
+# AI coding assistants
 {
   programs.claude-code.enable = true;
   programs.claude-code.enableMcpIntegration = true;

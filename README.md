@@ -7,15 +7,14 @@ Personal Nix setup using flakes, flake-parts, and home-manager.
 ```
 .
 ├── flake.nix              # Main flake configuration
-├── shell.nix              # Development shell
 ├── lib/                   # Helper functions (importDir, mkPkgs, mkHome)
 ├── hosts/                 # Host-specific configurations
-├── modules/
-│   ├── darwin/            # Darwin modules
-│   └── home/              # Home-manager modules
+├── modules/home/          # Home-manager modules
+│   ├── common/            # Shared modules
+│   ├── personal/          # Personal-only modules
+│   └── work/              # Work-only modules
 ├── profiles/home/         # Composable profiles (personal, work-laptop, work-devbox)
-├── overlays.nix           # Package overlays
-└── templates/             # Project starters (basic, rust, cpp, python)
+└── overlays.nix           # Package overlays
 ```
 
 ## Flake Outputs
@@ -32,23 +31,25 @@ Personal Nix setup using flakes, flake-parts, and home-manager.
 ## Usage
 
 ```bash
-# First-time setup
-nix --experimental-features 'nix-command flakes' run home-manager -- switch --flake .
+# First-time setup (no clone needed)
+nix --experimental-features 'nix-command flakes' run nixpkgs#nh -- home switch github:stamp711/nix
 
-# Switch configuration
-home-manager switch --flake .#stamp@Lius-MacBook-Pro
+# Switch configuration (NH_FLAKE is set after first switch)
+nh home switch
 
-# Or use a template config (for devboxes)
-home-manager switch --flake .#work-devbox
+# Or explicitly specify configuration
+nh home switch -c work-devbox
+```
 
+### Local Development
+
+```bash
 # Deploy to remote host
 deploy .#dev
 deploy .#work-dev
 
 # Format code (nix, lua, json, c/c++, cmake)
 nix fmt
-# or globally
-treefmt
 
 # Update flake inputs
 nix flake update

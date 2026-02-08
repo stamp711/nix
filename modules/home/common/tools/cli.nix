@@ -1,17 +1,29 @@
+# General CLI tools
+{ self, pkgs, ... }:
 {
-  self,
-  inputs,
-  pkgs,
-  ...
-}:
-{
-  imports = [
-    inputs.nix-index-database.homeModules.nix-index
-  ];
-
   # Multi-language formatter (treefmt wrapped with nixfmt, stylua, prettier, etc.)
-  home.packages = [
+  home.packages = with pkgs; [
     self.formatter.${pkgs.stdenv.hostPlatform.system}
+
+    # Search
+    fd
+    ripgrep
+
+    # General utilities
+    assh
+    age
+    age-plugin-1p
+    doxygen
+    eternal-terminal
+    imgcat
+    helix
+    just
+    netcat
+    scc
+    sops
+    watch
+    wakatime-cli
+    wget
   ];
 
   # Modern ls replacement
@@ -29,7 +41,6 @@
     enable = true;
     terminal = "xterm-256color";
   };
-
   programs.zellij.enable = true;
 
   # Manual pages
@@ -46,8 +57,4 @@
 
   # Modern alternative to the watch command
   programs.hwatch.enable = true;
-
-  # Nix index for command-not-found
-  programs.nix-index-database.comma.enable = true;
-  programs.nix-index.enable = true;
 }
