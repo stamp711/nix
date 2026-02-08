@@ -81,6 +81,7 @@
 
           # Show module tree structure
           # Use: nix run .#show-modules [--json|--tree]
+          # ANSI: \u001b[1m = bold, \u001b[2m = dim, \u001b[0m = reset
           apps.show-modules = {
             type = "app";
             program = toString (
@@ -96,8 +97,9 @@
                         (.key == $last) as $is_last |
                         (if $is_last then "└── " else "├── " end) as $branch |
                         (if $is_last then "    " else "│   " end) as $ext |
-                        "\(prefix)\($branch)\(.key)",
-                        (if .value == {} then empty else .value | tree("\(prefix)\($ext)") end);
+                        (if .value | type == "string" then ": \u001b[2m\(.value)\u001b[0m" else "" end) as $desc |
+                        "\(prefix)\($branch)\u001b[1m\(.key)\u001b[0m\($desc)",
+                        (if (.value | type) == "object" then .value | tree("\(prefix)\($ext)") else empty end);
                       tree("")
                     ' ;;
                   *) echo "Usage: show-modules [--json|--tree]" ;;
