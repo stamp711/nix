@@ -1,7 +1,7 @@
 # Personal Git Identity
 { inputs, ... }:
 let
-  private = inputs.private;
+  inherit (inputs) private;
 in
 {
   programs.git.settings = {

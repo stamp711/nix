@@ -95,5 +95,6 @@ in
   };
   home.shellAliases = {
     ssh = "assh wrapper ssh --";
+    nix-init = "nix flake init -t github:the-nix-way/dev-templates#";
   };
 }

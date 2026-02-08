@@ -12,7 +12,9 @@
   };
 
   # Copy LazyVim config
-  xdg.configFile."nvim/init.lua".source = ./nvim/init.lua;
-  xdg.configFile."nvim/lua".source = ./nvim/lua;
-  xdg.configFile."nvim/lazyvim.json".source = ./nvim/lazyvim.json;
+  xdg.configFile = {
+    "nvim/init.lua".source = ./nvim/init.lua;
+    "nvim/lua".source = ./nvim/lua;
+    "nvim/lazyvim.json".source = ./nvim/lazyvim.json;
+  };
 }

@@ -52,18 +52,14 @@
           };
         in
         {
-          _module.args.pkgs = import inputs.nixpkgs {
-            inherit system;
-            config.allowUnfree = true;
-            overlays = builtins.attrValues self.overlays;
-          };
+          _module.args.pkgs = self.lib.mkPkgs system;
 
           formatter = treefmt.config.build.wrapper;
 
           checks = {
             formatting = treefmt.config.build.check self;
             statix = pkgs.runCommand "statix" { } ''
-              ${pkgs.statix}/bin/statix check ${self}
+              ${pkgs.statix}/bin/statix check ${self} -c ${self}/statix.toml
               touch $out
             '';
             deadnix = pkgs.runCommand "deadnix" { } ''
@@ -72,12 +68,20 @@
             '';
           };
 
-          devShells.default = import ./shell.nix { inherit pkgs; };
+          devShells.default = pkgs.mkShell {
+            packages = [
+              pkgs.statix
+              pkgs.deadnix
+              pkgs.nix-output-monitor
+              inputs.deploy-rs.packages.${system}.default
+            ];
+            inputsFrom = [ treefmt.config.build.devShell ];
+          };
         };
 
       flake =
         let
-          lib = inputs.nixpkgs.lib;
+          inherit (inputs.nixpkgs) lib;
 
           # Load host definitions
           hosts = self.lib.loadDir ./hosts { inherit self inputs; };
@@ -91,16 +95,10 @@
           # Manual template configs for common cases
           templateHomeConfigs = {
             # Generic work devbox configuration (Linux)
-            work-devbox = inputs.home-manager.lib.homeManagerConfiguration {
-              pkgs = import inputs.nixpkgs {
-                system = "x86_64-linux";
-                config.allowUnfree = true;
-              };
-              extraSpecialArgs = { inherit self inputs; };
-              modules = [
-                { home.username = inputs.private.work.hosts.dev.username; }
-                self.homeProfiles.work-devbox
-              ];
+            work-devbox = self.lib.mkHome {
+              system = "x86_64-linux";
+              inherit (inputs.private.work.hosts.dev) username;
+              modules = [ self.homeProfiles.work-devbox ];
             };
           };
 
@@ -128,7 +126,7 @@
         in
         {
           # Library functions
-          lib = import ./lib { lib = inputs.nixpkgs.lib; };
+          lib = import ./lib.nix { inherit self inputs; };
 
           # Home Manager
           homeModules = {
@@ -148,26 +146,6 @@
 
           # Deploy-rs
           deploy.nodes = deployNodes;
-
-          # Templates
-          templates = {
-            default = {
-              path = ./templates/basic;
-              description = "Basic Nix development environment";
-            };
-            rust = {
-              path = ./templates/rust;
-              description = "Rust development environment";
-            };
-            cpp = {
-              path = ./templates/cpp;
-              description = "C++ development environment";
-            };
-            python = {
-              path = ./templates/python;
-              description = "Python development environment with uv";
-            };
-          };
         };
     };
 }

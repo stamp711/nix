@@ -2,22 +2,14 @@
 { self, inputs }:
 let
   host = inputs.private.personal.hosts.macbook;
-  username = host.username;
-  hostname = host.hostname;
+  inherit (host) username hostname;
   system = "aarch64-darwin";
 in
 {
   inherit username hostname system;
 
-  homeConfiguration = inputs.home-manager.lib.homeManagerConfiguration {
-    pkgs = import inputs.nixpkgs {
-      inherit system;
-      config.allowUnfree = true;
-    };
-    extraSpecialArgs = { inherit self inputs; };
-    modules = [
-      { home.username = username; }
-      self.homeProfiles.personal
-    ];
+  homeConfiguration = self.lib.mkHome {
+    inherit system username;
+    modules = [ self.homeProfiles.personal ];
   };
 }

@@ -1,5 +1,7 @@
-{ lib }:
+{ self, inputs }:
 let
+  inherit (inputs.nixpkgs) lib;
+
   # Match .nix files (excluding default.nix) or directories with default.nix
   entries =
     dir:
@@ -20,6 +22,15 @@ let
   entryName = name: type: if type == "directory" then name else lib.removeSuffix ".nix" name;
 in
 {
+  # Create a nixpkgs instance with our standard configuration.
+  mkPkgs =
+    system:
+    import inputs.nixpkgs {
+      inherit system;
+      config.allowUnfree = true;
+      overlays = builtins.attrValues self.overlays;
+    };
+
   # Import all .nix files and directories with default.nix into an attrset.
   importDir =
     dir:
@@ -38,4 +49,17 @@ in
 
   # Collect all values from multiple attrsets into a flat list.
   collectModules = modules: builtins.concatLists (map builtins.attrValues modules);
+
+  # Create a home-manager configuration from system, username, and modules.
+  mkHome =
+    {
+      system,
+      username,
+      modules,
+    }:
+    inputs.home-manager.lib.homeManagerConfiguration {
+      pkgs = self.lib.mkPkgs system;
+      extraSpecialArgs = { inherit self inputs; };
+      modules = [ { home.username = username; } ] ++ modules;
+    };
 }
