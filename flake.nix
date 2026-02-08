@@ -34,6 +34,23 @@
 
       perSystem =
         { pkgs, system, ... }:
+        let
+          treefmt = inputs.treefmt-nix.lib.evalModule pkgs {
+            projectRootFile = "flake.nix";
+            programs.nixfmt.enable = true;
+            programs.stylua.enable = true;
+            programs.prettier.enable = true;
+            programs.clang-format.enable = true;
+            settings.formatter.gersemi = {
+              command = "${pkgs.gersemi}/bin/gersemi";
+              options = [ "-i" ];
+              includes = [
+                "**/CMakeLists.txt"
+                "**/*.cmake"
+              ];
+            };
+          };
+        in
         {
           _module.args.pkgs = import inputs.nixpkgs {
             inherit system;
@@ -41,22 +58,19 @@
             overlays = builtins.attrValues self.overlays;
           };
 
-          formatter =
-            (inputs.treefmt-nix.lib.evalModule pkgs {
-              projectRootFile = "flake.nix";
-              programs.nixfmt.enable = true;
-              programs.stylua.enable = true;
-              programs.prettier.enable = true;
-              programs.clang-format.enable = true;
-              settings.formatter.gersemi = {
-                command = "${pkgs.gersemi}/bin/gersemi";
-                options = [ "-i" ];
-                includes = [
-                  "**/CMakeLists.txt"
-                  "**/*.cmake"
-                ];
-              };
-            }).config.build.wrapper;
+          formatter = treefmt.config.build.wrapper;
+
+          checks = {
+            formatting = treefmt.config.build.check self;
+            statix = pkgs.runCommand "statix" { } ''
+              ${pkgs.statix}/bin/statix check ${self}
+              touch $out
+            '';
+            deadnix = pkgs.runCommand "deadnix" { } ''
+              ${pkgs.deadnix}/bin/deadnix --fail ${self}
+              touch $out
+            '';
+          };
 
           devShells.default = import ./shell.nix { inherit pkgs; };
         };
