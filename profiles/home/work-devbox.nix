@@ -1,9 +1,7 @@
 { self, ... }:
 {
-  imports =
-    self.lib.collectModules [ self.homeModules.common ]
-    ++ (with self.homeModules.work; [
-      git-identity
-      devbox-proxy
-    ]);
+  imports = self.homeModules.common._all ++ [
+    self.homeModules.work.git-identity
+    self.homeModules.work.devbox-proxy
+  ];
 }

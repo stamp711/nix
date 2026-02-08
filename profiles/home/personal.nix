@@ -1,7 +1,4 @@
 { self, ... }:
 {
-  imports = self.lib.collectModules [
-    self.homeModules.common
-    self.homeModules.personal
-  ];
+  imports = self.homeModules.common._all ++ self.homeModules.personal._all;
 }

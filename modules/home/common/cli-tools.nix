@@ -1,7 +1,17 @@
-{ inputs, ... }:
+{
+  self,
+  inputs,
+  pkgs,
+  ...
+}:
 {
   imports = [
     inputs.nix-index-database.homeModules.nix-index
+  ];
+
+  # Multi-language formatter (treefmt wrapped with nixfmt, stylua, prettier, etc.)
+  home.packages = [
+    self.formatter.${pkgs.stdenv.hostPlatform.system}
   ];
 
   # Modern ls replacement

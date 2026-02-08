@@ -1,3 +1,4 @@
+# Interactive shell: zsh, prompt, and theme
 {
   inputs,
   pkgs,
@@ -11,6 +12,7 @@ in
   imports = [
     inputs.nix-colors.homeManagerModules.default
   ];
+
   # Color scheme
   colorScheme = inputs.nix-colors.colorSchemes.dracula;
 
@@ -63,6 +65,7 @@ in
     '';
   };
 
+  # History search
   programs.hstr.enable = true;
 
   # Starship prompt
@@ -73,28 +76,5 @@ in
       kubernetes.disabled = false;
       container.disabled = true;
     };
-  };
-
-  # direnv and nix-direnv
-  programs.direnv = {
-    enable = true;
-    nix-direnv.enable = true;
-  };
-
-  # Shell environment
-  home.sessionPath = [
-    "$HOME/.local/bin"
-    "$XDG_DATA_HOME/bob/nvim-bin"
-    "$VOLTA_HOME/bin"
-    "$HOME/.cargo/bin"
-    "/opt/homebrew/bin"
-  ];
-  home.sessionVariables = {
-    VOLTA_HOME = "$HOME/.volta";
-    COLORTERM = "truecolor";
-  };
-  home.shellAliases = {
-    ssh = "assh wrapper ssh --";
-    nix-init = "nix flake init -t github:the-nix-way/dev-templates#";
   };
 }

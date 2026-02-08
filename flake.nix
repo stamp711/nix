@@ -84,7 +84,7 @@
           inherit (inputs.nixpkgs) lib;
 
           # Load host definitions
-          hosts = self.lib.loadDir ./hosts { inherit self inputs; };
+          hosts = self.lib.importDir ./hosts { args = { inherit self inputs; }; };
 
           # Generate named host-specific configs from host files
           hostsWithHome = lib.filterAttrs (_: host: host.homeConfiguration or null != null) hosts;
@@ -126,16 +126,12 @@
         in
         {
           # Library functions
-          lib = import ./lib.nix { inherit self inputs; };
+          lib = import ./lib { inherit self inputs; };
 
           # Home Manager
-          homeModules = {
-            common = self.lib.importDir ./modules/home;
-            personal = self.lib.importDir ./modules/home-personal;
-            work = self.lib.importDir ./modules/home-work;
-          };
+          homeModules = self.lib.importDir ./modules/home { collect = true; };
 
-          homeProfiles = self.lib.importDir ./profiles/home;
+          homeProfiles = self.lib.importDir ./profiles/home { };
 
           # Overlays
           overlays = import ./overlays.nix { inherit inputs; };

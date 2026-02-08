@@ -8,12 +8,11 @@ Personal Nix setup using flakes, flake-parts, and home-manager.
 .
 ├── flake.nix              # Main flake configuration
 ├── shell.nix              # Development shell
-├── lib/                   # Helper functions (importDir, loadDir)
+├── lib/                   # Helper functions (importDir, mkPkgs, mkHome)
 ├── hosts/                 # Host-specific configurations
 ├── modules/
-│   ├── home/              # Shared home-manager modules
-│   ├── home-personal/     # Personal-only modules
-│   └── home-work/         # Work-only modules
+│   ├── darwin/            # Darwin modules
+│   └── home/              # Home-manager modules
 ├── profiles/home/         # Composable profiles (personal, work-laptop, work-devbox)
 ├── overlays.nix           # Package overlays
 └── templates/             # Project starters (basic, rust, cpp, python)
