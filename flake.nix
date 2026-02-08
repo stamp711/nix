@@ -117,20 +117,30 @@
           hosts = self.lib.importDir ./hosts { args = { inherit self inputs; }; };
 
           # Generate named host-specific configs from host files
+          # Format: { description, module }
           hostsWithHome = lib.filterAttrs (_: host: host.homeConfiguration or null != null) hosts;
-          hostHomeConfigs = lib.mapAttrs' (
-            _: host: lib.nameValuePair "${host.username}@${host.hostname}" host.homeConfiguration
+          hostHomeEntries = lib.mapAttrs' (
+            _: host:
+            lib.nameValuePair "${host.username}@${host.hostname}" {
+              description = host.description or null;
+              module = host.homeConfiguration;
+            }
           ) hostsWithHome;
 
           # Manual template configs for common cases
-          templateHomeConfigs = {
-            # Generic work devbox configuration (Linux)
-            work-devbox = self.lib.mkHome {
-              system = "x86_64-linux";
-              inherit (inputs.private.work.hosts.dev) username;
-              modules = [ self.homeProfiles.work-devbox ];
+          templateHomeEntries = {
+            work-devbox = {
+              description = "Generic work devbox";
+              module = self.lib.mkHome {
+                system = "x86_64-linux";
+                inherit (inputs.private.work.hosts.dev) username;
+                modules = [ self.homeProfiles.work-devbox ];
+              };
             };
           };
+
+          # Combined entries
+          homeConfigEntries = hostHomeEntries // templateHomeEntries;
 
           # Generate deploy-rs nodes from hosts with deploy config
           hostsWithDeploy = lib.filterAttrs (_: host: host.deploy or null != null) hosts;
@@ -159,16 +169,22 @@
           lib = import ./lib { inherit self inputs; };
 
           # Home Manager
-          homeModules = self.lib.importDir ./modules/home { collect = true; };
+          # Extract .module from wrappers, or use as-is if already a function
+          homeModules = self.lib.importDir ./modules/home {
+            mapper = m: m.module or m;
+            collect = true;
+          };
 
           homeProfiles = self.lib.importDir ./profiles/home { };
 
           # Overlays
           overlays = import ./overlays.nix { inherit inputs; };
 
-          # Home configurations
-          # Combine both automatic and manual configs
-          homeConfigurations = hostHomeConfigs // templateHomeConfigs;
+          # Home configurations (extract .module from entries)
+          homeConfigurations = lib.mapAttrs (_: e: e.module) homeConfigEntries;
+
+          # Raw entries with descriptions for tree visualization
+          inherit homeConfigEntries;
 
           # Deploy-rs
           deploy.nodes = deployNodes;

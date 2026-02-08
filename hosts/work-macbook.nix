@@ -1,4 +1,3 @@
-# Work MacBook
 { self, inputs }:
 let
   host = inputs.private.work.hosts.macbook;
@@ -6,6 +5,7 @@ let
   system = "aarch64-darwin";
 in
 {
+  description = "Work MacBook";
   inherit username hostname system;
 
   homeConfiguration = self.lib.mkHome {

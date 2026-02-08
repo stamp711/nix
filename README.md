@@ -27,7 +27,7 @@ Personal Nix setup using flakes, flake-parts, and home-manager.
 | `homeProfiles`       | Composable profiles (personal, work-laptop, work-devbox)     |
 | `formatter`          | treefmt with nixfmt, stylua, prettier, clang-format, gersemi |
 | `deploy`             | deploy-rs configuration for remote hosts                     |
-| `templates`          | Project starters (basic, rust, cpp, python)                  |
+| `apps.show-modules`  | Visualize module tree with descriptions                      |
 
 ## Usage
 
@@ -67,12 +67,31 @@ nix fmt
 # Update flake inputs
 nix flake update
 
-# New project from template
-nix flake init -t .#python  # or rust, cpp, basic
+# View module tree with descriptions
+nix run .#show-modules
 
 # Dev shell
 nix develop
 ```
+
+## Wrapper Pattern
+
+Modules and configurations use a wrapper pattern `{ description, module }` to attach metadata:
+
+```nix
+# modules/home/common/example.nix
+{
+  description = "Example module description";
+
+  module = { pkgs, ... }: {
+    home.packages = [ pkgs.hello ];
+  };
+}
+```
+
+The `description` is extracted for visualization (`nix run .#show-modules`), while `module` is
+extracted for actual use. Plain functions without wrappers are also supported (description will
+be null).
 
 ## Adding a New Host
 
@@ -80,19 +99,19 @@ nix develop
 
 ```nix
 { self, inputs }:
+let
+  system = "x86_64-linux";  # or aarch64-darwin
+in
 {
+  description = "My new host";
   username = "user";
   hostname = "hostname";
+  inherit system;
 
-  homeConfiguration = inputs.home-manager.lib.homeManagerConfiguration {
-    pkgs = import inputs.nixpkgs {
-      system = "x86_64-linux";  # or aarch64-darwin
-      config.allowUnfree = true;
-    };
-    extraSpecialArgs = { inherit self inputs; };
-    modules = [
-      self.homeProfiles.personal  # or work-laptop, work-devbox
-    ];
+  homeConfiguration = self.lib.mkHome {
+    inherit system;
+    username = "user";
+    modules = [ self.homeProfiles.personal ];  # or work-laptop, work-devbox
   };
 }
 ```

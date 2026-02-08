@@ -1,34 +1,38 @@
-# Development tools
-{ pkgs, ... }:
 {
-  home.packages = with pkgs; [
-    # Binary analysis
-    elf-info
-    binsider
+  description = "Development tools and language servers";
 
-    # Security
-    _1password-cli
+  module =
+    { pkgs, ... }:
+    {
+      home.packages = with pkgs; [
+        # Binary analysis
+        elf-info
+        binsider
 
-    # C/C++
-    cmake
+        # Security
+        _1password-cli
 
-    # Rust
-    cargo-expand
-    cargo-feature
-    cargo-nextest
-    cargo-watch
-    rustup
+        # C/C++
+        cmake
 
-    # Python
-    uv
+        # Rust
+        cargo-expand
+        cargo-feature
+        cargo-nextest
+        cargo-watch
+        rustup
 
-    # NodeJS
-    volta
+        # Python
+        uv
 
-    # Language servers
-    lua-language-server
-    nil
-    nixd
-    yaml-language-server
-  ];
+        # NodeJS
+        volta
+
+        # Language servers
+        lua-language-server
+        nil
+        nixd
+        yaml-language-server
+      ];
+    };
 }

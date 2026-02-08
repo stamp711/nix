@@ -1,24 +1,29 @@
 # Core home-manager and nix configuration
-{ config, pkgs, ... }:
 {
-  home.stateVersion = "26.05";
+  description = "Core home-manager and nix configuration";
 
-  home.homeDirectory =
-    if pkgs.stdenv.isDarwin then "/Users/${config.home.username}" else "/home/${config.home.username}";
+  module =
+    { config, pkgs, ... }:
+    {
+      home.stateVersion = "26.05";
 
-  # XDG base directories
-  xdg.enable = true;
+      home.homeDirectory =
+        if pkgs.stdenv.isDarwin then "/Users/${config.home.username}" else "/home/${config.home.username}";
 
-  # Home Manager self-management
-  programs.home-manager.enable = true;
+      # XDG base directories
+      xdg.enable = true;
 
-  # Nix configuration
-  nix.package = pkgs.nix;
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
-  ];
+      # Home Manager self-management
+      programs.home-manager.enable = true;
 
-  # nh (nix helper) configuration
-  home.sessionVariables.NH_FLAKE = "github:stamp711/nix";
+      # Nix configuration
+      nix.package = pkgs.nix;
+      nix.settings.experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
+
+      # nh (nix helper) configuration
+      home.sessionVariables.NH_FLAKE = "github:stamp711/nix";
+    };
 }

@@ -1,4 +1,3 @@
-# Work devbox
 { self, inputs }:
 let
   host = inputs.private.work.hosts.dev;
@@ -6,6 +5,7 @@ let
   system = "x86_64-linux";
 in
 {
+  description = "Work devbox";
   inherit username hostname system;
 
   homeConfiguration = self.lib.mkHome {

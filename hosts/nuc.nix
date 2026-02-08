@@ -1,4 +1,3 @@
-# Personal devbox
 { self, inputs }:
 let
   host = inputs.private.personal.hosts.nuc;
@@ -6,6 +5,7 @@ let
   system = "x86_64-linux";
 in
 {
+  description = "Personal devbox";
   inherit username hostname system;
 
   homeConfiguration = self.lib.mkHome {

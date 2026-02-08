@@ -1,15 +1,18 @@
-# AI coding assistants
 {
-  programs.claude-code.enable = true;
-  programs.claude-code.enableMcpIntegration = true;
+  description = "AI coding assistants";
 
-  programs.codex.enable = true;
+  module = {
+    programs.claude-code.enable = true;
+    programs.claude-code.enableMcpIntegration = true;
 
-  programs.gemini-cli.enable = true;
+    programs.codex.enable = true;
 
-  programs.opencode.enable = true;
-  programs.opencode.enableMcpIntegration = true;
+    programs.gemini-cli.enable = true;
 
-  programs.mcp.enable = true;
-  programs.mcp.servers = { };
+    programs.opencode.enable = true;
+    programs.opencode.enableMcpIntegration = true;
+
+    programs.mcp.enable = true;
+    programs.mcp.servers = { };
+  };
 }

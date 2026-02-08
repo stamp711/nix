@@ -33,7 +33,7 @@ in
     home = {
       modules = extractTree rawHomeModules;
       profiles = extractTree self.homeProfiles;
-      configurations = extractTree self.homeConfigurations;
+      configurations = extractTree self.homeConfigEntries;
     };
     darwin = { };
     nixos = { };
