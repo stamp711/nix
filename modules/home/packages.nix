@@ -63,7 +63,7 @@ in
     nh
     niv
     nixfmt
-    alejandra
+    statix
 
     # General utilities
     age
