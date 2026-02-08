@@ -22,8 +22,5 @@
         "nix-command"
         "flakes"
       ];
-
-      # nh (nix helper) configuration
-      home.sessionVariables.NH_FLAKE = "github:stamp711/nix";
     };
 }
