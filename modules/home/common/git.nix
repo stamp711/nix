@@ -58,5 +58,9 @@
       programs.lazygit.enable = true;
       programs.git-worktree-switcher.enable = true;
       programs.gitui.enable = true;
+
+      home.packages = with pkgs; [
+        git-filter-repo
+      ];
     };
 }
