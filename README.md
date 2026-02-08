@@ -14,7 +14,8 @@ Personal Nix setup using flakes, flake-parts, and home-manager.
 │   ├── personal/          # Personal-only modules
 │   └── work/              # Work-only modules
 ├── profiles/home/         # Composable profiles (personal, work-laptop, work-devbox)
-└── overlays.nix           # Package overlays
+├── overlays.nix           # Package overlays
+└── private-stub/          # Empty flake for bootstrapping without SSH key
 ```
 
 ## Flake Outputs
@@ -39,6 +40,18 @@ nh home switch
 
 # Or explicitly specify configuration
 nh home switch -c work-devbox
+```
+
+### Without Private Flake Access
+
+This flake has a private input (`git+ssh://...`) for private information. To use
+configurations that don't depend on private information, or to bootstrap without SSH
+key access, override the private input with the included stub flake:
+
+```bash
+nix --experimental-features 'nix-command flakes' run nixpkgs#nh -- home switch github:stamp711/nix \
+  --override-input private github:stamp711/nix?dir=private-stub \
+  -c <config-name>
 ```
 
 ### Local Development
