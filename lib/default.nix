@@ -2,8 +2,7 @@
 let
   inherit (inputs.nixpkgs) lib;
 in
-import ./import.nix { inherit lib; }
-// {
+{
   # Create a nixpkgs instance with our standard configuration.
   mkPkgs =
     system:
@@ -26,3 +25,5 @@ import ./import.nix { inherit lib; }
       modules = [ { home.username = username; } ] ++ modules;
     };
 }
+// import ./import.nix { inherit lib; }
+// import ./tree.nix { inherit self inputs; }

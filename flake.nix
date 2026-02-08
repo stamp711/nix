@@ -73,9 +73,37 @@
               pkgs.statix
               pkgs.deadnix
               pkgs.nix-output-monitor
+              pkgs.fx
               inputs.deploy-rs.packages.${system}.default
             ];
             inputsFrom = [ treefmt.config.build.devShell ];
+          };
+
+          # Show module tree structure
+          # Use: nix run .#show-modules [--json|--tree]
+          apps.show-modules = {
+            type = "app";
+            program = toString (
+              pkgs.writeShellScript "show-modules" ''
+                json=$(${pkgs.nix}/bin/nix eval .#lib.moduleTree --json 2>/dev/null)
+                case "$1" in
+                  --json) echo "$json" | ${pkgs.jq}/bin/jq . ;;
+                  --tree|"")
+                    echo "$json" | ${pkgs.jq}/bin/jq -r '
+                      def tree(prefix):
+                        (keys | last) as $last |
+                        to_entries[] |
+                        (.key == $last) as $is_last |
+                        (if $is_last then "└── " else "├── " end) as $branch |
+                        (if $is_last then "    " else "│   " end) as $ext |
+                        "\(prefix)\($branch)\(.key)",
+                        (if .value == {} then empty else .value | tree("\(prefix)\($ext)") end);
+                      tree("")
+                    ' ;;
+                  *) echo "Usage: show-modules [--json|--tree]" ;;
+                esac
+              ''
+            );
           };
         };
 
