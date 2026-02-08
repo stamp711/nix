@@ -84,6 +84,7 @@
           # ANSI: \u001b[1m = bold, \u001b[2m = dim, \u001b[0m = reset
           apps.show-modules = {
             type = "app";
+            meta.description = "Show module tree with descriptions";
             program = toString (
               pkgs.writeShellScript "show-modules" ''
                 json=$(${pkgs.nix}/bin/nix eval .#lib.moduleTree --json 2>/dev/null)
