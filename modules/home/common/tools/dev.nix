@@ -5,10 +5,6 @@
     { pkgs, ... }:
     {
       home.packages = with pkgs; [
-        # Binary analysis
-        elf-info
-        binsider
-
         # Security
         _1password-cli
 
