@@ -31,15 +31,18 @@ rec {
   # - directories without default.nix are recursively traversed
   # Options:
   #   args: if set, call each import with args (default: null)
+  #   mapper: transform each leaf value after import (default: identity)
   #   collect: if true, add `_all` attribute with all entries at each level (default: false)
+  # Note: args and mapper are mutually exclusive
   importDir =
     dir:
     {
       args ? null,
+      mapper ? (x: x),
       collect ? false,
     }:
     let
-      load = path: if args == null then import path else import path args;
+      load = path: mapper (if args == null then import path else import path args);
 
       entries = builtins.readDir dir;
 
@@ -60,7 +63,7 @@ rec {
         else if isPlainDir dir name type then
           {
             inherit name;
-            value = importDir (dir + "/${name}") { inherit args collect; };
+            value = importDir (dir + "/${name}") { inherit args mapper collect; };
             isLeaf = false;
           }
         else
