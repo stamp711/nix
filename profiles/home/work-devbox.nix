@@ -1,6 +1,6 @@
 { self, inputs, ... }:
 let
-  private = inputs.private;
+  inherit (inputs) private;
 in
 {
   imports =
