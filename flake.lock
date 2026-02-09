@@ -175,11 +175,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1770621314,
-        "narHash": "sha256-1S7Hg+XFx5lTa5uphzROByJTu6EGls1j+1MxeEOEQ3s=",
+        "lastModified": 1770624371,
+        "narHash": "sha256-QOWkK0ssCkl5Crm/OV+n0FqCcJogjS8d9i4o9nVHEJk=",
         "ref": "refs/heads/master",
-        "rev": "047fb4a5ad7892f57b35c8c354d77ee682e0c5cf",
-        "revCount": 8,
+        "rev": "0b9e3fd2df37b05dc16a1ea9df7edca4e20fbcc8",
+        "revCount": 9,
         "type": "git",
         "url": "ssh://git@github.com/stamp711/nix-private"
       },
