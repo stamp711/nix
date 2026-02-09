@@ -21,7 +21,12 @@
       url = "github:serokell/deploy-rs";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    private.url = "git+ssh://git@github.com/stamp711/nix-private";
+    utils.url = "path:./nix-utils";
+    private = {
+      url = "git+ssh://git@github.com/stamp711/nix-private";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.utils.follows = "utils";
+    };
   };
 
   outputs =

@@ -1,7 +1,10 @@
-{ self, ... }:
+{ self, inputs, ... }:
+let
+  private = inputs.private;
+in
 {
-  imports = self.homeModules.common._all ++ [
-    self.homeModules.work.git-identity
-    self.homeModules.work.devbox-proxy
-  ];
+  imports =
+    self.homeModules.common._all
+    ++ private.homeModules.work.shared._all
+    ++ private.homeModules.work.devbox._all;
 }

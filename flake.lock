@@ -177,13 +177,37 @@
         "type": "github"
       }
     },
-    "private": {
+    "nixpkgs_2": {
       "locked": {
-        "lastModified": 1770607942,
-        "narHash": "sha256-8BbegL+1/mOPkIUUDF9TS8hVV7+ecvWd47JAb/Noihk=",
+        "lastModified": 1770562336,
+        "narHash": "sha256-ub1gpAONMFsT/GU2hV6ZWJjur8rJ6kKxdm9IlCT0j84=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "d6c71932130818840fc8fe9509cf50be8c64634f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "private": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "utils": [
+          "utils"
+        ]
+      },
+      "locked": {
+        "lastModified": 1770616212,
+        "narHash": "sha256-n0WiGeZvGBmGZGH5N80F51f0CS5TLKkU6uK5Qi1AuYc=",
         "ref": "refs/heads/master",
-        "rev": "1e11e028da5882ca5ecd32c82e40eafe42d4ddd4",
-        "revCount": 4,
+        "rev": "0fb2d21a64d96198977e0b541c0d412451ce176f",
+        "revCount": 5,
         "type": "git",
         "url": "ssh://git@github.com/stamp711/nix-private"
       },
@@ -201,7 +225,8 @@
         "nix-index-database": "nix-index-database",
         "nixpkgs": "nixpkgs",
         "private": "private",
-        "treefmt-nix": "treefmt-nix"
+        "treefmt-nix": "treefmt-nix",
+        "utils": "utils_2"
       }
     },
     "systems": {
@@ -256,6 +281,20 @@
         "repo": "flake-utils",
         "type": "github"
       }
+    },
+    "utils_2": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_2"
+      },
+      "locked": {
+        "path": "./nix-utils",
+        "type": "path"
+      },
+      "original": {
+        "path": "./nix-utils",
+        "type": "path"
+      },
+      "parent": []
     }
   },
   "root": "root",

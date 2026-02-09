@@ -18,12 +18,12 @@ let
           if builtins.isFunction value then
             null # Plain function module, no description
           else if builtins.isAttrs value && value ? _all then
-            go (builtins.removeAttrs value [ "_all" ]) # Directory, recurse
+            go (removeAttrs value [ "_all" ]) # Directory, recurse
           else if builtins.isAttrs value && value ? module then
             value.description or null # Wrapper: use description string directly
           else
             null # Other attrset
-        ) (builtins.removeAttrs attrs [ "_all" ]);
+        ) (removeAttrs attrs [ "_all" ]);
     in
     go;
 in
