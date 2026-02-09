@@ -15,6 +15,7 @@ in
 
   deploy = {
     hostname = host.address;
+    sshUser = username;
     remoteBuild = true;
   };
 }
