@@ -1,0 +1,26 @@
+name: Update private input
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [update-private]
+
+concurrency:
+  group: update-private
+  cancel-in-progress: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+      - uses: DeterminateSystems/nix-installer-action@main
+      - run: git config --global url."https://x-access-token:${{ secrets.GH_PAT }}@github.com/".insteadOf "ssh://git@github.com/"
+      - run: nix flake update private
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add flake.lock
+          git commit -m "Update private input" || true
+          git push
