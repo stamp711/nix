@@ -8,7 +8,10 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nix-colors.url = "github:misterio77/nix-colors";
+    nix-colors = {
+      url = "github:misterio77/nix-colors";
+      inputs.nixpkgs-lib.follows = "flake-parts/nixpkgs-lib";
+    };
     nix-index-database = {
       url = "github:Mic92/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -21,7 +24,10 @@
       url = "github:serokell/deploy-rs";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    utils.url = "path:./nix-utils";
+    utils = {
+      url = "path:./nix-utils";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     private = {
       url = "git+ssh://git@github.com/stamp711/nix-private";
       inputs.nixpkgs.follows = "nixpkgs";
