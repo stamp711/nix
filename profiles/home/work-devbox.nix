@@ -5,6 +5,7 @@ in
 {
   imports =
     self.homeModules.common._all
+    ++ [ self.homeModules.secrets.github-token ]
     ++ private.homeModules.work.shared._all
     ++ private.homeModules.work.devbox._all;
 }

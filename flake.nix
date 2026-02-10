@@ -24,12 +24,16 @@
       url = "github:serokell/deploy-rs";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    opnix = {
+      url = "github:brizzbuzz/opnix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     utils = {
       url = "path:./nix-utils";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     private = {
-      url = "git+ssh://git@github.com/stamp711/nix-private";
+      url = "github:stamp711/nix-private";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.utils.follows = "utils";
     };
