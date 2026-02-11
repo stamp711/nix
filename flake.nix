@@ -51,7 +51,7 @@
         { pkgs, system, ... }:
         let
           treefmt = inputs.treefmt-nix.lib.evalModule pkgs {
-            projectRootFile = "flake.nix";
+            projectRootFile = null;
             programs.nixfmt.enable = true;
             programs.stylua.enable = true;
             programs.prettier.enable = true;

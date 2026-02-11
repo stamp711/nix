@@ -2,12 +2,9 @@
   description = "General CLI tools and utilities";
 
   module =
-    { self, pkgs, ... }:
+    { pkgs, ... }:
     {
-      # Multi-language formatter (treefmt wrapped with nixfmt, stylua, prettier, etc.)
       home.packages = with pkgs; [
-        self.formatter.${pkgs.stdenv.hostPlatform.system}
-
         # Search
         fd
         ripgrep
