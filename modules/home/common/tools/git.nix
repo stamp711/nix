@@ -1,5 +1,5 @@
 {
-  description = "Git configuration with signing, delta, and GitHub CLI";
+  description = "Git configuration with signing, delta, and GitHub CLI & other VCS tools";
 
   module =
     {
@@ -68,6 +68,7 @@
       programs.lazygit.enable = true;
       programs.git-worktree-switcher.enable = true;
       programs.gitui.enable = true;
+      programs.jujutsu.enable = true;
 
       home.packages = with pkgs; [
         git-filter-repo
