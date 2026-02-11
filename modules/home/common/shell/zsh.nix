@@ -71,12 +71,25 @@
       programs.fzf.enable = true;
 
       # Starship prompt
+      home.packages = [
+        inputs.jj-starship.packages.${pkgs.stdenv.hostPlatform.system}.default
+      ];
       programs.starship = {
         enable = true;
         settings = {
-          git_metrics.disabled = false;
+          # Replaced by jj-starship
+          git_branch.disabled = true;
+          git_commit.disabled = true;
+          git_status.disabled = true;
+          # git_metrics.disabled = false;
+
           kubernetes.disabled = false;
           container.disabled = true;
+          custom.jj = {
+            when = "jj-starship detect";
+            shell = "jj-starship";
+            format = "$output ";
+          };
         };
       };
     };

@@ -28,6 +28,11 @@
       url = "github:brizzbuzz/opnix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    jj-starship = {
+      url = "github:dmmulroy/jj-starship";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     utils = {
       url = "path:./nix-utils";
       inputs.nixpkgs.follows = "nixpkgs";
