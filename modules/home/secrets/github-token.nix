@@ -2,21 +2,11 @@
   description = "GitHub token via 1Password for nix, git, and CLI tools";
 
   module =
-    {
-      inputs,
-      config,
-      lib,
-      ...
-    }:
+    { config, ... }:
     let
       secretsDir = "${config.xdg.configHome}/secrets";
     in
     {
-      imports = [ inputs.opnix.homeManagerModules.default ];
-
-      programs.onepassword-secrets.enable = true;
-      programs.onepassword-secrets.tokenFile = "${secretsDir}/opnix-token";
-
       # Environment variable for gh, git, etc.
       programs.onepassword-secrets.secrets.githubToken = {
         reference = "op://Nix Secrets/Github Token/credential";
