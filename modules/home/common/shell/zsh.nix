@@ -68,8 +68,7 @@
         '';
       };
 
-      # History search
-      programs.hstr.enable = true;
+      programs.fzf.enable = true;
 
       # Starship prompt
       programs.starship = {
