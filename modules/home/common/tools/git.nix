@@ -24,6 +24,7 @@
       # Delta diff viewer
       programs.delta.enable = true;
       programs.delta.enableGitIntegration = true;
+      programs.delta.enableJujutsuIntegration = true;
       programs.delta.options.side-by-side = true;
 
       # Signing
@@ -68,7 +69,11 @@
       programs.lazygit.enable = true;
       programs.git-worktree-switcher.enable = true;
       programs.gitui.enable = true;
+
       programs.jujutsu.enable = true;
+      programs.jujutsu.settings.user = lib.mkIf (
+        config.programs.git.settings ? user
+      ) config.programs.git.settings.user;
 
       home.packages = with pkgs; [
         git-filter-repo
