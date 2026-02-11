@@ -74,6 +74,7 @@
       programs.jujutsu.settings.user = lib.mkIf (
         config.programs.git.settings ? user
       ) config.programs.git.settings.user;
+      programs.jjui.enable = true;
 
       home.packages = with pkgs; [
         git-filter-repo
