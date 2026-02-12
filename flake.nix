@@ -141,28 +141,13 @@
 
         # Generate named host-specific configs from host files
         hostsWithHome = lib.filterAttrs (_: host: host.homeConfiguration or null != null) hosts;
-        hostHomeEntries = lib.mapAttrs' (
+        homeConfigEntries = lib.mapAttrs' (
           _: host:
           lib.nameValuePair "${host.username}@${host.hostname}" {
             description = host.description or null;
             module = host.homeConfiguration;
           }
         ) hostsWithHome;
-
-        # Manual template configs for common cases
-        templateHomeEntries = {
-          work-devbox = {
-            description = "Generic work devbox";
-            module = self.lib.mkHome {
-              system = "x86_64-linux";
-              inherit (inputs.private.work.hosts.dev) username;
-              modules = [ self.homeProfiles.work-devbox ];
-            };
-          };
-        };
-
-        # Combined entries
-        homeConfigEntries = hostHomeEntries // templateHomeEntries;
 
         # Generate deploy-rs nodes from hosts with deploy config
         hostsWithDeploy = lib.filterAttrs (_: host: host.deploy or null != null) hosts;
