@@ -46,6 +46,8 @@
 
   outputs =
     inputs@{ self, flake-parts, ... }:
+    # flake-parts for perSystem only; flake-level outputs merged via //
+    # to avoid flake-parts wrapping standard outputs (e.g. nixosModules)
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [
         "aarch64-darwin"
@@ -129,86 +131,85 @@
             );
           };
         };
+    }
+    // (
+      let
+        inherit (inputs.nixpkgs) lib;
 
-      flake =
-        let
-          inherit (inputs.nixpkgs) lib;
+        # Load host definitions
+        hosts = self.lib.importDir ./hosts { args = { inherit self inputs; }; };
 
-          # Load host definitions
-          hosts = self.lib.importDir ./hosts { args = { inherit self inputs; }; };
+        # Generate named host-specific configs from host files
+        hostsWithHome = lib.filterAttrs (_: host: host.homeConfiguration or null != null) hosts;
+        hostHomeEntries = lib.mapAttrs' (
+          _: host:
+          lib.nameValuePair "${host.username}@${host.hostname}" {
+            description = host.description or null;
+            module = host.homeConfiguration;
+          }
+        ) hostsWithHome;
 
-          # Generate named host-specific configs from host files
-          # Format: { description, module }
-          hostsWithHome = lib.filterAttrs (_: host: host.homeConfiguration or null != null) hosts;
-          hostHomeEntries = lib.mapAttrs' (
-            _: host:
-            lib.nameValuePair "${host.username}@${host.hostname}" {
-              description = host.description or null;
-              module = host.homeConfiguration;
-            }
-          ) hostsWithHome;
-
-          # Manual template configs for common cases
-          templateHomeEntries = {
-            work-devbox = {
-              description = "Generic work devbox";
-              module = self.lib.mkHome {
-                system = "x86_64-linux";
-                inherit (inputs.private.work.hosts.dev) username;
-                modules = [ self.homeProfiles.work-devbox ];
-              };
+        # Manual template configs for common cases
+        templateHomeEntries = {
+          work-devbox = {
+            description = "Generic work devbox";
+            module = self.lib.mkHome {
+              system = "x86_64-linux";
+              inherit (inputs.private.work.hosts.dev) username;
+              modules = [ self.homeProfiles.work-devbox ];
             };
           };
-
-          # Combined entries
-          homeConfigEntries = hostHomeEntries // templateHomeEntries;
-
-          # Generate deploy-rs nodes from hosts with deploy config
-          hostsWithDeploy = lib.filterAttrs (_: host: host.deploy or null != null) hosts;
-          deployNodes = lib.mapAttrs (
-            _: host:
-            let
-              profiles =
-                lib.optionalAttrs (host.homeConfiguration or null != null) {
-                  home-manager = {
-                    user = host.username;
-                    path = inputs.deploy-rs.lib.${host.system}.activate.home-manager host.homeConfiguration;
-                  };
-                }
-                // lib.optionalAttrs (host.nixosConfiguration or null != null) {
-                  system = {
-                    user = "root";
-                    path = inputs.deploy-rs.lib.${host.system}.activate.nixos host.nixosConfiguration;
-                  };
-                };
-            in
-            host.deploy // { inherit profiles; }
-          ) hostsWithDeploy;
-        in
-        {
-          # Library functions
-          lib = import ./lib { inherit self inputs; };
-
-          # Home Manager
-          # Extract .module from wrappers, or use as-is if already a function
-          homeModules = self.lib.importDir ./modules/home {
-            mapper = m: m.module or m;
-            collect = true;
-          };
-
-          homeProfiles = self.lib.importDir ./profiles/home { };
-
-          # Overlays
-          overlays = import ./overlays.nix { inherit inputs; };
-
-          # Home configurations (extract .module from entries)
-          homeConfigurations = lib.mapAttrs (_: e: e.module) homeConfigEntries;
-
-          # Raw entries with descriptions for tree visualization
-          inherit homeConfigEntries;
-
-          # Deploy-rs
-          deploy.nodes = deployNodes;
         };
-    };
+
+        # Combined entries
+        homeConfigEntries = hostHomeEntries // templateHomeEntries;
+
+        # Generate deploy-rs nodes from hosts with deploy config
+        hostsWithDeploy = lib.filterAttrs (_: host: host.deploy or null != null) hosts;
+        deployNodes = lib.mapAttrs (
+          _: host:
+          let
+            profiles =
+              lib.optionalAttrs (host.homeConfiguration or null != null) {
+                home-manager = {
+                  user = host.username;
+                  path = inputs.deploy-rs.lib.${host.system}.activate.home-manager host.homeConfiguration;
+                };
+              }
+              // lib.optionalAttrs (host.nixosConfiguration or null != null) {
+                system = {
+                  user = "root";
+                  path = inputs.deploy-rs.lib.${host.system}.activate.nixos host.nixosConfiguration;
+                };
+              };
+          in
+          host.deploy // { inherit profiles; }
+        ) hostsWithDeploy;
+      in
+      {
+        # Library functions
+        lib = import ./lib { inherit self inputs; };
+
+        # Home Manager
+        # Extract .module from wrappers, or use as-is if already a function
+        homeModules = self.lib.importDir ./modules/home {
+          mapper = m: m.module or m;
+          collect = true;
+        };
+
+        homeProfiles = self.lib.importDir ./profiles/home { };
+
+        # Overlays
+        overlays = import ./overlays.nix { inherit inputs; };
+
+        # Home configurations (extract .module from entries)
+        homeConfigurations = lib.mapAttrs (_: e: e.module) homeConfigEntries;
+
+        # Raw entries with descriptions for tree visualization
+        inherit homeConfigEntries;
+
+        # Deploy-rs
+        deploy.nodes = deployNodes;
+      }
+    );
 }
