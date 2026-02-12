@@ -3,10 +3,7 @@
 let
   inherit (inputs.nixpkgs) lib;
 
-  # Import modules without mapper to get raw wrappers with descriptions
-  rawHomeModules = self.lib.importDir "${self}/modules/home" { collect = true; };
-
-  # Extract tree with descriptions from raw module wrappers
+  # Extract tree with descriptions from tree of wrappers
   # Wrapper format: { description = "..."; module = ...; }
   # Plain module: function
   extractTree =
@@ -31,10 +28,11 @@ in
   # Module tree for visualization (use with: nix run .#show-modules)
   moduleTree = {
     home = {
-      modules = extractTree rawHomeModules;
+      modules = extractTree self.homeModuleEntries;
       profiles = extractTree self.homeProfiles;
       configurations = extractTree self.homeConfigEntries;
     };
+    deploy = extractTree self.deployNodeEntries;
     darwin = { };
     nixos = { };
   };

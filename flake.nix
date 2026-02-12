@@ -139,7 +139,7 @@
         # Load host definitions
         hosts = self.lib.importDir ./hosts { args = { inherit self inputs; }; };
 
-        # Generate named host-specific configs from host files
+        # Generate home configs from hosts
         hostsWithHome = lib.filterAttrs (_: host: host.homeConfiguration or null != null) hosts;
         homeConfigEntries = lib.mapAttrs' (
           _: host:
@@ -149,34 +149,28 @@
           }
         ) hostsWithHome;
 
-        # Generate deploy-rs nodes from hosts with deploy config
+        # Generate deploy-rs nodes from hosts
         hostsWithDeploy = lib.filterAttrs (_: host: host.deploy or null != null) hosts;
-        deployNodes = lib.mapAttrs (
-          _: host:
-          let
-            profiles =
-              lib.optionalAttrs (host.homeConfiguration or null != null) {
-                home-manager = {
-                  user = host.username;
-                  path = inputs.deploy-rs.lib.${host.system}.activate.home-manager host.homeConfiguration;
-                };
-              }
-              // lib.optionalAttrs (host.nixosConfiguration or null != null) {
-                system = {
-                  user = "root";
-                  path = inputs.deploy-rs.lib.${host.system}.activate.nixos host.nixosConfiguration;
-                };
-              };
-          in
-          host.deploy // { inherit profiles; }
-        ) hostsWithDeploy;
+        deployNodeEntries = lib.mapAttrs (_: host: {
+          description = host.description or null;
+          module = host.deploy // {
+            profiles.home-manager = lib.optionalAttrs (host.homeConfiguration or null != null) {
+              user = host.username;
+              path = inputs.deploy-rs.lib.${host.system}.activate.home-manager host.homeConfiguration;
+            };
+            profiles.system = lib.optionalAttrs (host.nixosConfiguration or null != null) {
+              user = "root";
+              path = inputs.deploy-rs.lib.${host.system}.activate.nixos host.nixosConfiguration;
+            };
+          };
+        }) hostsWithDeploy;
       in
       {
-        # Library functions
+        # ----- Library functions -----
         lib = import ./lib { inherit self inputs; };
 
-        # Home Manager
-        # Extract .module from wrappers, or use as-is if already a function
+        # ----- Home Manager -----
+        homeModuleEntries = self.lib.importDir ./modules/home { collect = true; };
         homeModules = self.lib.importDir ./modules/home {
           mapper = m: m.module or m;
           collect = true;
@@ -184,17 +178,15 @@
 
         homeProfiles = self.lib.importDir ./profiles/home { };
 
-        # Overlays
-        overlays = import ./overlays.nix { inherit inputs; };
-
-        # Home configurations (extract .module from entries)
+        inherit homeConfigEntries;
         homeConfigurations = lib.mapAttrs (_: e: e.module) homeConfigEntries;
 
-        # Raw entries with descriptions for tree visualization
-        inherit homeConfigEntries;
+        # ----- Overlays -----
+        overlays = import ./overlays.nix { inherit inputs; };
 
-        # Deploy-rs
-        deploy.nodes = deployNodes;
+        # ----- Deploy-rs -----
+        inherit deployNodeEntries;
+        deploy.nodes = lib.mapAttrs (_: e: e.module) deployNodeEntries;
       }
     );
 }
