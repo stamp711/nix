@@ -71,6 +71,11 @@
       programs.gitui.enable = true;
 
       programs.jujutsu.enable = true;
+      programs.jujutsu.settings.ui.default-command = [
+        "log"
+        "--template"
+        "builtin_log_comfortable"
+      ];
       programs.jujutsu.settings.user = lib.mkIf (
         config.programs.git.settings ? user
       ) config.programs.git.settings.user;
