@@ -27,7 +27,7 @@
         programs.onepassword-secrets.tokenFile = "${secretsDir}/opnix-token";
 
         programs.onepassword-secrets.secrets.opnixToken = {
-          reference = cfg.reference;
+          inherit (cfg) reference;
           path = "${secretsDir}/opnix-token";
         };
       };
