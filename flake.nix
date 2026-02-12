@@ -142,10 +142,13 @@
 
         # Generate NixOS configurations from hosts
         hostsWithNixos = lib.filterAttrs (_: host: host.nixosConfiguration or null != null) hosts;
-        nixosConfigEntries = lib.mapAttrs (_: host: {
-          description = host.description or null;
-          module = host.nixosConfiguration;
-        }) hostsWithNixos;
+        nixosConfigEntries = lib.mapAttrs' (
+          _: host:
+          lib.nameValuePair host.hostname {
+            description = host.description or null;
+            module = host.nixosConfiguration;
+          }
+        ) hostsWithNixos;
 
         # Generate home config entries from hosts
         hostsWithHome = lib.filterAttrs (_: host: host.homeConfiguration or null != null) hosts;
