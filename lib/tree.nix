@@ -29,7 +29,7 @@ in
   moduleTree = {
     home = {
       modules = extractTree self.homeModuleEntries;
-      profiles = extractTree self.homeProfiles;
+      profiles = extractTree self.homeProfileEntries;
       configurations = extractTree self.homeConfigEntries;
     };
     deploy = extractTree self.deployNodeEntries;

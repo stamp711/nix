@@ -139,7 +139,11 @@
         # Load host definitions
         hosts = self.lib.importDir ./hosts { args = { inherit self inputs; }; };
 
-        # Generate home configs from hosts
+        # Generate module & profile entries from files
+        homeModuleEntries = self.lib.importDir ./modules/home { collect = true; };
+        homeProfileEntries = self.lib.importDir ./profiles/home { };
+
+        # Generate home config entries from hosts
         hostsWithHome = lib.filterAttrs (_: host: host.homeConfiguration or null != null) hosts;
         homeConfigEntries = lib.mapAttrs' (
           _: host:
@@ -149,7 +153,7 @@
           }
         ) hostsWithHome;
 
-        # Generate deploy-rs nodes from hosts
+        # Generate deploy-rs node entries from hosts
         hostsWithDeploy = lib.filterAttrs (_: host: host.deploy or null != null) hosts;
         deployNodeEntries = lib.mapAttrs (_: host: {
           description = host.description or null;
@@ -170,13 +174,14 @@
         lib = import ./lib { inherit self inputs; };
 
         # ----- Home Manager -----
-        homeModuleEntries = self.lib.importDir ./modules/home { collect = true; };
+        inherit homeModuleEntries;
         homeModules = self.lib.importDir ./modules/home {
           mapper = m: m.module or m;
           collect = true;
         };
 
-        homeProfiles = self.lib.importDir ./profiles/home { };
+        inherit homeProfileEntries;
+        homeProfiles = lib.mapAttrs (_: e: e.module or e) homeProfileEntries;
 
         inherit homeConfigEntries;
         homeConfigurations = lib.mapAttrs (_: e: e.module) homeConfigEntries;

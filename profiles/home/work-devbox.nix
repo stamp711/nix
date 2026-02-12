@@ -1,16 +1,21 @@
-{ self, inputs, ... }:
-let
-  inherit (inputs) private;
-in
 {
-  imports =
-    self.homeModules.common._all
-    ++ [
-      self.homeModules.secrets.opnix
-      self.homeModules.secrets.github-token
-    ]
-    ++ private.homeModules.work.shared._all
-    ++ private.homeModules.work.devbox._all;
+  description = "Home profile for work devbox";
 
-  secrets.opnix-token.reference = "op://Nix Secrets/Service Account Auth Token/Work Devices";
+  module =
+    { self, inputs, ... }:
+    let
+      inherit (inputs) private;
+    in
+    {
+      imports =
+        self.homeModules.common._all
+        ++ [
+          self.homeModules.secrets.opnix
+          self.homeModules.secrets.github-token
+        ]
+        ++ private.homeModules.work.shared._all
+        ++ private.homeModules.work.devbox._all;
+
+      secrets.opnix-token.reference = "op://Nix Secrets/Service Account Auth Token/Work Devices";
+    };
 }
