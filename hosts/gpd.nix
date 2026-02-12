@@ -12,14 +12,9 @@ in
     inherit system username;
     modules = [
       self.nixosProfiles.gpd-pocket-4
+      self.nixosModules.hardware."disko-btrfs"
       {
         networking.hostName = hostname;
-
-        # TODO: replace with hardware-configuration.nix from nixos-generate-config
-        fileSystems."/" = {
-          device = "/dev/disk/by-label/nixos";
-          fsType = "ext4";
-        };
         boot.initrd.availableKernelModules = [
           "nvme"
           "xhci_pci"
