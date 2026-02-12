@@ -9,6 +9,31 @@
       overlays = builtins.attrValues self.overlays;
     };
 
+  # Create a NixOS system configuration.
+  mkNixos =
+    {
+      system,
+      username,
+      modules,
+    }:
+    inputs.nixpkgs.lib.nixosSystem {
+      inherit system;
+      specialArgs = { inherit self inputs; };
+      modules = [
+        {
+          nixpkgs.pkgs = self.lib.mkPkgs system;
+          users.users.${username} = {
+            isNormalUser = true;
+            extraGroups = [
+              "wheel"
+              "networkmanager"
+            ];
+          };
+        }
+      ]
+      ++ modules;
+    };
+
   # Create a home-manager configuration from system, username, and modules.
   mkHome =
     {

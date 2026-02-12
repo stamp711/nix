@@ -28,6 +28,7 @@
       url = "github:brizzbuzz/opnix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-hardware.url = "github:NixOS/nixos-hardware";
     jj-starship = {
       url = "github:dmmulroy/jj-starship";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -135,8 +136,16 @@
         hosts = self.lib.importDir ./hosts { args = { inherit self inputs; }; };
 
         # Generate module & profile entries from files
+        nixosProfileEntries = self.lib.importDir ./profiles/nixos { };
         homeModuleEntries = self.lib.importDir ./modules/home { collect = true; };
         homeProfileEntries = self.lib.importDir ./profiles/home { };
+
+        # Generate NixOS configurations from hosts
+        hostsWithNixos = lib.filterAttrs (_: host: host.nixosConfiguration or null != null) hosts;
+        nixosConfigEntries = lib.mapAttrs (_: host: {
+          description = host.description or null;
+          module = host.nixosConfiguration;
+        }) hostsWithNixos;
 
         # Generate home config entries from hosts
         hostsWithHome = lib.filterAttrs (_: host: host.homeConfiguration or null != null) hosts;
@@ -185,6 +194,19 @@
 
         inherit homeConfigEntries;
         homeConfigurations = lib.mapAttrs (_: e: e.module) homeConfigEntries;
+
+        # ----- NixOS -----
+        nixosModuleEntries = self.lib.importDir ./modules/nixos { collect = true; };
+        nixosModules = self.lib.importDir ./modules/nixos {
+          mapper = m: m.module or m;
+          collect = true;
+        };
+
+        inherit nixosProfileEntries;
+        nixosProfiles = lib.mapAttrs (_: e: e.module or e) nixosProfileEntries;
+
+        inherit nixosConfigEntries;
+        nixosConfigurations = lib.mapAttrs (_: e: e.module) nixosConfigEntries;
 
         # ----- Overlays -----
         overlays = import ./overlays.nix { inherit inputs; };

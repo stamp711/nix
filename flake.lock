@@ -191,6 +191,21 @@
         "type": "github"
       }
     },
+    "nixos-hardware": {
+      "locked": {
+        "lastModified": 1770882871,
+        "narHash": "sha256-nw5g+xl3veea+maxJ2/81tMEA/rPq9aF1H5XF35X+OE=",
+        "owner": "NixOS",
+        "repo": "nixos-hardware",
+        "rev": "af04cb78aa85b2a4d1c15fc7270347e0d0eda97b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixos-hardware",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1770562336,
@@ -251,6 +266,7 @@
         "jj-starship": "jj-starship",
         "nix-colors": "nix-colors",
         "nix-index-database": "nix-index-database",
+        "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs",
         "opnix": "opnix",
         "treefmt-nix": "treefmt-nix",

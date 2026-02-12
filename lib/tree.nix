@@ -34,6 +34,10 @@ in
     };
     deploy = extractTree self.deployNodeEntries;
     darwin = { };
-    nixos = { };
+    nixos = {
+      modules = extractTree self.nixosModuleEntries;
+      profiles = extractTree self.nixosProfileEntries;
+      configurations = extractTree self.nixosConfigEntries;
+    };
   };
 }
