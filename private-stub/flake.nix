@@ -22,6 +22,11 @@
         hostname = "personal-nuc";
         address = "";
       };
+      gpd = {
+        username = "user";
+        hostname = "gpd";
+        address = "";
+      };
     };
     work.hosts = {
       macbook = {
