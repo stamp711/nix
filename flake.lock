@@ -243,29 +243,6 @@
         "type": "github"
       }
     },
-    "private": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "utils": [
-          "utils"
-        ]
-      },
-      "locked": {
-        "lastModified": 1770903021,
-        "narHash": "sha256-46kVhSV3oo669Nn3bgYPPBvXwDrq/3MqHKB53GBUR2E=",
-        "owner": "stamp711",
-        "repo": "nix-private",
-        "rev": "a8d7929954012086b46a7ad888c20153f1350072",
-        "type": "github"
-      },
-      "original": {
-        "owner": "stamp711",
-        "repo": "nix-private",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "deploy-rs": "deploy-rs",
@@ -276,7 +253,6 @@
         "nix-index-database": "nix-index-database",
         "nixpkgs": "nixpkgs",
         "opnix": "opnix",
-        "private": "private",
         "treefmt-nix": "treefmt-nix",
         "utils": "utils_2"
       }

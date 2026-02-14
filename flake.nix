@@ -37,11 +37,6 @@
       url = "path:./nix-utils";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    private = {
-      url = "github:stamp711/nix-private";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.utils.follows = "utils";
-    };
   };
 
   outputs =

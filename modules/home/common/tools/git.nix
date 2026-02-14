@@ -49,6 +49,9 @@
         ".claude/"
         "CLAUDE.local.md"
         "__local__/"
+        # build artifacts
+        ".bundle"
+        "compile_commands.json"
       ];
 
       # GitHub CLI
