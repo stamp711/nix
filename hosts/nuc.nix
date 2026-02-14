@@ -1,7 +1,7 @@
-{ self, inputs }:
+{ self }:
 let
-  host = inputs.private.personal.hosts.nuc;
-  inherit (host) username hostname;
+  username = "stamp";
+  hostname = "NUC13RNGi9";
   system = "x86_64-linux";
 in
 {
@@ -14,7 +14,7 @@ in
   };
 
   deploy = {
-    hostname = host.address;
+    hostname = "NUC13RNGi9.home";
     remoteBuild = true;
   };
 }

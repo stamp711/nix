@@ -1,7 +1,7 @@
-{ self, inputs }:
+{ self }:
 let
-  host = inputs.private.work.hosts.dev;
-  inherit (host) username hostname;
+  username = "tiger";
+  hostname = "n37-098-023";
   system = "x86_64-linux";
 in
 {
@@ -14,7 +14,7 @@ in
   };
 
   deploy = {
-    hostname = host.address;
+    hostname = "dev";
     sshUser = username;
     remoteBuild = true;
   };

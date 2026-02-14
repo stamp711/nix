@@ -1,7 +1,7 @@
-{ self, inputs }:
+{ self }:
 let
-  host = inputs.private.work.hosts.macbook;
-  inherit (host) username hostname;
+  username = "stamp";
+  hostname = "Lius-Work-MacBook";
   system = "aarch64-darwin";
 in
 {

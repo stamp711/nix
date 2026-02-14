@@ -1,11 +1,12 @@
-{ self, inputs }:
+{ self }:
 let
-  host = inputs.private.personal.hosts.macbook;
-  inherit (host) username hostname;
+  username = "stamp";
+  hostname = "Lius-MacBook-Pro";
   system = "aarch64-darwin";
 in
 {
   description = "Personal MacBook";
+
   inherit username hostname system;
 
   homeConfiguration = self.lib.mkHome {
