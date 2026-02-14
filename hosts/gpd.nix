@@ -6,7 +6,10 @@ let
 in
 {
   description = "GPD Pocket 4";
-  inherit username hostname system;
+
+  username = "stamp";
+  hostname = "GPD";
+  inherit system;
 
   nixosConfiguration = self.lib.mkNixos {
     inherit system username;
