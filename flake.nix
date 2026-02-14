@@ -37,6 +37,10 @@
       url = "github:dmmulroy/jj-starship";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    ssh-keys = {
+      url = "https://github.com/stamp711.keys";
+      flake = false;
+    };
 
     utils = {
       url = "path:./nix-utils";

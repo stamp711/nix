@@ -1,14 +1,10 @@
 {
-  description = "Base NixOS system: boot, nix, locale, SSH, sudo";
+  description = "Base NixOS system: nix, locale, SSH, sudo";
 
   module =
     { pkgs, ... }:
     {
       system.stateVersion = "26.05";
-
-      # Bootloader
-      boot.loader.systemd-boot.enable = true;
-      boot.loader.efi.canTouchEfiVariables = true;
 
       # Nix
       nix.settings = {

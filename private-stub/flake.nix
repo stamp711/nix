@@ -27,6 +27,11 @@
         hostname = "gpd";
         address = "";
       };
+      proxy = {
+        username = "user";
+        hostname = "proxy";
+        address = "";
+      };
     };
     work.hosts = {
       macbook = {

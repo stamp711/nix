@@ -314,8 +314,21 @@
         "nixpkgs": "nixpkgs",
         "opnix": "opnix",
         "private": "private",
+        "ssh-keys": "ssh-keys",
         "treefmt-nix": "treefmt-nix",
         "utils": "utils_2"
+      }
+    },
+    "ssh-keys": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-3T+MH4wLsL8b9kof3rD5D249obbaFxXsQ4Gt+tq/O1w=",
+        "type": "file",
+        "url": "https://github.com/stamp711.keys"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://github.com/stamp711.keys"
       }
     },
     "systems": {
