@@ -153,14 +153,19 @@
         deployNodeEntries = lib.mapAttrs (_: host: {
           description = host.description or null;
           module = host.deploy // {
-            profiles.home-manager = lib.optionalAttrs (host.homeConfiguration or null != null) {
-              user = host.username;
-              path = inputs.deploy-rs.lib.${host.system}.activate.home-manager host.homeConfiguration;
-            };
-            profiles.system = lib.optionalAttrs (host.nixosConfiguration or null != null) {
-              user = "root";
-              path = inputs.deploy-rs.lib.${host.system}.activate.nixos host.nixosConfiguration;
-            };
+            profiles =
+              lib.optionalAttrs (host.homeConfiguration or null != null) {
+                home-manager = {
+                  user = host.username;
+                  path = inputs.deploy-rs.lib.${host.system}.activate.home-manager host.homeConfiguration;
+                };
+              }
+              // lib.optionalAttrs (host.nixosConfiguration or null != null) {
+                system = {
+                  user = "root";
+                  path = inputs.deploy-rs.lib.${host.system}.activate.nixos host.nixosConfiguration;
+                };
+              };
           };
         }) hostsWithDeploy;
       in
