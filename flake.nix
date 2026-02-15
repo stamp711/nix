@@ -132,7 +132,7 @@
         inherit (inputs.nixpkgs) lib;
 
         # Load host definitions
-        hosts = self.lib.importDir ./hosts { args = { inherit self; }; };
+        hosts = self.lib.importDir ./hosts { args = { inherit self inputs; }; };
 
         # Generate module & profile entries from files
         homeModuleEntries = self.lib.importDir ./modules/home { collect = true; };

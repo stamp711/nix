@@ -1,4 +1,4 @@
-{ self }:
+{ self, ... }:
 let
   username = "tiger";
   hostname = "n37-098-023";
