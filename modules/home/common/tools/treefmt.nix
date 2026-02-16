@@ -6,6 +6,7 @@
     {
       home.packages = [
         self.formatter.${pkgs.stdenv.hostPlatform.system}
+        pkgs.prettier
       ];
     };
 }
