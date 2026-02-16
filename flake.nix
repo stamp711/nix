@@ -107,35 +107,7 @@
             inputsFrom = [ treefmt.config.build.devShell ];
           };
 
-          # Show module tree structure
-          # Use: nix run .#show-modules [--json|--tree]
-          # ANSI: \u001b[1m = bold, \u001b[2m = dim, \u001b[0m = reset
-          apps.show-modules = {
-            type = "app";
-            meta.description = "Show module tree with descriptions";
-            program = toString (
-              pkgs.writeShellScript "show-modules" ''
-                json=$(${pkgs.nix}/bin/nix eval .#lib.moduleTree --json 2>/dev/null)
-                case "$1" in
-                  --json) echo "$json" | ${pkgs.jq}/bin/jq . ;;
-                  --tree|"")
-                    echo "$json" | ${pkgs.jq}/bin/jq -r '
-                      def tree(prefix):
-                        (keys | last) as $last |
-                        to_entries[] |
-                        (.key == $last) as $is_last |
-                        (if $is_last then "└── " else "├── " end) as $branch |
-                        (if $is_last then "    " else "│   " end) as $ext |
-                        (if .value | type == "string" then ": \u001b[2m\(.value)\u001b[0m" else "" end) as $desc |
-                        "\(prefix)\($branch)\u001b[1m\(.key)\u001b[0m\($desc)",
-                        (if (.value | type) == "object" then .value | tree("\(prefix)\($ext)") else empty end);
-                      tree("")
-                    ' ;;
-                  *) echo "Usage: show-modules [--json|--tree]" ;;
-                esac
-              ''
-            );
-          };
+          apps = import ./apps.nix { inherit pkgs inputs; };
         };
     }
     // (
