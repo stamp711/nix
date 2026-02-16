@@ -1,5 +1,25 @@
 {
   "nodes": {
+    "age-plugin-op": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1760321496,
+        "narHash": "sha256-em5Heor01988U9sZs6hmbCIM8wag8GPP5f0r30kTRfw=",
+        "owner": "bromanko",
+        "repo": "age-plugin-op",
+        "rev": "3601d836bbaeb5eac9583175804da8b76396bd51",
+        "type": "github"
+      },
+      "original": {
+        "owner": "bromanko",
+        "repo": "age-plugin-op",
+        "type": "github"
+      }
+    },
     "agenix": {
       "inputs": {
         "darwin": "darwin",
@@ -437,6 +457,7 @@
     },
     "root": {
       "inputs": {
+        "age-plugin-op": "age-plugin-op",
         "agenix": "agenix",
         "agenix-rekey": "agenix-rekey",
         "deploy-rs": "deploy-rs",
@@ -449,7 +470,20 @@
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs",
         "opnix": "opnix",
+        "ssh-keys": "ssh-keys",
         "treefmt-nix": "treefmt-nix"
+      }
+    },
+    "ssh-keys": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-3T+MH4wLsL8b9kof3rD5D249obbaFxXsQ4Gt+tq/O1w=",
+        "type": "file",
+        "url": "https://github.com/stamp711.keys"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://github.com/stamp711.keys"
       }
     },
     "systems": {

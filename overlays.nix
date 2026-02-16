@@ -9,6 +9,8 @@
     ) inputs;
   };
 
+  agenix-rekey = inputs.agenix-rekey.overlays.default;
+
   # Custom modifications to packages
   modifications = _: _: {
     # Example: override a package

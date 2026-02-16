@@ -40,6 +40,10 @@
       inputs.flake-parts.follows = "flake-parts";
       inputs.treefmt-nix.follows = "treefmt-nix";
     };
+    age-plugin-op = {
+      url = "github:bromanko/age-plugin-op";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -47,6 +51,10 @@
     jj-starship = {
       url = "github:dmmulroy/jj-starship";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+    ssh-keys = {
+      url = "https://github.com/stamp711.keys";
+      flake = false;
     };
   };
 
@@ -103,6 +111,8 @@
               pkgs.nix-output-monitor
               pkgs.fx
               inputs.deploy-rs.packages.${system}.default
+              inputs.agenix-rekey.packages.${system}.default
+              inputs.age-plugin-op.defaultPackage.${system}
             ];
             inputsFrom = [ treefmt.config.build.devShell ];
           };
@@ -116,11 +126,6 @@
 
         # Load host definitions
         hosts = self.lib.importDir ./hosts { args = { inherit self inputs; }; };
-
-        # Generate module & profile entries from files
-        nixosProfileEntries = self.lib.importDir ./profiles/nixos { };
-        homeModuleEntries = self.lib.importDir ./modules/home { collect = true; };
-        homeProfileEntries = self.lib.importDir ./profiles/home { };
 
         # Generate NixOS configurations from hosts
         hostsWithNixos = lib.filterAttrs (_: host: host.nixosConfiguration or null != null) hosts;
@@ -168,14 +173,14 @@
         lib = import ./lib { inherit self inputs; };
 
         # ----- Home Manager -----
-        inherit homeModuleEntries;
+        homeModuleEntries = self.lib.importDir ./modules/home { collect = true; };
         homeModules = self.lib.importDir ./modules/home {
           mapper = m: m.module or m;
           collect = true;
         };
 
-        inherit homeProfileEntries;
-        homeProfiles = lib.mapAttrs (_: e: e.module or e) homeProfileEntries;
+        homeProfileEntries = self.lib.importDir ./profiles/home { };
+        homeProfiles = lib.mapAttrs (_: e: e.module or e) self.homeProfileEntries;
 
         inherit homeConfigEntries;
         homeConfigurations = lib.mapAttrs (_: e: e.module) homeConfigEntries;
@@ -187,14 +192,23 @@
           collect = true;
         };
 
-        inherit nixosProfileEntries;
-        nixosProfiles = lib.mapAttrs (_: e: e.module or e) nixosProfileEntries;
+        nixosProfileEntries = self.lib.importDir ./profiles/nixos { };
+        nixosProfiles = lib.mapAttrs (_: e: e.module or e) self.nixosProfileEntries;
 
         inherit nixosConfigEntries;
         nixosConfigurations = lib.mapAttrs (_: e: e.module) nixosConfigEntries;
 
         # ----- Overlays -----
         overlays = import ./overlays.nix { inherit inputs; };
+
+        # ----- age-rekey -----
+        agenix-rekey = inputs.agenix-rekey.configure {
+          userFlake = self;
+          # inherit (self) nixosConfigurations;
+          nixosConfigurations = {
+            inherit (self.nixosConfigurations) NURO;
+          };
+        };
 
         # ----- Deploy-rs -----
         inherit deployNodeEntries;

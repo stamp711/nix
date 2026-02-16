@@ -15,6 +15,8 @@ in
       self.nixosModules.hardware."disko-btrfs"
       {
         networking.hostName = hostname;
+        boot.loader.systemd-boot.enable = true;
+        boot.loader.efi.canTouchEfiVariables = true;
         boot.initrd.availableKernelModules = [
           "nvme"
           "xhci_pci"

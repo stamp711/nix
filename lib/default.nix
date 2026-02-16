@@ -1,5 +1,11 @@
 { self, inputs }:
 {
+  sshPublicKeys = {
+    apricity = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG0Zuk/bYRvsX5WypXgY7aopBeoTNjma1rr6Txtp87JS ssh-apricity";
+    surge = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICLSD33Pxjchgjm+JUtKKB7mtPhY05647eN69eBNOAg7 ssh-surge";
+    age = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHdOxmUp8REg9IBoipLV40VYmLNiD6+TUUHb/ofyor60 ssh-age";
+  };
+
   # Create a nixpkgs instance with our standard configuration.
   mkPkgs =
     system:

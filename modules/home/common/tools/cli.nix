@@ -2,7 +2,7 @@
   description = "General CLI tools and utilities";
 
   module =
-    { pkgs, ... }:
+    { inputs, pkgs, ... }:
     {
       home.packages = with pkgs; [
         # Search
@@ -12,7 +12,9 @@
         # General utilities
         assh
         age
+        agenix-rekey
         age-plugin-1p
+        inputs.age-plugin-op.defaultPackage.${pkgs.system}
         doxygen
         eternal-terminal
         imgcat
@@ -24,6 +26,7 @@
         watch
         wakatime-cli
         wget
+
       ];
 
       # Modern ls replacement
