@@ -47,5 +47,5 @@
       modules = [ { home.username = username; } ] ++ modules;
     };
 }
-// inputs.utils.lib
+// import ./import.nix { inherit self inputs; }
 // import ./tree.nix { inherit self inputs; }

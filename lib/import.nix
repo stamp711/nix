@@ -1,6 +1,8 @@
 # Directory import utilities
-{ lib }:
+{ inputs, ... }:
 let
+  inherit (inputs.nixpkgs) lib;
+
   # Reserved attribute name for collecting all entries
   collectAttr = "_all";
 
