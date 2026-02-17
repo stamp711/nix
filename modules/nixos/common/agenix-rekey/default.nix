@@ -19,7 +19,7 @@
           }
         ];
         storageMode = "local";
-        localStorageDir = "${self}/agenix-rekey";
+        localStorageDir = "${self}/.rekey";
       };
     };
 }

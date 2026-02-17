@@ -2,7 +2,7 @@
 nixosConfigurations:
 let
   inherit (inputs.nixpkgs) lib;
-  rekeyDir = self + "/agenix-rekey";
+  rekeyDir = self + "/.rekey";
 
   expectedFiles = lib.unique (
     lib.concatLists (
