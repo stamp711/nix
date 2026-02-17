@@ -27,9 +27,6 @@ in
         users.users.${username} = {
           isNormalUser = true;
           extraGroups = [ "wheel" ];
-          openssh.authorizedKeys.keys = [
-            self.lib.sshPublicKeys.apricity
-          ];
         };
       }
     ];
