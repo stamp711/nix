@@ -9,6 +9,7 @@
         self.nixosModules.common.agenix-rekey
         self.nixosModules.services.xray-proxy
         self.nixosModules.services.snell
+        self.nixosModules.common.allow-cloudflare-443
         self.nixosModules.boot-disk.mbr-ext4
       ];
 
@@ -38,6 +39,7 @@
       };
       services.snell = {
         enable = true;
+        openFirewall = true;
         port = 28799;
         pskSecretFile = ./snell-psk.age;
       };

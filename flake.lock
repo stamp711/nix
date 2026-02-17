@@ -89,6 +89,18 @@
         "type": "github"
       }
     },
+    "cloudflare-ips": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-MZgL1oONv9kF7w608CfeBRdAwnCjVatNXM9mUkzqU+4=",
+        "type": "file",
+        "url": "https://api.cloudflare.com/client/v4/ips"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://api.cloudflare.com/client/v4/ips"
+      }
+    },
     "darwin": {
       "inputs": {
         "nixpkgs": [
@@ -460,6 +472,7 @@
         "age-plugin-op": "age-plugin-op",
         "agenix": "agenix",
         "agenix-rekey": "agenix-rekey",
+        "cloudflare-ips": "cloudflare-ips",
         "deploy-rs": "deploy-rs",
         "disko": "disko",
         "flake-parts": "flake-parts",
