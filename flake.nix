@@ -138,53 +138,80 @@
       let
         inherit (inputs.nixpkgs) lib;
 
-        # Load host definitions
-        hosts = self.lib.importDir ./hosts { args = { inherit self inputs; }; };
+        # Load host definitions (collect = true provides _all with flattened leaves)
+        hosts = self.lib.importDir ./hosts {
+          args = { inherit self inputs; };
+          collect = true;
+        };
 
         # Generate NixOS configurations from hosts
-        hostsWithNixos = lib.filterAttrs (_: host: host.nixosConfiguration or null != null) hosts;
-        nixosConfigEntries = lib.mapAttrs' (
-          _: host:
-          lib.nameValuePair host.hostname {
-            description = host.description or null;
-            module = host.nixosConfiguration;
-          }
-        ) hostsWithNixos;
+        nixosConfigEntries = builtins.listToAttrs (
+          map (
+            h:
+            lib.nameValuePair h.hostname {
+              description = h.description or null;
+              module = h.nixosConfiguration;
+            }
+          ) (builtins.filter (h: h.nixosConfiguration or null != null) hosts._all)
+        );
 
         # Generate home config entries from hosts
-        hostsWithHome = lib.filterAttrs (_: host: host.homeConfiguration or null != null) hosts;
-        homeConfigEntries = lib.mapAttrs' (
-          _: host:
-          lib.nameValuePair "${host.username}@${host.hostname}" {
-            description = host.description or null;
-            module = host.homeConfiguration;
-          }
-        ) hostsWithHome;
+        homeConfigEntries = builtins.listToAttrs (
+          map (
+            h:
+            lib.nameValuePair "${h.username}@${h.hostname}" {
+              description = h.description or null;
+              module = h.homeConfiguration;
+            }
+          ) (builtins.filter (h: h.homeConfiguration or null != null) hosts._all)
+        );
 
         # Generate deploy-rs node entries from hosts
-        hostsWithDeploy = lib.filterAttrs (_: host: host.deploy or null != null) hosts;
-        deployNodeEntries = lib.mapAttrs (_: host: {
-          description = host.description or null;
-          module = host.deploy // {
-            profiles =
-              lib.optionalAttrs (host.homeConfiguration or null != null) {
-                home-manager = {
-                  user = host.username;
-                  path = inputs.deploy-rs.lib.${host.system}.activate.home-manager host.homeConfiguration;
-                };
-              }
-              // lib.optionalAttrs (host.nixosConfiguration or null != null) {
-                system = {
-                  user = "root";
-                  path = inputs.deploy-rs.lib.${host.system}.activate.nixos host.nixosConfiguration;
-                };
+        deployNodeEntries = builtins.listToAttrs (
+          map (
+            host:
+            lib.nameValuePair host.hostname {
+              description = host.description or null;
+              module = host.deploy // {
+                profiles =
+                  lib.optionalAttrs (host.homeConfiguration or null != null) {
+                    home-manager = {
+                      user = host.username;
+                      path = inputs.deploy-rs.lib.${host.system}.activate.home-manager host.homeConfiguration;
+                    };
+                  }
+                  // lib.optionalAttrs (host.nixosConfiguration or null != null) {
+                    system = {
+                      user = "root";
+                      path = inputs.deploy-rs.lib.${host.system}.activate.nixos host.nixosConfiguration;
+                    };
+                  };
               };
-          };
-        }) hostsWithDeploy;
+            }
+          ) (builtins.filter (host: host.deploy or null != null) hosts._all)
+        );
       in
       {
+        inherit hosts;
+
         # ----- Library functions -----
         lib = import ./lib { inherit self inputs; };
+
+        # ----- Overlays -----
+        overlays = import ./overlays.nix { inherit inputs; };
+
+        # ----- agenix-rekey -----
+        rekeyNixosConfigurations = lib.filterAttrs (
+          _: cfg: (cfg.config ? age) && (cfg.config.age ? rekey)
+        ) self.nixosConfigurations;
+        agenix-rekey = inputs.agenix-rekey.configure {
+          userFlake = self;
+          nixosConfigurations = self.rekeyNixosConfigurations;
+        };
+
+        # ----- Deploy-rs -----
+        inherit deployNodeEntries;
+        deploy.nodes = lib.mapAttrs (_: e: e.module) deployNodeEntries;
 
         # ----- Home Manager -----
         homeModuleEntries = self.lib.importDir ./modules/home { collect = true; };
@@ -211,22 +238,6 @@
 
         inherit nixosConfigEntries;
         nixosConfigurations = lib.mapAttrs (_: e: e.module) nixosConfigEntries;
-
-        # ----- Overlays -----
-        overlays = import ./overlays.nix { inherit inputs; };
-
-        # ----- agenix-rekey -----
-        rekeyNixosConfigurations = lib.filterAttrs (
-          _: cfg: (cfg.config ? age) && (cfg.config.age ? rekey)
-        ) self.nixosConfigurations;
-        agenix-rekey = inputs.agenix-rekey.configure {
-          userFlake = self;
-          nixosConfigurations = self.rekeyNixosConfigurations;
-        };
-
-        # ----- Deploy-rs -----
-        inherit deployNodeEntries;
-        deploy.nodes = lib.mapAttrs (_: e: e.module) deployNodeEntries;
       }
     );
 }
