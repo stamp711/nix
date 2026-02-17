@@ -34,9 +34,6 @@ in
             "wheel"
             "networkmanager"
           ];
-          openssh.authorizedKeys.keys = [
-            self.lib.sshPublicKeys.apricity
-          ];
         };
       }
     ];
