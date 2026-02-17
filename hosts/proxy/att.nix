@@ -3,7 +3,7 @@ let
   username = "stamp";
   hostname = "ATT";
   system = "x86_64-linux";
-  hostPubkey = "REPLACE_WITH_HOST_SSH_ED25519_PUBKEY";
+  hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL43yQdzry+dsa0ojFl5Y9GD48jzUQou99gG4pMOXXff";
 in
 {
   description = "Proxy server (ATT)";
