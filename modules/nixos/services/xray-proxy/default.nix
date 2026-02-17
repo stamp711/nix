@@ -15,7 +15,7 @@
         enable = lib.mkEnableOption "Xray proxy with Caddy";
         secretsFile = lib.mkOption {
           type = lib.types.path;
-          description = "Path to .age env file containing DOMAIN, CAMOUFLAGE, UUIDs, passwords, and paths";
+          description = "Path to .age env file containing CAMOUFLAGE, UUIDs, passwords, and paths";
         };
       };
 
