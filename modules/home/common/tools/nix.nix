@@ -13,6 +13,7 @@
         nh
         niv
         nixfmt
+        nixos-anywhere
         statix
       ];
 
