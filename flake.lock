@@ -60,15 +60,15 @@
         ]
       },
       "locked": {
-        "lastModified": 1759699908,
-        "narHash": "sha256-kYVGY8sAfqwpNch706Fy2+/b+xbtfidhXSnzvthAhIQ=",
-        "owner": "oddlama",
+        "lastModified": 1771338525,
+        "narHash": "sha256-TxZlPp3C3w1M5DXxgQ1A+eu9/tsBbZBQPZi44dfjF/M=",
+        "owner": "stamp711",
         "repo": "agenix-rekey",
-        "rev": "42362b12f59978aabf3ec3334834ce2f3662013d",
+        "rev": "46ecf7b920af8f093a452e6c45184029fa48ad88",
         "type": "github"
       },
       "original": {
-        "owner": "oddlama",
+        "owner": "stamp711",
         "repo": "agenix-rekey",
         "type": "github"
       }
