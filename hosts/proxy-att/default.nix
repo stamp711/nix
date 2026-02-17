@@ -23,8 +23,6 @@ in
         networking.hostName = hostname;
         age.rekey.hostPubkey = hostPubkey;
 
-        boot-disk.device = "/dev/vda";
-
         # Primary user
         users.users.${username} = {
           isNormalUser = true;
