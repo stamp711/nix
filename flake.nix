@@ -56,6 +56,10 @@
       url = "https://github.com/stamp711.keys";
       flake = false;
     };
+    cloudflare-ips = {
+      url = "https://api.cloudflare.com/client/v4/ips";
+      flake = false;
+    };
   };
 
   outputs =

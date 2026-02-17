@@ -13,6 +13,7 @@
     {
       options.services.xray-proxy = {
         enable = lib.mkEnableOption "Xray proxy with Caddy";
+        openFirewall = lib.mkEnableOption "Open TCP port 443 in the firewall";
         secretsFile = lib.mkOption {
           type = lib.types.path;
           description = "Path to .age env file containing CAMOUFLAGE, UUIDs, passwords, and paths";
@@ -53,10 +54,7 @@
         ];
 
         # Firewall
-        networking.firewall.allowedTCPPorts = [
-          80
-          443
-        ];
+        networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [ 443 ];
       };
     };
 }
