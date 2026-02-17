@@ -29,7 +29,6 @@ in
           extraGroups = [ "wheel" ];
           openssh.authorizedKeys.keys = [
             self.lib.sshPublicKeys.apricity
-            self.lib.sshPublicKeys.surge
           ];
         };
       }
