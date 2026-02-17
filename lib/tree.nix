@@ -16,10 +16,10 @@ let
             null # Plain function module, no description
           else if builtins.isAttrs value && value ? _all then
             go (removeAttrs value [ "_all" ]) # Directory, recurse
-          else if builtins.isAttrs value && value ? module then
-            value.description or null # Wrapper: use description string directly
+          else if builtins.isAttrs value && value ? description then
+            value.description # Is attrset with .description
           else
-            null # Other attrset
+            null
         ) (removeAttrs attrs [ "_all" ]);
     in
     go;
@@ -27,6 +27,7 @@ in
 {
   # Module tree for visualization (use with: nix run .#show-modules)
   moduleTree = {
+    hosts = extractTree self.hosts;
     home = {
       modules = extractTree self.homeModuleEntries;
       profiles = extractTree self.homeProfileEntries;
