@@ -10,6 +10,7 @@
         self.nixosModules.services.xray-proxy
         self.nixosModules.services.snell
         self.nixosModules.common.allow-cloudflare-443
+        self.nixosModules.common.fail2ban
         self.nixosModules.boot-disk.mbr-ext4
       ];
 
