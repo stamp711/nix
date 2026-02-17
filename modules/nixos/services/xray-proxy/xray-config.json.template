@@ -1,0 +1,42 @@
+{
+  "log": { "loglevel": "warning" },
+  "inbounds": [
+    {
+      "listen": "/dev/shm/xray-xhttp.socket,0666",
+      "protocol": "vless",
+      "settings": {
+        "decryption": "none",
+        "clients": [{ "id": "$VLESS_UUID" }]
+      },
+      "streamSettings": {
+        "network": "xhttp",
+        "xhttpSettings": { "path": "$VLESS_PATH" }
+      }
+    },
+    {
+      "listen": "/dev/shm/xray-vmess-ws.socket,0666",
+      "protocol": "vmess",
+      "settings": {
+        "clients": [{ "id": "$VMESS_UUID" }]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "wsSettings": { "path": "$VMESS_PATH" }
+      }
+    },
+    {
+      "listen": "/dev/shm/xray-trojan-ws.socket,0666",
+      "protocol": "trojan",
+      "settings": {
+        "clients": [{ "password": "$TROJAN_PASSWORD" }]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "wsSettings": { "path": "$TROJAN_PATH" }
+      }
+    }
+  ],
+  "outbounds": [
+    { "protocol": "freedom" }
+  ]
+}

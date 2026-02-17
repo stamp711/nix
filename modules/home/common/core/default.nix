@@ -23,7 +23,11 @@
         "flakes"
       ];
 
-      nixpkgs.config = import ./nixpkgs-config.nix;
+      nixpkgs.config = {
+        allowUnfree = true;
+        allowUnfreePredicate = _: true;
+      };
+
       xdg.configFile."nixpkgs/config.nix".source = ./nixpkgs-config.nix;
     };
 }

@@ -102,6 +102,20 @@
               ${pkgs.deadnix}/bin/deadnix --fail ${self}
               touch $out
             '';
+            agenix-rekey =
+              let
+                rekey = self.lib.checkRekey self.rekeyNixosConfigurations;
+                msg =
+                  pkgs.lib.optionalString (
+                    rekey.missing != [ ]
+                  ) "Missing rekeyed secrets: ${builtins.concatStringsSep ", " rekey.missing}\n"
+                  + pkgs.lib.optionalString (
+                    rekey.orphaned != [ ]
+                  ) "Orphaned files in agenix-rekey/: ${builtins.concatStringsSep ", " rekey.orphaned}\n"
+                  + "Run 'agenix rekey -a' to fix.";
+              in
+              assert rekey.missing == [ ] && rekey.orphaned == [ ] || throw msg;
+              pkgs.runCommand "agenix-rekey-check" { } "touch $out";
           };
 
           devShells.default = pkgs.mkShell {
@@ -201,13 +215,13 @@
         # ----- Overlays -----
         overlays = import ./overlays.nix { inherit inputs; };
 
-        # ----- age-rekey -----
+        # ----- agenix-rekey -----
+        rekeyNixosConfigurations = lib.filterAttrs (
+          _: cfg: (cfg.config ? age) && (cfg.config.age ? rekey)
+        ) self.nixosConfigurations;
         agenix-rekey = inputs.agenix-rekey.configure {
           userFlake = self;
-          # inherit (self) nixosConfigurations;
-          nixosConfigurations = {
-            inherit (self.nixosConfigurations) NURO;
-          };
+          nixosConfigurations = self.rekeyNixosConfigurations;
         };
 
         # ----- Deploy-rs -----

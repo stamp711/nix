@@ -19,25 +19,14 @@
   mkNixos =
     {
       system,
-      username,
       modules,
     }:
     inputs.nixpkgs.lib.nixosSystem {
       inherit system;
       specialArgs = { inherit self inputs; };
-      modules = [
-        {
-          nixpkgs.pkgs = self.lib.mkPkgs system;
-          users.users.${username} = {
-            isNormalUser = true;
-            extraGroups = [
-              "wheel"
-              "networkmanager"
-            ];
-          };
-        }
-      ]
-      ++ modules;
+      modules = modules ++ [
+        { nixpkgs.pkgs = self.lib.mkPkgs system; }
+      ];
     };
 
   # Create a home-manager configuration from system, username, and modules.
@@ -52,6 +41,8 @@
       extraSpecialArgs = { inherit self inputs; };
       modules = [ { home.username = username; } ] ++ modules;
     };
+
+  checkRekey = import ./check-rekey.nix { inherit self inputs; };
 }
 // import ./import.nix { inherit self inputs; }
 // import ./tree.nix { inherit self inputs; }

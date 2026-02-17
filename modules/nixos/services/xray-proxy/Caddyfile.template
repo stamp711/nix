@@ -1,0 +1,9 @@
+$DOMAIN {
+    tls internal
+    reverse_proxy $VLESS_PATH unix//dev/shm/xray-xhttp.socket
+    reverse_proxy $VMESS_PATH unix//dev/shm/xray-vmess-ws.socket
+    reverse_proxy $TROJAN_PATH unix//dev/shm/xray-trojan-ws.socket
+    reverse_proxy https://$CAMOUFLAGE {
+        header_up Host $CAMOUFLAGE
+    }
+}
