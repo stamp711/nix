@@ -6,6 +6,7 @@ in
   sshPublicKeys = {
     apricity = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG0Zuk/bYRvsX5WypXgY7aopBeoTNjma1rr6Txtp87JS ssh-apricity";
     age = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHdOxmUp8REg9IBoipLV40VYmLNiD6+TUUHb/ofyor60 ssh-age";
+    work = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICvYg3Qb8kAY7RD/3Y3uxaInkgxtUJ0o/Lb+7vkIcB1O";
   };
 
   # Create a nixpkgs instance with our standard configuration.

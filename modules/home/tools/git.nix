@@ -9,7 +9,9 @@
       ...
     }:
     let
+      hasEmail = (config.programs.git.settings.user.email or null) != null;
       hasSigningKey = config.programs.git.signing.key != null;
+      canGenerateAllowedSignersFile = hasEmail && hasSigningKey;
     in
     {
       programs.git.enable = true;
@@ -30,10 +32,13 @@
       # Signing
       programs.git.signing.format = "ssh";
       programs.git.signing.signByDefault = lib.mkIf hasSigningKey true;
-      programs.git.settings.gpg.ssh.allowedSignersFile = "${config.xdg.configHome}/git/allowed_signers";
-      home.file."${config.xdg.configHome}/git/allowed_signers" = lib.mkIf hasSigningKey {
-        text = with config.programs.git; ''
-          ${settings.user.email} namespaces="git" ${signing.key}
+
+      # Allowed signers file
+      programs.git.settings.gpg.ssh.allowedSignersFile =
+        lib.mkIf canGenerateAllowedSignersFile "${config.xdg.configHome}/git/allowed_signers";
+      home.file."${config.xdg.configHome}/git/allowed_signers" = lib.mkIf canGenerateAllowedSignersFile {
+        text = ''
+          ${config.programs.git.settings.user.email} namespaces="git" ${config.programs.git.signing.key}
         '';
       };
 

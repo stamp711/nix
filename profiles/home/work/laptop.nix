@@ -1,13 +1,12 @@
 {
-  description = "Home profile for personal devices (Darwin & Linux)";
+  description = "Home profile for work laptop";
 
   module =
     { self, ... }:
     {
       imports = self.homeModules.core._all ++ self.homeModules.shell._all ++ self.homeModules.tools._all;
 
-      programs.ssh.secretConfigFiles = [ ./ssh-hosts.conf.age ];
       programs.zsh.secretEnvExtra = [ ./vcs-identity.sh.age ];
-      programs.git.signing.key = self.lib.sshPublicKeys.apricity;
+      programs.git.signing.key = self.lib.sshPublicKeys.work;
     };
 }

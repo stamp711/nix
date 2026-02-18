@@ -6,7 +6,6 @@ let
 in
 {
   description = "Personal MacBook";
-
   inherit username hostname system;
 
   homeConfiguration = self.lib.mkHome {

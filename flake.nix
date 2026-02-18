@@ -24,10 +24,6 @@
       url = "github:serokell/deploy-rs";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    opnix = {
-      url = "github:brizzbuzz/opnix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     nixos-hardware.url = "github:NixOS/nixos-hardware";
     agenix = {
       url = "github:ryantm/agenix";
@@ -232,7 +228,9 @@
         };
 
         homeProfileEntries = self.lib.importDir ./profiles/home { };
-        homeProfiles = lib.mapAttrs (_: e: e.module or e) self.homeProfileEntries;
+        homeProfiles = self.lib.importDir ./profiles/home {
+          mapper = m: m.module or m;
+        };
 
         inherit homeConfigEntries;
         homeConfigurations = lib.mapAttrs (_: e: e.module) homeConfigEntries;
@@ -245,7 +243,9 @@
         };
 
         nixosProfileEntries = self.lib.importDir ./profiles/nixos { };
-        nixosProfiles = lib.mapAttrs (_: e: e.module or e) self.nixosProfileEntries;
+        nixosProfiles = self.lib.importDir ./profiles/nixos {
+          mapper = m: m.module or m;
+        };
 
         inherit nixosConfigEntries;
         nixosConfigurations = lib.mapAttrs (_: e: e.module) nixosConfigEntries;

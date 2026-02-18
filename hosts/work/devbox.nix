@@ -10,7 +10,7 @@ in
 
   homeConfiguration = self.lib.mkHome {
     inherit system username;
-    modules = [ self.homeProfiles.work-devbox ];
+    modules = [ self.homeProfiles.work.devbox ];
   };
 
   deploy = {
