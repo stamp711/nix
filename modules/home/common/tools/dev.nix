@@ -8,9 +8,6 @@
         # Security
         _1password-cli
 
-        # C/C++
-        cmake
-
         # Rust
         cargo-expand
         cargo-feature
