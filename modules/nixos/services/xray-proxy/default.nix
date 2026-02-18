@@ -14,14 +14,14 @@
       options.services.xray-proxy = {
         enable = lib.mkEnableOption "Xray proxy with Caddy";
         openFirewall = lib.mkEnableOption "Open TCP port 443 in the firewall";
-        secretsFile = lib.mkOption {
+        secretEnvFile = lib.mkOption {
           type = lib.types.path;
-          description = "Path to .age env file containing CAMOUFLAGE, UUIDs, passwords, and paths";
+          description = "Path to .age env file containing DOMAIN, CAMOUFLAGE, UUIDs, passwords, and paths";
         };
       };
 
       config = lib.mkIf cfg.enable {
-        age.secrets.xray-proxy.rekeyFile = cfg.secretsFile;
+        age.secrets.xray-proxy.rekeyFile = cfg.secretEnvFile;
 
         # Caddy
         age-template.files."Caddyfile" = {
@@ -36,7 +36,7 @@
         };
         systemd.services.caddy.reloadTriggers = [
           ./Caddyfile.template
-          cfg.secretsFile
+          cfg.secretEnvFile
         ];
 
         # Xray
@@ -50,7 +50,7 @@
         };
         systemd.services.xray.restartTriggers = [
           ./xray-config.json.template
-          cfg.secretsFile
+          cfg.secretEnvFile
         ];
 
         # Firewall
