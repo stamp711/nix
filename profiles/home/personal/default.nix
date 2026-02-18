@@ -4,11 +4,15 @@
   module =
     { self, ... }:
     {
-      imports = self.homeModules.common._all ++ [
-        self.homeModules.secrets.opnix
-        self.homeModules.secrets.github-token
-        self.homeModules.secrets.personal-git
-      ];
+      imports =
+        self.homeModules.core._all
+        ++ self.homeModules.shell._all
+        ++ self.homeModules.tools._all
+        ++ [
+          self.homeModules.secrets.opnix
+          self.homeModules.secrets.github-token
+          self.homeModules.secrets.personal-git
+        ];
 
       programs.ssh.secretConfigFiles = [ ./ssh-hosts.conf.age ];
 
