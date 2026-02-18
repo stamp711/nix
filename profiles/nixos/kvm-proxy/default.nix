@@ -36,7 +36,7 @@
       # Proxy services
       services.xray-proxy = {
         enable = true;
-        secretEnvFile = ./xray-proxy.env.age;
+        secretEnvFiles = [ ./xray-proxy.env.age ];
       };
       services.snell = {
         enable = true;
