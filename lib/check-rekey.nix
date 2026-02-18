@@ -1,10 +1,14 @@
 { self, inputs }:
-nixosConfigurations:
+{
+  nixosConfigurations ? { },
+  homeConfigurations ? { },
+}:
 let
   inherit (inputs.nixpkgs) lib;
   rekeyDir = self + "/.rekey";
 
-  expectedFiles = lib.unique (
+  extractExpectedFiles =
+    configurations:
     lib.concatLists (
       lib.mapAttrsToList (
         _: cfg:
@@ -13,8 +17,11 @@ let
           rekeyed = lib.filterAttrs (_: s: (s.rekeyFile or null) != null) secrets;
         in
         lib.mapAttrsToList (_: s: baseNameOf (toString s.file)) rekeyed
-      ) nixosConfigurations
-    )
+      ) configurations
+    );
+
+  expectedFiles = lib.unique (
+    extractExpectedFiles nixosConfigurations ++ extractExpectedFiles homeConfigurations
   );
 
   actualFiles =

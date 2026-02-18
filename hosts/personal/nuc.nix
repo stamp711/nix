@@ -10,7 +10,12 @@ in
 
   homeConfiguration = self.lib.mkHome {
     inherit system username;
-    modules = [ self.homeProfiles.personal ];
+    modules = [
+      self.homeProfiles.personal
+      {
+        age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIO0ec9IGOqtQ32SRf5RSKjNkB9F8WpyVTnbV1nf2C22";
+      }
+    ];
   };
 
   deploy = {

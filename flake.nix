@@ -108,7 +108,10 @@
             '';
             agenix-rekey =
               let
-                rekey = self.lib.checkRekey self.rekeyNixosConfigurations;
+                rekey = self.lib.checkRekey {
+                  nixosConfigurations = self.rekeyNixosConfigurations;
+                  homeConfigurations = self.rekeyHomeConfigurations;
+                };
                 msg =
                   pkgs.lib.optionalString (
                     rekey.missing != [ ]
@@ -208,9 +211,13 @@
         rekeyNixosConfigurations = lib.filterAttrs (
           _: cfg: (cfg.config ? age) && (cfg.config.age ? rekey)
         ) self.nixosConfigurations;
+        rekeyHomeConfigurations = lib.filterAttrs (
+          _: cfg: (cfg.config ? age) && (cfg.config.age ? rekey)
+        ) self.homeConfigurations;
         agenix-rekey = inputs.agenix-rekey.configure {
           userFlake = self;
           nixosConfigurations = self.rekeyNixosConfigurations;
+          homeConfigurations = self.rekeyHomeConfigurations;
         };
 
         # ----- Deploy-rs -----
