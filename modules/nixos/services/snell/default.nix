@@ -3,6 +3,7 @@
 
   module =
     {
+      self,
       config,
       pkgs,
       lib,
@@ -10,6 +11,7 @@
     }:
     let
       cfg = config.services.snell;
+      secretName = self.lib.ageSecretName cfg.pskSecretFile;
     in
     {
       options.services.snell = {
@@ -25,9 +27,9 @@
       };
 
       config = lib.mkIf cfg.enable {
-        age.secrets.snell-psk.rekeyFile = cfg.pskSecretFile;
+        age.secrets.${secretName}.rekeyFile = cfg.pskSecretFile;
         age-template.files."snell.conf" = {
-          vars.psk = config.age.secrets.snell-psk.path;
+          vars.psk = config.age.secrets.${secretName}.path;
           content = ''
             [snell-server]
             listen = ::0:${toString cfg.port}
