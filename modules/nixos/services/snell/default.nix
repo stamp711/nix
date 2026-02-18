@@ -16,7 +16,7 @@
     {
       options.services.snell = {
         enable = lib.mkEnableOption "Snell proxy server";
-        openFirewall = lib.mkEnableOption "opening the Snell port in the firewall";
+        openFirewall = lib.mkEnableOption "Open the Snell port in the firewall";
         port = lib.mkOption {
           type = lib.types.port;
         };
