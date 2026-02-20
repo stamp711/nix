@@ -44,6 +44,10 @@
 
       # Global ignores
       programs.git.ignores = [
+        # macOS
+        ".DS_Store"
+        "._*"
+
         ".cache/"
         # direnv
         ".direnv/"
