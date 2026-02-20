@@ -2,7 +2,7 @@
   description = "General CLI tools and utilities";
 
   module =
-    { inputs, pkgs, ... }:
+    { pkgs, ... }:
     {
       home.packages = with pkgs; [
         # Search

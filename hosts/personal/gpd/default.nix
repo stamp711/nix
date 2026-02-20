@@ -40,8 +40,8 @@ in
     ];
   };
 
-  homeConfiguration = self.lib.mkHome {
-    inherit system username;
-    modules = [ self.homeProfiles.personal ];
-  };
+  # homeConfiguration = self.lib.mkHome {
+  #   inherit system username;
+  #   modules = [ self.homeProfiles.personal ];
+  # };
 }
