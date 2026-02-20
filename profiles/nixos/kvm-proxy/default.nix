@@ -33,6 +33,8 @@
 
       boot-disk.device = "/dev/vda";
 
+      services.openssh.ports = [ 50022 ];
+
       # Proxy services
       services.xray-proxy = {
         enable = true;
