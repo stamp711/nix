@@ -89,7 +89,13 @@
       ) config.programs.git.settings.user;
       programs.jjui.enable = true;
 
+      programs.git.settings.ghq = {
+        root = "~/code";
+        user = "stamp711";
+      };
+
       home.packages = with pkgs; [
+        ghq
         git-filter-repo
       ];
     };
