@@ -32,4 +32,15 @@
       ''
     );
   };
+
+  update-inputs = {
+    type = "app";
+    program = toString (
+      pkgs.writeShellScript "update-nixpkgs" ''
+        rev=$(${pkgs.curl}/bin/curl -sL https://channels.nixos.org/nixpkgs-unstable/git-revision)
+        echo "Updating to nixpkgs-unstable: $rev"
+        ${pkgs.nix}/bin/nix flake update --override-input nixpkgs "github:NixOS/nixpkgs/$rev"
+      ''
+    );
+  };
 }
