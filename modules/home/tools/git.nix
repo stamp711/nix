@@ -90,7 +90,7 @@
       programs.jjui.enable = true;
 
       programs.git.settings.ghq = {
-        root = "~/code";
+        root = if pkgs.stdenv.isDarwin then "~/Developer" else "~/code";
         user = "stamp711";
       };
 
