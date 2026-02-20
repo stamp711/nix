@@ -1,25 +1,5 @@
 {
   "nodes": {
-    "age-plugin-op": {
-      "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1760321496,
-        "narHash": "sha256-em5Heor01988U9sZs6hmbCIM8wag8GPP5f0r30kTRfw=",
-        "owner": "bromanko",
-        "repo": "age-plugin-op",
-        "rev": "3601d836bbaeb5eac9583175804da8b76396bd51",
-        "type": "github"
-      },
-      "original": {
-        "owner": "bromanko",
-        "repo": "age-plugin-op",
-        "type": "github"
-      }
-    },
     "agenix": {
       "inputs": {
         "darwin": "darwin",
@@ -378,13 +358,13 @@
       "locked": {
         "lastModified": 1771369470,
         "narHash": "sha256-0NBlEBKkN3lufyvFegY4TYv5mCNHbi5OmBDrzihbBMQ=",
-        "owner": "nixos",
+        "owner": "NixOS",
         "repo": "nixpkgs",
         "rev": "0182a361324364ae3f436a63005877674cf45efb",
         "type": "github"
       },
       "original": {
-        "owner": "nixos",
+        "owner": "NixOS",
         "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
@@ -430,7 +410,6 @@
     },
     "root": {
       "inputs": {
-        "age-plugin-op": "age-plugin-op",
         "agenix": "agenix",
         "agenix-rekey": "agenix-rekey",
         "cloudflare-ips": "cloudflare-ips",

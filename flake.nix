@@ -2,7 +2,7 @@
   description = "Reusable Nix configuration modules";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -35,10 +35,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-parts.follows = "flake-parts";
       inputs.treefmt-nix.follows = "treefmt-nix";
-    };
-    age-plugin-op = {
-      url = "github:bromanko/age-plugin-op";
-      inputs.nixpkgs.follows = "nixpkgs";
     };
     disko = {
       url = "github:nix-community/disko";
@@ -129,7 +125,6 @@
               pkgs.fx
               inputs.deploy-rs.packages.${system}.default
               inputs.agenix-rekey.packages.${system}.default
-              inputs.age-plugin-op.defaultPackage.${system}
             ];
             inputsFrom = [ treefmt.config.build.devShell ];
           };

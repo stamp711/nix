@@ -14,7 +14,6 @@
         age
         agenix-rekey
         age-plugin-1p
-        inputs.age-plugin-op.defaultPackage.${pkgs.stdenv.hostPlatform.system}
         doxygen
         eternal-terminal
         imgcat
