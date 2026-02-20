@@ -3,7 +3,7 @@ let
   username = "stamp";
   hostname = "VIA";
   system = "x86_64-linux";
-  hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJpjV+/0kUmxzzBXYb+o1fVDX4qKMdgj3Wq1tJH92Vkw";
+  hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICq8tSt+rdX9EJXMNsmy716vCBABcwL7nGslkPEvUw9b";
 in
 {
   description = "Proxy server (Broadband VIA)";
