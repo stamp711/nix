@@ -2,23 +2,8 @@
   description = "Zsh with oh-my-zsh, starship prompt, and modern history";
 
   module =
+    { inputs, pkgs, ... }:
     {
-      inputs,
-      pkgs,
-      config,
-      ...
-    }:
-    let
-      nix-colors-lib = inputs.nix-colors.lib.contrib { inherit pkgs; };
-    in
-    {
-      imports = [
-        inputs.nix-colors.homeManagerModules.default
-      ];
-
-      # Color scheme
-      colorScheme = inputs.nix-colors.colorSchemes.dracula;
-
       # Zsh configuration
       programs.zsh = {
         enable = true;
@@ -72,8 +57,6 @@
           export YSU_MESSAGE_FORMAT="💡 $(tput setab 22)$(tput setaf 231) %alias $(tput sgr0)"
           unset __HM_SESS_VARS_SOURCED # workaround for orbstack shells
           [ -f ~/.config/op/plugins.sh ] && source ~/.config/op/plugins.sh
-          # Apply color scheme
-          #${nix-colors-lib.shellThemeFromScheme { scheme = config.colorScheme; }}
           # source extra rc in home dir if found
           [ -f ~/.zshrc_extra ] && source ~/.zshrc_extra
         '';

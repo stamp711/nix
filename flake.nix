@@ -8,10 +8,6 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nix-colors = {
-      url = "github:misterio77/nix-colors";
-      inputs.nixpkgs-lib.follows = "flake-parts/nixpkgs-lib";
-    };
     nix-index-database = {
       url = "github:Mic92/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -33,8 +29,6 @@
     agenix-rekey = {
       url = "github:stamp711/agenix-rekey";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-parts.follows = "flake-parts";
-      inputs.treefmt-nix.follows = "treefmt-nix";
     };
     disko = {
       url = "github:nix-community/disko";
@@ -43,10 +37,6 @@
     jj-starship = {
       url = "github:dmmulroy/jj-starship";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-    ssh-keys = {
-      url = "https://github.com/stamp711.keys";
-      flake = false;
     };
     cloudflare-ips = {
       url = "https://api.cloudflare.com/client/v4/ips";
