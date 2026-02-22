@@ -38,8 +38,13 @@ in
             "nvme"
             "xhci_pci"
             "thunderbolt"
-            "usbhid" # external USB keyboard for LUKS passphrase
+            "usbhid"
           ];
+          # Auto-authorize Thunderbolt devices in initrd so USB devices behind
+          # Thunderbolt docks/displays work for LUKS unlock.
+          boot.initrd.services.udev.rules = ''
+            ACTION=="add", SUBSYSTEM=="thunderbolt", ATTR{authorized}=="0", ATTR{authorized}="1"
+          '';
 
           programs.zsh.enable = true;
           users.defaultUserShell = pkgs.zsh;
