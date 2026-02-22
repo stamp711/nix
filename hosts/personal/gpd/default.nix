@@ -24,7 +24,7 @@ in
       ./hardware.nix
       ./lte.nix
       self.nixosModules.desktop.gnome
-      self.nixosModules.boot-disk.efi-btrfs
+      self.nixosModules.boot-disk.efi-btrfs-luks
       (
         { pkgs, ... }:
         {
@@ -36,6 +36,7 @@ in
             "nvme"
             "xhci_pci"
             "thunderbolt"
+            "usbhid" # external USB keyboard for LUKS passphrase
           ];
 
           programs.zsh.enable = true;
