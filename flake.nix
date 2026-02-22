@@ -46,6 +46,10 @@
       url = "https://api.cloudflare.com/client/v4/ips";
       flake = false;
     };
+    NixVirt = {
+      url = "https://flakehub.com/f/AshleyYakeley/NixVirt/*.tar.gz";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
