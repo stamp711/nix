@@ -55,6 +55,9 @@
         # Sudo
         security.sudo.wheelNeedsPassword = false;
 
+        # Terminfo for modern terminal emulators (ghostty, kitty, foot, etc.)
+        environment.enableAllTerminfo = true;
+
         # Basic system packages
         environment.systemPackages = with pkgs; [
           vim
