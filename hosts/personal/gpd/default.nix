@@ -3,8 +3,8 @@ let
   username = "stamp";
   hostname = "GPD";
   system = "x86_64-linux";
-  hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBTyOPbsihNDeD7xK5TCqRa/68JY1ff6tp0plNjkda1s";
-  userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGCt7+OlTiE/l4dWFibRgI2VjEAs4+veq2qw2JdNsrCt";
+  hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGTQLBSo+0ienoQG9TV4XyNt3vbN60uS10OD4TUDB1an";
+  userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBt5OaxhvkIQJWZ80eX8czcCESykRu8oNlx1UIFiQz0G";
 in
 {
   description = "GPD Pocket 4";
