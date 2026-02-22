@@ -33,6 +33,7 @@
 
       boot-disk.device = "/dev/vda";
 
+      networking.firewall.enable = true;
       services.openssh.ports = [ 50022 ];
 
       # Nix GC
