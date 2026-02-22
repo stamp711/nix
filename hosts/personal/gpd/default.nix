@@ -59,9 +59,8 @@ in
     inherit system username;
     modules = [
       self.homeProfiles.personal
-      {
-        age.rekey.hostPubkey = userPubkey;
-      }
-    ];
+      { age.rekey.hostPubkey = userPubkey; }
+    ]
+    ++ self.homeModules.desktop._all;
   };
 }
