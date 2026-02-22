@@ -38,6 +38,10 @@
       url = "github:dmmulroy/jj-starship";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    monaco = {
+      url = "github:thep0y/monaco-nerd-font";
+      flake = false;
+    };
     cloudflare-ips = {
       url = "https://api.cloudflare.com/client/v4/ips";
       flake = false;

@@ -32,7 +32,6 @@
       programs.lsd = {
         enable = true;
         enableZshIntegration = true;
-        settings.icons.theme = "unicode";
       };
 
       # Smarter cd command
