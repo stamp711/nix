@@ -14,8 +14,14 @@
     {
       imports = [ inputs.disko.nixosModules.disko ];
 
-      options.boot-disk.device = lib.mkOption {
-        type = lib.types.str;
+      options.boot-disk = {
+        device = lib.mkOption {
+          type = lib.types.str;
+        };
+        swapSize = lib.mkOption {
+          type = lib.types.str;
+          default = "16G";
+        };
       };
 
       config = {
@@ -60,7 +66,7 @@
                       "@nix".mountpoint = "/nix";
                       "@home".mountpoint = "/home";
                       "@swap".mountpoint = "/.swap";
-                      "@swap".swap.swapfile.size = "16G";
+                      "@swap".swap.swapfile.size = cfg.swapSize;
                     };
                   };
                 };

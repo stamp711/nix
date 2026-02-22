@@ -32,6 +32,7 @@ in
           age.rekey.hostPubkey = hostPubkey;
 
           boot-disk.device = "/dev/nvme0n1";
+          boot-disk.swapSize = "32G";
           boot.initrd.availableKernelModules = [
             "nvme"
             "xhci_pci"
