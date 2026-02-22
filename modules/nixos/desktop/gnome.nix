@@ -16,17 +16,11 @@
       # Touchpad / touchscreen
       services.libinput.enable = true;
 
-      # Remove GNOME bloat
-      environment.gnome.excludePackages = with pkgs; [
-        epiphany
-        geary
-        gnome-characters
-        gnome-maps
-        gnome-music
-        gnome-tour
-        gnome-weather
-        totem
-        yelp
+      # Only install GNOME shell, not the bundled apps
+      services.gnome.core-utilities.enable = false;
+      environment.systemPackages = with pkgs; [
+        gnome-terminal
+        nautilus
       ];
     };
 }

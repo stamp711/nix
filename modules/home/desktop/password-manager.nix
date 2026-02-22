@@ -1,9 +1,10 @@
 {
-  description = "1Password desktop app";
+  description = "1Password SSH agent integration";
 
   module =
-    { pkgs, ... }:
+    { config, ... }:
     {
-      home.packages = [ pkgs._1password-gui ];
+      # Use 1Password SSH agent
+      home.sessionVariables.SSH_AUTH_SOCK = "${config.home.homeDirectory}/.1password/agent.sock";
     };
 }

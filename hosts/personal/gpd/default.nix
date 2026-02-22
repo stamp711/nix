@@ -18,6 +18,7 @@ in
     inherit system;
     modules = [
       self.nixosModules.common.core
+      self.nixosModules.common.onepassword
       self.nixosModules.common.agenix-rekey
       self.nixosModules.common.audio
       self.nixosModules.common.networking
