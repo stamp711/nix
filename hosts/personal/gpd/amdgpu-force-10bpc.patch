@@ -1,0 +1,11 @@
+diff --git a/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c b/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
+--- a/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
++++ b/drivers/gpu/drm/amd/display/amdgpu_dm/amdgpu_dm.c
+@@ -7853,6 +7853,6 @@ create_validate_stream_for_sink(struct drm_connector *connector,
+ 	struct amdgpu_device *adev = drm_to_adev(connector->dev);
+ 	struct dc_stream_state *stream;
+ 	const struct drm_connector_state *drm_state = dm_state ? &dm_state->base : NULL;
+-	int requested_bpc = drm_state ? drm_state->max_requested_bpc : 8;
++	int requested_bpc = 10;
+ 	enum dc_status dc_result = DC_OK;
+ 	uint8_t bpc_limit = 6;
