@@ -1,12 +1,15 @@
 {
-  description = "NetworkManager with wifi powersave and firewall";
+  description = "NetworkManager with wifi powersave";
 
-  module = {
-    networking = {
-      networkmanager = {
-        enable = true;
-        wifi.powersave = true;
+  module =
+    { lib, ... }:
+    {
+      networking = {
+        firewall.enable = lib.mkDefault false;
+        networkmanager = {
+          enable = true;
+          wifi.powersave = true;
+        };
       };
     };
-  };
 }
