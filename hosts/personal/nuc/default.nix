@@ -25,6 +25,7 @@ in
       ./hardware.nix
       ./vm.nix
       self.nixosModules.desktop.gnome
+      self.nixosModules.desktop.solaar
       self.nixosModules.boot-disk.efi-btrfs-luks
       (
         { pkgs, ... }:
@@ -45,7 +46,7 @@ in
           security.tpm2.enable = true;
           boot.kernelModules = [ "kvm-intel" ];
 
-          # Always-on desktop — disable all sleep states
+          # Always-on desktop - disable all sleep states
           systemd.targets.sleep.enable = false;
           systemd.targets.suspend.enable = false;
           systemd.targets.hibernate.enable = false;

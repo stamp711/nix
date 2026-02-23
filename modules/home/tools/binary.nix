@@ -24,7 +24,7 @@
         ]
         ++ lib.optionals pkgs.stdenv.isLinux [
           # ELF inspection
-          elfutils # eu-readelf, eu-objdump, eu-nm — better DWARF support than binutils
+          elfutils # eu-readelf, eu-objdump, eu-nm - better DWARF support than binutils
 
           # Debuggers & tracers (Linux)
           gdb # GNU debugger

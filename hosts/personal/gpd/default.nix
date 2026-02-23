@@ -25,6 +25,7 @@ in
       ./hardware.nix
       ./lte.nix
       self.nixosModules.desktop.gnome
+      self.nixosModules.desktop.solaar
       self.nixosModules.boot-disk.efi-btrfs-luks
       (
         { pkgs, ... }:

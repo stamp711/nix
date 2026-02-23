@@ -8,13 +8,13 @@
         with pkgs;
         [
           # Profiling
-          samply # sampling profiler — outputs to Firefox Profiler format
+          samply # sampling profiler - outputs to Firefox Profiler format
           flamegraph # generate flamegraphs from perf/dtrace output
-          inferno # Rust rewrite of flamegraph — faster, same CLI interface
+          inferno # Rust rewrite of flamegraph - faster, same CLI interface
           flamelens # TUI interactive flamegraph viewer
 
           # Benchmarking
-          hyperfine # CLI benchmark runner — compare command execution times
+          hyperfine # CLI benchmark runner - compare command execution times
           sysbench # system performance benchmark suite
         ]
         ++ lib.optionals pkgs.stdenv.isLinux [
