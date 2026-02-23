@@ -36,13 +36,6 @@
       networking.firewall.enable = true;
       services.openssh.ports = [ 50022 ];
 
-      # Nix GC
-      nix.gc = {
-        automatic = true;
-        dates = "weekly";
-        options = "--delete-older-than 30d";
-      };
-
       # Proxy services
       services.xray-proxy = {
         enable = true;

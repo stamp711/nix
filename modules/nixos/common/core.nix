@@ -28,6 +28,13 @@
         system.stateVersion = "26.05";
 
         # Nix
+        programs.nh = {
+          enable = true;
+          clean = {
+            enable = true;
+            extraArgs = "--keep-since 30d --keep 3";
+          };
+        };
         nix.settings = {
           experimental-features = [
             "nix-command"
