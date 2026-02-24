@@ -13,15 +13,86 @@ let
   };
 
   hexInt = s: (fromTOML "v = 0x${s}").v;
-  usb = vendor: product: {
-    mode = "subsystem";
-    type = "usb";
-    managed = true;
-    source = {
-      vendor.id = hexInt vendor;
-      product.id = hexInt product;
-    };
-  };
+  # usb = vendor: product: {
+  #   mode = "subsystem";
+  #   type = "usb";
+  #   managed = true;
+  #   source = {
+  #     vendor.id = hexInt vendor;
+  #     product.id = hexInt product;
+  #   };
+  # };
+
+  # Front panel USB ports on bus 1 (PCH xHCI controller)
+  vmFrontPanelPorts = [
+    9
+    10
+    11
+  ];
+
+  # Long-running: watches for VM lifecycle events and runs a callback on start
+  # Usage: vm-start-watcher <vm-name> <callback>
+  vmStartWatcher = pkgs.writeShellScript "vm-start-watcher" ''
+    VM="$1"
+    CALLBACK="$2"
+    VIRSH="${pkgs.libvirt}/bin/virsh"
+
+    # Catch VM already running (delayed to let event listener connect first)
+    (sleep 5 && "$VIRSH" domstate "$VM" 2>/dev/null | grep -qE 'running|paused' && "$CALLBACK" "$VM") &
+
+    # Watch for all future start events
+    "$VIRSH" event --domain "$VM" --event lifecycle --loop | while read -r line; do
+      if echo "$line" | grep -q "Started"; then
+        "$CALLBACK" "$VM"
+      fi
+    done
+  '';
+
+  # Callback: prod QEMU monitor to work around swtpm wakeup bug
+  qemuProd = pkgs.writeShellScript "qemu-prod" ''
+    VM="$1"
+    VIRSH="${pkgs.libvirt}/bin/virsh"
+    echo "Prodding QEMU monitor for $VM"
+    for delay in 1 3 5 10; do
+      sleep "$delay"
+      "$VIRSH" qemu-monitor-command "$VM" --hmp "info version" >/dev/null 2>&1 || return
+    done
+  '';
+
+  # Callback: scan front-panel USB ports and attach connected devices
+  usbPassthroughScan = pkgs.writeShellScript "usb-passthrough-scan" ''
+    VM="$1"
+    echo "Scanning front-panel USB ports for $VM"
+    for PORT in ${builtins.concatStringsSep " " (map toString vmFrontPanelPorts)}; do
+      SYSPATH="/sys/bus/usb/devices/1-$PORT"
+      [ -f "$SYSPATH/busnum" ] && ${virshUsbPassthrough} attach "$VM" "$SYSPATH"
+    done
+  '';
+
+  # Attach/detach a single USB device (by sysfs path) to a VM via virsh
+  virshUsbPassthrough = pkgs.writeShellScript "virsh-usb-passthrough" ''
+    ACTION="$1"   # attach or detach
+    VM="$2"       # VM name
+    SYSPATH="$3"  # e.g. /sys/bus/usb/devices/1-9
+
+    VIRSH="${pkgs.libvirt}/bin/virsh"
+
+    # Bail if VM doesn't have an active QEMU process
+    if ! "$VIRSH" domstate "$VM" 2>/dev/null | grep -qE 'running|paused'; then
+      echo "$VM not active, skipping $ACTION for $SYSPATH"
+      exit 0
+    fi
+
+    BUSNUM=$(cat "$SYSPATH/busnum")
+    DEVNUM=$(cat "$SYSPATH/devnum")
+    echo "$ACTION bus=$BUSNUM dev=$DEVNUM ($SYSPATH) -> $VM"
+
+    XML="<hostdev mode='subsystem' type='usb' managed='yes'>
+      <source><address bus='$BUSNUM' device='$DEVNUM'/></source>
+    </hostdev>"
+
+    echo "$XML" | "$VIRSH" "$ACTION-device" "$VM" /dev/stdin
+  '';
 
   win11 = {
     type = "kvm";
@@ -113,7 +184,6 @@ let
         (passthrough 3 0 0) # NVMe D:              (03:00.0)
         (passthrough 8 0 0) # TB4 NHI              (08:00.0)
         (passthrough (hexInt "3c") 0 0) # TB4 USB  (3c:00.0)
-        (usb "046d" "c548") # Logi Bolt Receiver
       ];
       channel = [
         {
@@ -165,34 +235,49 @@ in
   # Workaround: QEMU 10.2 has a bug where the TPM CRB chardev doesn't wake the
   # main event loop after sending a command to swtpm, causing OVMF to hang during
   # TPM init. Any QMP monitor command unblocks it by waking the main loop.
-  systemd.services.win11-qemu-prod = {
-    description = "Prod QEMU monitor on VM start (swtpm main loop wakeup bug)";
+  systemd.services.win11-qemu-prod-watcher = {
+    description = "Prod QEMU monitor on VM start (workaround for swtpm main loop wakeup bug)";
     after = [ "libvirtd.service" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
-      Type = "simple";
       Restart = "always";
       RestartSec = 2;
+      ExecStart = "${vmStartWatcher} win11 ${qemuProd}";
     };
-    path = [ pkgs.libvirt ];
-    script = ''
-      prod() {
-        echo "Prodding QEMU monitor (swtpm wakeup workaround)"
-        for delay in 1 3 5 10; do
-          sleep "$delay"
-          virsh qemu-monitor-command win11 --hmp "info version" >/dev/null 2>&1 || return
-        done
-      }
-      # Delayed prod catches VM autostart before the listener connects
-      (sleep 2 && prod) &
-      # Watch for all future start events
-      virsh event --domain win11 --event lifecycle --loop | while read -r line; do
-        if echo "$line" | grep -q "Started"; then
-          prod
-        fi
-      done
-    '';
   };
+
+  # Auto-passthrough front panel USB ports to win11 VM on start
+  systemd.services.win11-usb-passthrough-watcher = {
+    description = "Watch for win11 VM starts and attach front-panel USB devices";
+    after = [ "libvirtd.service" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Restart = "always";
+      RestartSec = 2;
+      ExecStart = "${vmStartWatcher} win11 ${usbPassthroughScan}";
+    };
+  };
+
+  # Graceful shutdown via guest agent (ACPI power button doesn't work in Modern Standby)
+  systemd.services.win11-shutdown = {
+    description = "Gracefully shut down win11 VM via guest agent";
+    after = [ "libvirtd.service" ];
+    before = [ "libvirt-guests.service" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStop = "${pkgs.libvirt}/bin/virsh shutdown win11 --mode agent";
+      TimeoutStopSec = "30min";
+    };
+  };
+
+  # Hot-plug: attach USB devices on front panel ports when plugged in while VM is running
+  services.udev.extraRules = builtins.concatStringsSep "\n" (
+    map (port: ''
+      ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTR{busnum}=="1", ATTR{devpath}=="${toString port}", RUN+="${virshUsbPassthrough} attach win11 /sys$env{DEVPATH}"
+    '') vmFrontPanelPorts
+  );
 
   environment.systemPackages = [ pkgs.virt-manager ];
 }
