@@ -1,5 +1,5 @@
 # NUC13RNGi9 hardware (Intel i9-13900, Intel iGPU + NVIDIA RTX 4080 via VFIO)
-{ inputs, ... }:
+{ inputs, pkgs, ... }:
 {
   imports = [
     inputs.nixos-hardware.nixosModules.common-gpu-intel
@@ -11,6 +11,11 @@
 
   # Intel iGPU for host display
   hardware.graphics.enable = true;
+
+  # Disable Energy Efficient Ethernet on igc NIC to prevent link flapping
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="net", DRIVERS=="igc", RUN+="${pkgs.ethtool}/bin/ethtool --set-eee $name eee off"
+  '';
 
   # VFIO: isolate NVIDIA GPU + Aquantia 10GbE at boot for VM passthrough
   boot.initrd.kernelModules = [
