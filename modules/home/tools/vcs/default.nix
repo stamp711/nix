@@ -3,15 +3,38 @@
 
   module =
     {
+      self,
       pkgs,
       config,
       lib,
       ...
     }:
     let
-      hasEmail = (config.programs.git.settings.user.email or null) != null;
-      hasSigningKey = config.programs.git.signing.key != null;
-      canGenerateAllowedSignersFile = hasEmail && hasSigningKey;
+      mkAgeSecret =
+        file:
+        let
+          name = self.lib.ageSecretName file;
+        in
+        {
+          inherit name;
+          inherit (config.age.secrets.${name}) path;
+          rekey.${name}.rekeyFile = file;
+        };
+
+      ghqRoot = if pkgs.stdenv.isDarwin then "~/Developer" else "~/code";
+
+      gitIncludes = [
+        {
+          file = ./git.personal-identity.ini.age;
+          condition = "gitdir:${ghqRoot}/github.com/";
+        }
+        {
+          file = ./git.work-identity.ini.age;
+          condition = "gitdir:${ghqRoot}/code.byted.org/";
+        }
+      ];
+
+      jjIdentity = mkAgeSecret ./jj.identity.toml.age;
     in
     {
       programs.git.enable = true;
@@ -21,6 +44,10 @@
         init.defaultBranch = "master";
         pull.ff = "only";
         push.autoSetupRemote = true;
+        ghq = {
+          root = ghqRoot;
+          user = "stamp711";
+        };
       };
 
       # Delta diff viewer
@@ -28,19 +55,6 @@
       programs.delta.enableGitIntegration = true;
       programs.delta.enableJujutsuIntegration = true;
       programs.delta.options.side-by-side = true;
-
-      # Signing
-      programs.git.signing.format = "ssh";
-      programs.git.signing.signByDefault = lib.mkIf hasSigningKey true;
-
-      # Allowed signers file
-      programs.git.settings.gpg.ssh.allowedSignersFile =
-        lib.mkIf canGenerateAllowedSignersFile "${config.xdg.configHome}/git/allowed_signers";
-      home.file."${config.xdg.configHome}/git/allowed_signers" = lib.mkIf canGenerateAllowedSignersFile {
-        text = ''
-          ${config.programs.git.settings.user.email} namespaces="git" ${config.programs.git.signing.key}
-        '';
-      };
 
       # Global ignores
       programs.git.ignores = [
@@ -88,19 +102,24 @@
         "--template"
         "builtin_log_comfortable"
       ];
-      programs.jujutsu.settings.user = lib.mkIf (
-        config.programs.git.settings ? user
-      ) config.programs.git.settings.user;
       programs.jjui.enable = true;
-
-      programs.git.settings.ghq = {
-        root = if pkgs.stdenv.isDarwin then "~/Developer" else "~/code";
-        user = "stamp711";
-      };
 
       home.packages = with pkgs; [
         ghq
         git-filter-repo
       ];
+
+      # Conditional identity (age-encrypted)
+      age.secrets = lib.mkMerge (
+        (map (inc: (mkAgeSecret inc.file).rekey) gitIncludes) ++ [ jjIdentity.rekey ]
+      );
+
+      programs.git.includes = map (inc: {
+        inherit (inc) condition;
+        inherit (mkAgeSecret inc.file) path;
+      }) gitIncludes;
+
+      xdg.configFile."jj/conf.d/identity.toml".source =
+        config.lib.file.mkOutOfStoreSymlink jjIdentity.path;
     };
 }
