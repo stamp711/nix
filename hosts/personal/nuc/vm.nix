@@ -261,9 +261,12 @@ in
   # Graceful shutdown via guest agent (ACPI power button doesn't work in Modern Standby)
   systemd.services.win11-shutdown = {
     description = "Gracefully shut down win11 VM via guest agent";
-    after = [ "libvirtd.service" ];
-    before = [ "libvirt-guests.service" ];
+    after = [
+      "libvirtd.service"
+      "libvirt-guests.service"
+    ];
     wantedBy = [ "multi-user.target" ];
+    stopIfChanged = false;
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
