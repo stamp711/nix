@@ -30,6 +30,9 @@ in
           networking.hostName = hostname;
           age.rekey.hostPubkey = hostPubkey;
 
+          my.nixos-maintenance.autoUpdate = true;
+          my.nixos-maintenance.autoClean = true;
+
           my.boot-disk = {
             enable = true;
             layout = "efi-btrfs-luks";

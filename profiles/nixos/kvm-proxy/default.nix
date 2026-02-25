@@ -46,5 +46,8 @@
         port = 28799;
         pskSecretFile = ./snell-psk.age;
       };
+
+      my.nixos-maintenance.autoUpdate = true;
+      my.nixos-maintenance.autoClean = true;
     };
 }
