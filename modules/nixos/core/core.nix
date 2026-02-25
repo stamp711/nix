@@ -58,6 +58,10 @@
         # Terminfo for modern terminal emulators (ghostty, kitty, foot, etc.)
         environment.enableAllTerminfo = true;
 
+        # nh (nix helper)
+        programs.nh.enable = true;
+        programs.nh.flake = "github:stamp711/nix";
+
         # Basic system packages
         environment.systemPackages = with pkgs; [
           vim

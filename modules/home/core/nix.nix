@@ -13,5 +13,9 @@
       xdg.configFile."nixpkgs/config.nix".text = ''
         { allowUnfree = true; allowUnfreePredicate = _: true; }
       '';
+
+      # nh (nix helper)
+      programs.nh.enable = true;
+      programs.nh.flake = "github:stamp711/nix";
     };
 }

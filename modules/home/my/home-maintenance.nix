@@ -65,11 +65,6 @@
       };
 
       config = lib.mkMerge [
-        (lib.mkIf (cfg.autoUpdate || cfg.autoClean) {
-          programs.nh.enable = true;
-          programs.nh.flake = cfg.flake;
-        })
-
         # Auto-update
         (lib.mkIf cfg.autoUpdate {
           systemd.user.services.nh-update = {
