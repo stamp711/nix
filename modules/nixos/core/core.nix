@@ -37,6 +37,7 @@
             "root"
             "@wheel"
           ];
+          auto-optimise-store = true;
         };
 
         # Locale
