@@ -95,6 +95,8 @@
               Timer = {
                 OnCalendar = cfg.switch.dates;
                 Persistent = true;
+                RandomizedDelaySec = "4h";
+                FixedRandomDelay = true;
               };
             };
 
@@ -115,6 +117,8 @@
               Timer = {
                 OnCalendar = cfg.clean.dates;
                 Persistent = true;
+                RandomizedDelaySec = "4h";
+                FixedRandomDelay = true;
               };
             };
 

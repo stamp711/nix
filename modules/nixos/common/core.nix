@@ -35,6 +35,10 @@
             extraArgs = "--keep-since 30d --keep 3";
           };
         };
+        systemd.timers.nh-clean.timerConfig = {
+          RandomizedDelaySec = "4h";
+          FixedRandomDelay = true;
+        };
         nix.settings = {
           experimental-features = [
             "nix-command"
