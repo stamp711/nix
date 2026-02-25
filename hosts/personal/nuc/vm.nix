@@ -1,6 +1,14 @@
 # Windows 11 VM with VFIO GPU passthrough (NixVirt declarative domain)
-{ pkgs, inputs, ... }:
+{
+  pkgs,
+  inputs,
+  lib,
+  config,
+  ...
+}:
 let
+  cfg = config.virtualisation.win11-vm;
+
   passthrough = bus: slot: function: {
     mode = "subsystem";
     type = "pci";
@@ -219,71 +227,91 @@ let
   };
 in
 {
+  options.virtualisation.win11-vm.enable =
+    lib.mkEnableOption "Windows 11 VM with VFIO GPU passthrough"
+    // {
+      default = true;
+    };
+
   imports = [ inputs.NixVirt.nixosModules.default ];
 
-  virtualisation.libvirt.enable = true;
-  virtualisation.libvirt.swtpm.enable = true;
-  virtualisation.libvirtd.onShutdown = "shutdown";
-  # Allow Windows Update to finish during host shutdown
-  systemd.services.libvirt-guests.serviceConfig.TimeoutStopSec = "30min";
-
-  virtualisation.libvirt.connections."qemu:///system".domains = [
-    {
-      definition = inputs.NixVirt.lib.domain.writeXML win11;
-      active = null; # follow last state
-      restart = false; # never kill VM during os switch
-    }
-  ];
-
-  # Workaround: QEMU 10.2 has a bug where the TPM CRB chardev doesn't wake the
-  # main event loop after sending a command to swtpm, causing OVMF to hang during
-  # TPM init. Any QMP monitor command unblocks it by waking the main loop.
-  systemd.services.win11-qemu-prod-watcher = {
-    description = "Prod QEMU monitor on VM start (workaround for swtpm main loop wakeup bug)";
-    after = [ "libvirtd.service" ];
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig = {
-      Restart = "always";
-      RestartSec = 2;
-      ExecStart = "${vmEventWatcher} win11 ${qemuProd} 'started|reboot|crashed'";
-    };
-  };
-
-  # Auto-passthrough front panel USB ports to win11 VM on start
-  systemd.services.win11-usb-passthrough-watcher = {
-    description = "Watch for win11 VM starts and attach front-panel USB devices";
-    after = [ "libvirtd.service" ];
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig = {
-      Restart = "always";
-      RestartSec = 2;
-      ExecStart = "${vmEventWatcher} win11 ${usbPassthroughScan} started";
-    };
-  };
-
-  # Graceful shutdown via guest agent (ACPI power button doesn't work in Modern Standby)
-  systemd.services.win11-shutdown = {
-    description = "Gracefully shut down win11 VM via guest agent";
-    after = [
-      "libvirtd.service"
-      "libvirt-guests.service"
+  config = lib.mkIf cfg.enable {
+    # VFIO: bind GPU, GPU audio, and 10GbE NIC to vfio-pci at boot
+    boot.initrd.kernelModules = [
+      "vfio_pci"
+      "vfio"
+      "vfio_iommu_type1"
     ];
-    wantedBy = [ "multi-user.target" ];
-    stopIfChanged = false;
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      ExecStop = "${pkgs.libvirt}/bin/virsh shutdown win11 --mode agent";
-      TimeoutStopSec = "30min";
+    # 10de:2704 = RTX 4080 GPU
+    # 10de:22bb = RTX 4080 audio
+    # 1d6a:14c0 = Aquantia 10GbE
+    boot.kernelParams = [ "vfio-pci.ids=10de:2704,10de:22bb,1d6a:14c0" ];
+
+    virtualisation.libvirt.enable = true;
+    virtualisation.libvirt.swtpm.enable = true;
+    virtualisation.libvirtd.onShutdown = "shutdown";
+    # Allow Windows Update to finish during host shutdown
+    systemd.services.libvirt-guests.serviceConfig.TimeoutStopSec = "30min";
+
+    virtualisation.libvirt.connections."qemu:///system".domains = [
+      {
+        definition = inputs.NixVirt.lib.domain.writeXML win11;
+        active = null; # follow last state
+        restart = false; # never kill VM during os switch
+      }
+    ];
+
+    # Workaround: QEMU 10.2 has a bug where the TPM CRB chardev doesn't wake the
+    # main event loop after sending a command to swtpm, causing OVMF to hang during
+    # TPM init. Any QMP monitor command unblocks it by waking the main loop.
+    systemd.services.win11-qemu-prod-watcher = {
+      description = "Prod QEMU monitor on VM start (workaround for swtpm main loop wakeup bug)";
+      after = [ "libvirtd.service" ];
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = 2;
+        ExecStart = "${vmEventWatcher} win11 ${qemuProd} 'started|reboot|crashed'";
+      };
     };
+
+    # Auto-passthrough front panel USB ports to win11 VM on start
+    systemd.services.win11-usb-passthrough-watcher = {
+      description = "Watch for win11 VM starts and attach front-panel USB devices";
+      after = [ "libvirtd.service" ];
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        Restart = "always";
+        RestartSec = 2;
+        ExecStart = "${vmEventWatcher} win11 ${usbPassthroughScan} started";
+      };
+    };
+
+    # Graceful shutdown via guest agent (ACPI power button doesn't work in Modern Standby)
+    systemd.services.win11-shutdown = {
+      description = "Gracefully shut down win11 VM via guest agent";
+      after = [
+        "libvirtd.service"
+        "libvirt-guests.service"
+      ];
+      wantedBy = [ "multi-user.target" ];
+      stopIfChanged = false;
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        ExecStop = "${pkgs.libvirt}/bin/virsh shutdown win11 --mode agent";
+        TimeoutStopSec = "30min";
+      };
+    };
+
+    # Hot-plug: attach USB devices on front panel ports when plugged in while VM is running
+    services.udev.extraRules = builtins.concatStringsSep "\n" (
+      map (port: ''
+        ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTR{busnum}=="1", ATTR{devpath}=="${toString port}", RUN+="${virshUsbPassthrough} attach win11 /sys$env{DEVPATH}"
+      '') vmFrontPanelPorts
+    );
+
+    environment.systemPackages = [ pkgs.virt-manager ];
+    environment.variables.LIBVIRT_DEFAULT_URI = "qemu:///system";
   };
-
-  # Hot-plug: attach USB devices on front panel ports when plugged in while VM is running
-  services.udev.extraRules = builtins.concatStringsSep "\n" (
-    map (port: ''
-      ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTR{busnum}=="1", ATTR{devpath}=="${toString port}", RUN+="${virshUsbPassthrough} attach win11 /sys$env{DEVPATH}"
-    '') vmFrontPanelPorts
-  );
-
-  environment.systemPackages = [ pkgs.virt-manager ];
 }

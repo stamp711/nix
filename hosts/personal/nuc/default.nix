@@ -7,7 +7,7 @@ let
   userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDbNYaZnOCmlfKtRpPEq12Ot3iaVjq0AFj7vsB3DcjQ+";
 in
 {
-  description = "NUC13 desktop with VFIO GPU passthrough";
+  description = "NUC13RNGi9";
   inherit username hostname system;
 
   deploy = {
@@ -26,25 +26,13 @@ in
       ./vm.nix
       self.nixosModules.desktop.gnome
       self.nixosModules.desktop.solaar
-      self.nixosModules.boot-disk.efi-btrfs-luks
       (
         { pkgs, ... }:
         {
           networking.hostName = hostname;
           age.rekey.hostPubkey = hostPubkey;
 
-          boot-disk.device = "/dev/disk/by-id/nvme-Samsung_SSD_990_PRO_1TB_S6Z1NJ0W395410E";
-          boot-disk.swapSize = "16G";
-          boot.initrd.availableKernelModules = [
-            "nvme"
-            "xhci_pci"
-            "usbhid"
-            "ahci"
-            "thunderbolt"
-            "tpm_crb"
-          ];
           security.tpm2.enable = true;
-          boot.kernelModules = [ "kvm-intel" ];
 
           # Always-on desktop - disable all sleep states
           systemd.targets.sleep.enable = false;
@@ -66,8 +54,23 @@ in
             extraGroups = [
               "wheel"
               "networkmanager"
-              "libvirtd"
             ];
+          };
+
+          specialisation.desktop.configuration = {
+            system.nixos.tags = [ "desktop" ];
+            virtualisation.win11-vm.enable = false;
+          };
+
+          specialisation.gaming.configuration = {
+            system.nixos.tags = [ "steam" ];
+            virtualisation.win11-vm.enable = false;
+            services.xserver.videoDrivers = [ "nvidia" ];
+            hardware.nvidia.modesetting.enable = true;
+            hardware.nvidia.open = true;
+            services.displayManager.autoLogin.enable = true;
+            services.displayManager.autoLogin.user = username;
+            services.displayManager.defaultSession = "steam";
           };
         }
       )
