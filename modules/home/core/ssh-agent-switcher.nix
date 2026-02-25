@@ -9,7 +9,7 @@
     {
       home.packages = [ ssh-agent-switcher ];
 
-      programs.zsh.initExtra = ''
+      programs.zsh.initContent = ''
         if [ -n "$SSH_CONNECTION" ]; then
           export SSH_AUTH_SOCK="/tmp/ssh-agent-switcher.''${USER}.sock"
           ${lib.getExe ssh-agent-switcher} --daemon --socket-path="$SSH_AUTH_SOCK" 2>/dev/null || true
