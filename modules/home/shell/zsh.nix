@@ -55,7 +55,6 @@
         ];
         initContent = ''
           export YSU_MESSAGE_FORMAT="💡 $(tput setab 22)$(tput setaf 231) %alias $(tput sgr0)"
-          unset __HM_SESS_VARS_SOURCED # workaround for orbstack shells
           [ -f ~/.config/op/plugins.sh ] && source ~/.config/op/plugins.sh
           # source extra rc in home dir if found
           [ -f ~/.zshrc_extra ] && source ~/.zshrc_extra
