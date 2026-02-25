@@ -10,11 +10,11 @@
       ...
     }:
     let
-      cfg = config.services.snell;
+      cfg = config.my.snell;
       secretName = self.lib.ageSecretName cfg.pskSecretFile;
     in
     {
-      options.services.snell = {
+      options.my.snell = {
         enable = lib.mkEnableOption "Snell proxy server";
         openFirewall = lib.mkEnableOption "Open the Snell port in the firewall";
         port = lib.mkOption {
@@ -28,7 +28,7 @@
 
       config = lib.mkIf cfg.enable {
         age.secrets.${secretName}.rekeyFile = cfg.pskSecretFile;
-        age-template.files."snell.conf" = {
+        my.age-template.files."snell.conf" = {
           vars.psk = config.age.secrets.${secretName}.path;
           content = ''
             [snell-server]
@@ -44,7 +44,7 @@
           restartTriggers = [ cfg.pskSecretFile ];
           serviceConfig = {
             ExecStart = "${pkgs.snell}/bin/snell-server -c %d/config";
-            LoadCredential = "config:${config.age-template.files."snell.conf".path}";
+            LoadCredential = "config:${config.my.age-template.files."snell.conf".path}";
             DynamicUser = true;
             NoNewPrivileges = true;
           };

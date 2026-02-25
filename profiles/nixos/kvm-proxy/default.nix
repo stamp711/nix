@@ -5,13 +5,8 @@
     { self, ... }:
     {
       imports = [
-        self.nixosModules.common.core
-        self.nixosModules.common.agenix-rekey
-        self.nixosModules.services.xray-proxy
-        self.nixosModules.services.snell
         self.nixosModules.common.allow-cloudflare-443
         self.nixosModules.common.fail2ban
-        self.nixosModules.boot-disk.mbr-ext4
       ];
 
       # KVM/virtio kernel modules
@@ -31,17 +26,21 @@
       # QEMU guest agent
       services.qemuGuest.enable = true;
 
-      boot-disk.device = "/dev/vda";
+      my.boot-disk = {
+        enable = true;
+        layout = "mbr-ext4";
+        device = "/dev/vda";
+      };
 
       networking.firewall.enable = true;
       services.openssh.ports = [ 50022 ];
 
       # Proxy services
-      services.xray-proxy = {
+      my.xray-proxy = {
         enable = true;
         secretEnvFiles = [ ./xray-proxy.env.age ];
       };
-      services.snell = {
+      my.snell = {
         enable = true;
         openFirewall = true;
         port = 28799;

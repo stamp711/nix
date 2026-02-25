@@ -9,12 +9,12 @@
       ...
     }:
     let
-      cfg = config.programs.ssh;
+      cfg = config.my.ssh;
       secretNames = map self.lib.ageSecretName cfg.secretConfigFiles;
       decryptedPaths = map (n: config.age.secrets.${n}.path) secretNames;
     in
     {
-      options.programs.ssh.secretConfigFiles = lib.mkOption {
+      options.my.ssh.secretConfigFiles = lib.mkOption {
         type = lib.types.listOf lib.types.path;
         default = [ ];
         description = "List of .age files containing secret SSH config snippets to include";

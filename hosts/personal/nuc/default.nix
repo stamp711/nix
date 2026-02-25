@@ -18,8 +18,6 @@ in
   nixosConfiguration = self.lib.mkNixos {
     inherit system;
     modules = [
-      self.nixosModules.common.core
-      self.nixosModules.common.agenix-rekey
       self.nixosModules.common.audio
       self.nixosModules.common.networking
       ./hardware.nix
@@ -59,12 +57,12 @@ in
 
           specialisation.desktop.configuration = {
             system.nixos.tags = [ "desktop" ];
-            virtualisation.win11-vm.enable = false;
+            my.win11-vm.enable = false;
           };
 
           specialisation.gaming.configuration = {
             system.nixos.tags = [ "steam" ];
-            virtualisation.win11-vm.enable = false;
+            my.win11-vm.enable = false;
             services.xserver.videoDrivers = [ "nvidia" ];
             hardware.nvidia.modesetting.enable = true;
             hardware.nvidia.open = true;

@@ -9,12 +9,12 @@
       ...
     }:
     let
-      cfg = config.services.xray-proxy;
+      cfg = config.my.xray-proxy;
       secretNames = map self.lib.ageSecretName cfg.secretEnvFiles;
       decryptedPaths = map (n: config.age.secrets.${n}.path) secretNames;
     in
     {
-      options.services.xray-proxy = {
+      options.my.xray-proxy = {
         enable = lib.mkEnableOption "Xray proxy with Caddy";
         openFirewall = lib.mkEnableOption "Open TCP port 443 in the firewall";
         secretEnvFiles = lib.mkOption {
@@ -32,7 +32,7 @@
         );
 
         # Caddy
-        age-template.files."Caddyfile" = {
+        my.age-template.files."Caddyfile" = {
           envFiles = decryptedPaths;
           content = builtins.readFile ./Caddyfile.template;
           owner = "caddy";
@@ -40,18 +40,18 @@
         };
         services.caddy = {
           enable = true;
-          configFile = config.age-template.files."Caddyfile".path;
+          configFile = config.my.age-template.files."Caddyfile".path;
         };
         systemd.services.caddy.reloadTriggers = [ ./Caddyfile.template ] ++ cfg.secretEnvFiles;
 
         # Xray
-        age-template.files."xray-config.json" = {
+        my.age-template.files."xray-config.json" = {
           envFiles = decryptedPaths;
           content = builtins.readFile ./xray-config.json.template;
         };
         services.xray = {
           enable = true;
-          settingsFile = config.age-template.files."xray-config.json".path;
+          settingsFile = config.my.age-template.files."xray-config.json".path;
         };
         systemd.services.xray.restartTriggers = [ ./xray-config.json.template ] ++ cfg.secretEnvFiles;
 

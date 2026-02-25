@@ -9,12 +9,12 @@
       ...
     }:
     let
-      cfg = config.programs.zsh;
+      cfg = config.my.zsh;
       secretNames = map self.lib.ageSecretName cfg.secretEnvExtra;
       decryptedPaths = map (n: config.age.secrets.${n}.path) secretNames;
     in
     {
-      options.programs.zsh.secretEnvExtra = lib.mkOption {
+      options.my.zsh.secretEnvExtra = lib.mkOption {
         type = lib.types.listOf lib.types.path;
         default = [ ];
         description = "List of .age shell env files to decrypt and source in zsh";

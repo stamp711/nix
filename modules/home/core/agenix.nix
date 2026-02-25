@@ -3,20 +3,8 @@
   description = "agenix-rekey with shared master identity (home-manager)";
 
   module =
+    { self, config, ... }:
     {
-      inputs,
-      self,
-      config,
-      ...
-    }:
-    {
-      imports = [
-        inputs.agenix.homeManagerModules.default
-        # TODO: use inputs.agenix-rekey.homeManagerModules.default once
-        # https://github.com/oddlama/agenix-rekey/pull/143 is merged
-        (import "${inputs.agenix-rekey}/modules/agenix-rekey.nix" inputs.nixpkgs)
-      ];
-
       # secretsDir is only a symlink to secretsMountPoint, which still
       # defaults to an ephemeral runtime dir. Override with a literal path
       # so consumers like SSH Include can reference secret paths directly

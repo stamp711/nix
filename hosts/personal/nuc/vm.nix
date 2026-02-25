@@ -7,7 +7,7 @@
   ...
 }:
 let
-  cfg = config.virtualisation.win11-vm;
+  cfg = config.my.win11-vm;
 
   passthrough = bus: slot: function: {
     mode = "subsystem";
@@ -227,11 +227,9 @@ let
   };
 in
 {
-  options.virtualisation.win11-vm.enable =
-    lib.mkEnableOption "Windows 11 VM with VFIO GPU passthrough"
-    // {
-      default = true;
-    };
+  options.my.win11-vm.enable = lib.mkEnableOption "Windows 11 VM with VFIO GPU passthrough" // {
+    default = true;
+  };
 
   imports = [ inputs.NixVirt.nixosModules.default ];
 

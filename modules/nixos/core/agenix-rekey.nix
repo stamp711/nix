@@ -3,14 +3,8 @@
   description = "agenix-rekey with shared master identity";
 
   module =
-    { inputs, self, ... }:
+    { self, ... }:
     {
-      imports = [
-        inputs.agenix.nixosModules.default
-        inputs.agenix-rekey.nixosModules.default
-        ./agenix-template.nix
-      ];
-
       config.age.rekey = {
         masterIdentities = [
           {

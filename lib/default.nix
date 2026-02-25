@@ -27,7 +27,15 @@ in
     lib.nixosSystem {
       inherit system;
       specialArgs = { inherit self inputs; };
-      modules = modules ++ [
+      modules = [
+        inputs.disko.nixosModules.disko
+        inputs.agenix.nixosModules.default
+        inputs.agenix-rekey.nixosModules.default
+      ]
+      ++ self.nixosModules.core._all
+      ++ self.nixosModules.my._all
+      ++ modules
+      ++ [
         { nixpkgs.pkgs = self.lib.mkPkgs system; }
       ];
     };
@@ -42,7 +50,16 @@ in
     inputs.home-manager.lib.homeManagerConfiguration {
       pkgs = self.lib.mkPkgs system;
       extraSpecialArgs = { inherit self inputs; };
-      modules = [ { home.username = username; } ] ++ modules;
+      modules = [
+        { home.username = username; }
+        inputs.agenix.homeManagerModules.default
+        # TODO: use inputs.agenix-rekey.homeManagerModules.default once
+        # https://github.com/oddlama/agenix-rekey/pull/143 is merged
+        (import "${inputs.agenix-rekey}/modules/agenix-rekey.nix" inputs.nixpkgs)
+      ]
+      ++ self.homeModules.core._all
+      ++ self.homeModules.my._all
+      ++ modules;
     };
 
   # Derive a stable secret name from a .age file path, relative to the flake root.

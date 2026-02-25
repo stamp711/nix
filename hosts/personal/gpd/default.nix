@@ -17,24 +17,25 @@ in
   nixosConfiguration = self.lib.mkNixos {
     inherit system;
     modules = [
-      self.nixosModules.common.core
       self.nixosModules.common.onepassword
-      self.nixosModules.common.agenix-rekey
       self.nixosModules.common.audio
       self.nixosModules.common.networking
       ./hardware.nix
       ./lte.nix
       self.nixosModules.desktop.gnome
       self.nixosModules.desktop.solaar
-      self.nixosModules.boot-disk.efi-btrfs-luks
       (
         { pkgs, ... }:
         {
           networking.hostName = hostname;
           age.rekey.hostPubkey = hostPubkey;
 
-          boot-disk.device = "/dev/nvme0n1";
-          boot-disk.swapSize = "32G";
+          my.boot-disk = {
+            enable = true;
+            layout = "efi-btrfs-luks";
+            device = "/dev/nvme0n1";
+            swapSize = "32G";
+          };
           boot.initrd.availableKernelModules = [
             "nvme"
             "xhci_pci"
