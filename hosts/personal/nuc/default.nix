@@ -66,6 +66,7 @@ in
           specialisation.gaming.configuration = {
             system.nixos.tags = [ "steam" ];
             my.win11-vm.enable = false;
+            programs.gamemode.enable = true;
             services.xserver.videoDrivers = [ "nvidia" ];
             hardware.nvidia.modesetting.enable = true;
             hardware.nvidia.open = true;
