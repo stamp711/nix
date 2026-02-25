@@ -30,19 +30,22 @@ let
     11
   ];
 
-  # Long-running: watches for VM lifecycle events and runs a callback on start
-  # Usage: vm-start-watcher <vm-name> <callback>
-  vmStartWatcher = pkgs.writeShellScript "vm-start-watcher" ''
+  # Long-running: watches for VM events and runs a callback on matches
+  # Usage: vm-event-watcher <vm-name> <callback> <pattern>
+  # Pattern is an extended regex matched (case-insensitive) against virsh event output.
+  vmEventWatcher = pkgs.writeShellScript "vm-event-watcher" ''
     VM="$1"
     CALLBACK="$2"
+    PATTERN="$3"
     VIRSH="${pkgs.libvirt}/bin/virsh"
 
     # Catch VM already running (delayed to let event listener connect first)
     (sleep 5 && "$VIRSH" domstate "$VM" 2>/dev/null | grep -qE 'running|paused' && "$CALLBACK" "$VM") &
 
-    # Watch for all future start events
-    "$VIRSH" event --domain "$VM" --event lifecycle --loop | while read -r line; do
-      if echo "$line" | grep -q "Started"; then
+    # Watch for all future events, filter by pattern
+    "$VIRSH" event --domain "$VM" --all --loop | while read -r line; do
+      echo "$line"
+      if echo "$line" | grep -qiE "$PATTERN"; then
         "$CALLBACK" "$VM"
       fi
     done
@@ -242,7 +245,7 @@ in
     serviceConfig = {
       Restart = "always";
       RestartSec = 2;
-      ExecStart = "${vmStartWatcher} win11 ${qemuProd}";
+      ExecStart = "${vmEventWatcher} win11 ${qemuProd} 'started|reboot|crashed'";
     };
   };
 
@@ -254,7 +257,7 @@ in
     serviceConfig = {
       Restart = "always";
       RestartSec = 2;
-      ExecStart = "${vmStartWatcher} win11 ${usbPassthroughScan}";
+      ExecStart = "${vmEventWatcher} win11 ${usbPassthroughScan} started";
     };
   };
 
