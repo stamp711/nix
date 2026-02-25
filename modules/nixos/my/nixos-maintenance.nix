@@ -52,7 +52,7 @@
         };
         keepSince = lib.mkOption {
           type = lib.types.str;
-          default = "30d";
+          default = "7d";
         };
         keepGenerations = lib.mkOption {
           type = lib.types.int;
