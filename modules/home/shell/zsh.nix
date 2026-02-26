@@ -43,11 +43,6 @@
         };
         plugins = [
           {
-            name = "zsh-nix-shell";
-            src = pkgs.zsh-nix-shell;
-            file = "share/zsh-nix-shell/nix-shell.plugin.zsh";
-          }
-          {
             name = "you-should-use";
             src = pkgs.zsh-you-should-use;
             file = "share/zsh/plugins/you-should-use/you-should-use.plugin.zsh";
@@ -62,6 +57,7 @@
       };
 
       programs.fzf.enable = true;
+      programs.television.enable = true;
 
       programs.atuin = {
         enable = true;
