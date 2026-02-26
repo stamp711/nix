@@ -9,7 +9,17 @@
 let
   cfg = config.my.win11-vm;
 
-  passthrough = bus: slot: function: {
+  # VM memory size in GiB, backed by 1G hugepages
+  vmMemoryGiB = 40;
+
+  # Front panel USB ports on bus 1 (PCH xHCI controller)
+  vmFrontPanelPorts = [
+    9
+    10
+    11
+  ];
+
+  pci = bus: slot: function: {
     mode = "subsystem";
     type = "pci";
     managed = true;
@@ -20,27 +30,9 @@ let
     };
   };
 
-  hexInt = s: (fromTOML "v = 0x${s}").v;
-  # usb = vendor: product: {
-  #   mode = "subsystem";
-  #   type = "usb";
-  #   managed = true;
-  #   source = {
-  #     vendor.id = hexInt vendor;
-  #     product.id = hexInt product;
-  #   };
-  # };
-
-  # Front panel USB ports on bus 1 (PCH xHCI controller)
-  vmFrontPanelPorts = [
-    9
-    10
-    11
-  ];
-
   # Long-running: watches for VM events and runs a callback on matches
   # Usage: vm-event-watcher <vm-name> <callback> <pattern>
-  # Pattern is an extended regex matched (case-insensitive) against virsh event output.
+  # Pattern is an extended regex matched for `grep -qiE` against virsh event output.
   vmEventWatcher = pkgs.writeShellScript "vm-event-watcher" ''
     VM="$1"
     CALLBACK="$2"
@@ -113,27 +105,41 @@ let
     vcpu.count = 16;
     cpu = {
       mode = "host-passthrough";
-      maxphysaddr = {
-        mode = "passthrough";
-        limit = 39;
-      };
+      features = [
+        {
+          name = "vmx";
+          policy = "disable";
+        }
+      ];
       topology = {
         sockets = 1;
         dies = 1;
+        # 8Cx2T to match P-cores
         cores = 8;
         threads = 2;
       };
     };
-    # 1:1 vCPU-to-pCPU pinning for P-cores (CPUs 0-15, 8 cores × 2 threads)
+    # 1:1 pinning for P-cores (CPUs 0-15, 8Cx2T)
     cputune.vcpupin = builtins.genList (i: {
       vcpu = i;
       cpuset = toString i;
     }) 16;
 
     memory = {
-      count = 32;
+      count = vmMemoryGiB;
       unit = "GiB";
     };
+    memoryBacking = {
+      hugepages = {
+        page = {
+          size = 1;
+          unit = "GiB";
+        };
+      };
+      nosharepages = { };
+      locked = { };
+    };
+
     os = {
       type = "hvm";
       arch = "x86_64";
@@ -159,24 +165,12 @@ let
       offset = "localtime";
       timer = [
         {
-          name = "tsc";
-          mode = "native";
-        }
-        {
           name = "hypervclock";
           present = true;
         }
         {
           name = "hpet";
           present = false;
-        }
-        {
-          name = "pit";
-          tickpolicy = "discard";
-        }
-        {
-          name = "rtc";
-          tickpolicy = "catchup";
         }
       ];
     };
@@ -187,14 +181,15 @@ let
     };
 
     devices = {
+      memballoon.model = "none";
       hostdev = [
-        (passthrough 1 0 0) # RTX 4080 GPU         (01:00.0)
-        (passthrough 1 0 1) # RTX 4080 audio       (01:00.1)
-        (passthrough 4 0 0) # Aquantia 10GbE       (04:00.0)
-        (passthrough 2 0 0) # NVMe C:              (02:00.0)
-        (passthrough 3 0 0) # NVMe D:              (03:00.0)
-        (passthrough 8 0 0) # TB4 NHI              (08:00.0)
-        (passthrough (hexInt "3c") 0 0) # TB4 USB  (3c:00.0)
+        (pci 1 0 0) # RTX 4080 GPU         (01:00.0)
+        (pci 1 0 1) # RTX 4080 audio       (01:00.1)
+        (pci 4 0 0) # Aquantia 10GbE       (04:00.0)
+        (pci 2 0 0) # NVMe C:              (02:00.0)
+        (pci 3 0 0) # NVMe D:              (03:00.0)
+        (pci 8 0 0) # TB4 NHI              (08:00.0)
+        (pci (lib.fromHexString "3c") 0 0) # TB4 USB  (3c:00.0)
       ];
       channel = [
         {
@@ -240,22 +235,24 @@ in
       "vfio"
       "vfio_iommu_type1"
     ];
-    # 10de:2704 = RTX 4080 GPU
-    # 10de:22bb = RTX 4080 audio
-    # 1d6a:14c0 = Aquantia 10GbE
-    boot.kernelParams = [ "vfio-pci.ids=10de:2704,10de:22bb,1d6a:14c0" ];
+    boot.kernelParams = [
+      "hugepagesz=1G"
+      "hugepages=${toString vmMemoryGiB}"
+      # 10de:2704 = RTX 4080 GPU
+      # 10de:22bb = RTX 4080 audio
+      # 1d6a:14c0 = Aquantia 10GbE
+      "vfio-pci.ids=10de:2704,10de:22bb,1d6a:14c0"
+    ];
 
     virtualisation.libvirt.enable = true;
     virtualisation.libvirt.swtpm.enable = true;
     virtualisation.libvirtd.onShutdown = "shutdown";
-    # Allow Windows Update to finish during host shutdown
-    systemd.services.libvirt-guests.serviceConfig.TimeoutStopSec = "30min";
 
     virtualisation.libvirt.connections."qemu:///system".domains = [
       {
         definition = inputs.NixVirt.lib.domain.writeXML win11;
-        active = null; # follow last state
-        restart = false; # never kill VM during os switch
+        active = true; # start the domain at activation time
+        restart = false; # do not restart even if definition changed
       }
     ];
 
@@ -285,7 +282,7 @@ in
       };
     };
 
-    # Graceful shutdown via guest agent (ACPI power button doesn't work in Modern Standby)
+    # Graceful shutdown via guest agent (libvirt-guests.service)
     systemd.services.win11-shutdown = {
       description = "Gracefully shut down win11 VM via guest agent";
       after = [
