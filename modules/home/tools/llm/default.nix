@@ -33,6 +33,11 @@
     programs.opencode.enableMcpIntegration = true;
 
     programs.mcp.enable = true;
-    programs.mcp.servers = { };
+    programs.mcp.servers = {
+      github = {
+        type = "http";
+        url = "https://api.githubcopilot.com/mcp/";
+      };
+    };
   };
 }
