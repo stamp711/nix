@@ -63,9 +63,6 @@
         "._*"
 
         ".cache/"
-        # direnv
-        ".direnv/"
-        ".envrc"
         # vscode devcontainer
         ".devcontainer/"
         ".vscode/"
