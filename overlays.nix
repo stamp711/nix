@@ -5,11 +5,12 @@
   # 'inputs.${flake}.legacyPackages.${pkgs.system}'
   flake-inputs = final: _: {
     inputs = builtins.mapAttrs (
-      _: flake: (flake.legacyPackages or flake.packages or { }).${final.system} or { }
+      _: flake: (flake.legacyPackages or flake.packages or { }).${final.stdenv.hostPlatform.system} or { }
     ) inputs;
   };
 
   agenix-rekey = inputs.agenix-rekey.overlays.default;
+  llm-agents = inputs.llm-agents.overlays.default;
 
   # Custom modifications to packages
   modifications = _: _: {
@@ -22,7 +23,7 @@
   # Add access to x86_64 packages on Apple Silicon
   apple-silicon =
     _: prev:
-    if prev.stdenv.system == "aarch64-darwin" then
+    if prev.stdenv.hostPlatform.system == "aarch64-darwin" then
       {
         pkgs-intel = import inputs.nixpkgs {
           system = "x86_64-darwin";

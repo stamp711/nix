@@ -29,11 +29,7 @@
 
         # Nix
         nix.channel.enable = false;
-        nix.settings = {
-          experimental-features = [
-            "nix-command"
-            "flakes"
-          ];
+        nix.settings = self.lib.nixConfig // {
           trusted-users = [
             "root"
             "@wheel"
