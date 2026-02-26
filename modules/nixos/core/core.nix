@@ -53,6 +53,9 @@
           };
         };
 
+        # Enable but no firewall setting - not exposed on proxy servers
+        services.eternal-terminal.enable = true;
+
         # Sudo
         security.sudo.wheelNeedsPassword = false;
 
