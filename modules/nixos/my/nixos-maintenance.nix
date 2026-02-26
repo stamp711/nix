@@ -70,9 +70,10 @@
           systemd.services.nh-update = {
             description = "NixOS update via nh";
             restartIfChanged = false;
+            unitConfig.ConditionACPower = true;
             serviceConfig = {
               Type = "oneshot";
-              ExecStart = "${updateApp}/bin/nh-update";
+              ExecStart = "${pkgs.systemd}/bin/systemd-inhibit --what=sleep --who=nh-update --why='NixOS update in progress' --mode=block ${updateApp}/bin/nh-update";
               Nice = 19;
               CPUSchedulingPolicy = "idle";
               IOSchedulingClass = "idle";
@@ -94,9 +95,10 @@
         (lib.mkIf cfg.autoClean {
           systemd.services.nh-clean = {
             description = "Nix garbage collection (all) via nh";
+            unitConfig.ConditionACPower = true;
             serviceConfig = {
               Type = "oneshot";
-              ExecStart = "${cleanApp}/bin/nh-clean";
+              ExecStart = "${pkgs.systemd}/bin/systemd-inhibit --what=sleep --who=nh-clean --why='Nix garbage collection in progress' --mode=block ${cleanApp}/bin/nh-clean";
               Nice = 19;
               CPUSchedulingPolicy = "idle";
               IOSchedulingClass = "idle";

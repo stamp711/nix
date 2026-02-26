@@ -70,9 +70,10 @@
           systemd.user.services.nh-update = {
             Unit.Description = "Home Manager update via nh";
             Unit.X-RestartIfChanged = "false";
+            Unit.ConditionACPower = true;
             Service = {
               Type = "oneshot";
-              ExecStart = "${updateApp}/bin/nh-update";
+              ExecStart = "${pkgs.systemd}/bin/systemd-inhibit --what=sleep --who=nh-update --why='Home Manager update in progress' --mode=block ${updateApp}/bin/nh-update";
               Nice = 19;
               CPUSchedulingPolicy = "idle";
               IOSchedulingClass = "idle";
@@ -106,9 +107,10 @@
         (lib.mkIf cfg.autoClean {
           systemd.user.services.nh-clean = {
             Unit.Description = "Nix garbage collection (user) via nh";
+            Unit.ConditionACPower = true;
             Service = {
               Type = "oneshot";
-              ExecStart = "${cleanApp}/bin/nh-clean";
+              ExecStart = "${pkgs.systemd}/bin/systemd-inhibit --what=sleep --who=nh-clean --why='Nix garbage collection in progress' --mode=block ${cleanApp}/bin/nh-clean";
               Nice = 19;
               CPUSchedulingPolicy = "idle";
               IOSchedulingClass = "idle";
