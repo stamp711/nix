@@ -244,6 +244,13 @@ in
       "vfio-pci.ids=10de:2704,10de:22bb,1d6a:14c0"
     ];
 
+    # Mount hugetlbfs for 1 GiB hugepages
+    fileSystems."/dev/hugepages1G" = {
+      device = "hugetlbfs";
+      fsType = "hugetlbfs";
+      options = [ "pagesize=1G" ];
+    };
+
     virtualisation.libvirt.enable = true;
     virtualisation.libvirt.swtpm.enable = true;
     virtualisation.libvirtd.onShutdown = "shutdown";
