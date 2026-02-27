@@ -11,6 +11,7 @@
         enable = true;
         package = llm-agents.claude-code;
         enableMcpIntegration = true;
+        skillsDir = ./skills;
 
         settings = {
           permissions = {
@@ -20,6 +21,9 @@
               "mcp__claude_ai_DeepWiki__read_wiki_structure"
               "mcp__claude_ai_DeepWiki__read_wiki_contents"
               "mcp__claude_ai_DeepWiki__ask_question"
+              "Read:/nix/store/**"
+              "Bash(cat /nix/store/**)"
+              "Bash(ls /nix/store/**)"
             ];
           };
           statusLine = {
@@ -27,27 +31,33 @@
             command = "bash ${./statusline.sh}";
           };
         };
-
-        skillsDir = ./skills;
       };
 
-      programs.codex.enable = true;
-      programs.codex.package = llm-agents.codex;
-      programs.codex.enableMcpIntegration = true;
+      programs.opencode = {
+        enable = true;
+        package = llm-agents.opencode;
+        enableMcpIntegration = true;
+        skills = ./skills;
+      };
 
-      programs.gemini-cli.enable = true;
-      programs.gemini-cli.package = llm-agents.gemini-cli;
+      programs.codex = {
+        enable = true;
+        package = llm-agents.codex;
+        enableMcpIntegration = true;
+        skills = ./skills;
+      };
 
-      programs.opencode.enable = true;
-      programs.opencode.package = llm-agents.opencode;
-      programs.opencode.enableMcpIntegration = true;
+      programs.gemini-cli = {
+        enable = true;
+        package = llm-agents.gemini-cli;
+      };
 
       programs.mcp.enable = true;
       programs.mcp.servers = {
-        github = {
-          type = "http";
-          url = "https://api.githubcopilot.com/mcp/";
-        };
+        # github = {
+        #   type = "http";
+        #   url = "https://api.githubcopilot.com/mcp/";
+        # };
       };
     };
 }
