@@ -26,6 +26,8 @@
         nil
         nixd
         yaml-language-server
+
+        devenv
       ];
     };
 }
