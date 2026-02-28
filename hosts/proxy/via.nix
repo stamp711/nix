@@ -1,4 +1,4 @@
-{ self, ... }:
+{ self, inputs, ... }:
 let
   username = "stamp";
   hostname = "VIA";
@@ -6,19 +6,10 @@ let
   hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICq8tSt+rdX9EJXMNsmy716vCBABcwL7nGslkPEvUw9b";
 in
 {
-  description = "Proxy server (Broadband VIA)";
-
-  inherit username hostname system;
-
-  deploy = {
-    hostname = "proxy-via";
-    remoteBuild = false;
-  };
-
-  nixosConfiguration = self.lib.mkNixos {
+  flake.nixosConfigurations.${hostname} = self.lib.mkNixos {
     inherit system;
     modules = [
-      self.nixosProfiles.kvm-proxy
+      self.profiles.nixos.kvm-proxy
       {
         networking.hostName = hostname;
         age.rekey.hostPubkey = hostPubkey;
@@ -31,5 +22,14 @@ in
         };
       }
     ];
+  };
+
+  flake.deploy.nodes.${hostname} = {
+    hostname = "proxy-via";
+    remoteBuild = false;
+    profiles.system = {
+      user = "root";
+      path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.${hostname};
+    };
   };
 }

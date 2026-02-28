@@ -1,4 +1,4 @@
-{ self, ... }:
+{ self, inputs, ... }:
 let
   username = "stamp";
   hostname = "GPD";
@@ -7,31 +7,24 @@ let
   userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBt5OaxhvkIQJWZ80eX8czcCESykRu8oNlx1UIFiQz0G";
 in
 {
-  description = "GPD Pocket 4";
-  inherit username hostname system;
-
-  deploy = {
-    hostname = "GPD.home";
-  };
-
-  nixosConfiguration = self.lib.mkNixos {
+  flake.nixosConfigurations.${hostname} = self.lib.mkNixos {
     inherit system;
+    aspects = [ self.aspectModules.gnome ];
     modules = [
-      self.nixosModules.common.onepassword
-      self.nixosModules.common.audio
-      self.nixosModules.common.networking
+      self.nixosModules.onepassword
+      self.nixosModules.audio
+      self.nixosModules.networking
       ./hardware.nix
       ./lte.nix
-      self.nixosModules.desktop.gnome
-      self.nixosModules.desktop.solaar
+      self.nixosModules.solaar
       (
         { pkgs, ... }:
         {
           networking.hostName = hostname;
           age.rekey.hostPubkey = hostPubkey;
 
-          my.nixos-maintenance.autoUpdate = true;
-          my.nixos-maintenance.autoClean = true;
+          my.maintenance.autoUpdate = true;
+          my.maintenance.autoClean = true;
 
           my.boot-disk = {
             enable = true;
@@ -71,12 +64,29 @@ in
     ];
   };
 
-  homeConfiguration = self.lib.mkHome {
+  flake.homeConfigurations."${username}@${hostname}" = self.lib.mkHome {
     inherit system username;
+    aspects = [ self.aspectModules.gnome ];
     modules = [
-      self.homeProfiles.personal
+      self.profiles.homeManager.personal
       { age.rekey.hostPubkey = userPubkey; }
-    ]
-    ++ self.homeModules.desktop._all;
+      self.homeModules.desktop
+    ];
+  };
+
+  flake.deploy.nodes.${hostname} = {
+    hostname = "GPD.home";
+    profiles = {
+      home-manager = {
+        user = username;
+        path =
+          inputs.deploy-rs.lib.${system}.activate.home-manager
+            self.homeConfigurations."${username}@${hostname}";
+      };
+      system = {
+        user = "root";
+        path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.${hostname};
+      };
+    };
   };
 }

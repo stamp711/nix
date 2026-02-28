@@ -1,4 +1,4 @@
-{ self, ... }:
+{ self, inputs, ... }:
 let
   username = "stamp";
   hostname = "NURO";
@@ -6,19 +6,10 @@ let
   hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB50dHwZLQyKtq7VV9pa9F4QJJtGW0jgJ+RsV/x2IpJI";
 in
 {
-  description = "Proxy server (NURO)";
-
-  inherit username hostname system;
-
-  deploy = {
-    hostname = "proxy-nuro";
-    remoteBuild = false;
-  };
-
-  nixosConfiguration = self.lib.mkNixos {
+  flake.nixosConfigurations.${hostname} = self.lib.mkNixos {
     inherit system;
     modules = [
-      self.nixosProfiles.kvm-proxy
+      self.profiles.nixos.kvm-proxy
       {
         networking.hostName = hostname;
         age.rekey.hostPubkey = hostPubkey;
@@ -31,5 +22,14 @@ in
         };
       }
     ];
+  };
+
+  flake.deploy.nodes.${hostname} = {
+    hostname = "proxy-nuro";
+    remoteBuild = false;
+    profiles.system = {
+      user = "root";
+      path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.${hostname};
+    };
   };
 }
