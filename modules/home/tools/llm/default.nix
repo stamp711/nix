@@ -5,6 +5,12 @@
     { pkgs, ... }:
     let
       inherit (pkgs) llm-agents;
+
+      allowRead = pattern: [
+        "Read:${pattern}"
+        "Glob:${pattern}"
+        "Grep:${pattern}"
+      ];
     in
     {
       programs.claude-code = {
@@ -21,10 +27,10 @@
               "mcp__claude_ai_DeepWiki__read_wiki_structure"
               "mcp__claude_ai_DeepWiki__read_wiki_contents"
               "mcp__claude_ai_DeepWiki__ask_question"
-              "Read:/nix/store/**"
-              "Bash(cat /nix/store/**)"
-              "Bash(ls /nix/store/**)"
-            ];
+            ]
+            ++ allowRead "~/code/**"
+            ++ allowRead "/nix/store/**"
+            ++ allowRead "/tmp/**";
           };
           statusLine = {
             type = "command";
