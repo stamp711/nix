@@ -94,11 +94,7 @@
       programs.gitui.enable = true;
 
       programs.jujutsu.enable = true;
-      programs.jujutsu.settings.ui.default-command = [
-        "log"
-        "--template"
-        "builtin_log_comfortable"
-      ];
+      programs.jujutsu.settings.ui.default-command = [ "log" ];
       programs.jjui.enable = true;
 
       home.packages = with pkgs; [
