@@ -17,8 +17,16 @@
       ];
 
       programs.git.ignores = [
-        ".direnv/"
-        ".devenv/"
+        # Devenv
+        ".devenv*"
+        "devenv.local.nix"
+        "devenv.local.yaml"
+
+        # direnv
+        ".direnv"
+
+        # pre-commit
+        ".pre-commit-config.yaml"
       ];
 
       programs.mise.enable = true;
