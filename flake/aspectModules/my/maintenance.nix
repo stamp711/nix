@@ -166,7 +166,7 @@ in
             Unit.ConditionACPower = true;
             Service = {
               Type = "oneshot";
-              ExecStart = "${pkgs.systemd}/bin/systemd-inhibit --what=sleep --who=nh-update --why='Home Manager update in progress' --mode=block ${updateApp}/bin/nh-update";
+              ExecStart = "${updateApp}/bin/nh-update";
               Nice = 19;
               CPUSchedulingPolicy = "idle";
               IOSchedulingClass = "idle";
@@ -203,7 +203,7 @@ in
             Unit.ConditionACPower = true;
             Service = {
               Type = "oneshot";
-              ExecStart = "${pkgs.systemd}/bin/systemd-inhibit --what=sleep --who=nh-clean --why='Nix garbage collection in progress' --mode=block ${cleanApp}/bin/nh-clean";
+              ExecStart = "${cleanApp}/bin/nh-clean";
               Nice = 19;
               CPUSchedulingPolicy = "idle";
               IOSchedulingClass = "idle";
