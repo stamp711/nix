@@ -69,6 +69,9 @@ in
           wget
         ];
 
+        # Run unpatched dynamic binaries on NixOS
+        programs.nix-ld.enable = true;
+
         # Nix
         nix.channel.enable = false;
         nix.settings = nixConfig // {
