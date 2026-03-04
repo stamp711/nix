@@ -47,5 +47,8 @@
 
       my.maintenance.autoUpdate = true;
       my.maintenance.autoClean = true;
+      my.maintenance.cleanDates = "daily";
+      my.maintenance.keepSince = "0h";
+      my.maintenance.keepGenerations = 1;
     };
 }
