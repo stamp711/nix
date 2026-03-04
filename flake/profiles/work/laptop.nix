@@ -5,6 +5,7 @@
       imports = [
         self.homeModules.shell
         self.homeModules.tools
+        self.homeModules.desktop
       ];
 
       my.maintenance.autoUpdate = true;

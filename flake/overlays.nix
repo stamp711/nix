@@ -12,6 +12,7 @@
 
     agenix-rekey = inputs.agenix-rekey.overlays.default;
     llm-agents = inputs.llm-agents.overlays.default;
+    brew-nix = inputs.brew-nix.overlays.default;
 
     # Custom modifications to packages
     modifications = _: _: {

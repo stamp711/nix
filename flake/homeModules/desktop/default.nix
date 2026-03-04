@@ -1,7 +1,7 @@
 {
   imports = [
     ./browser.nix
-    ./editor.nix
     ./ghostty.nix
+    ./zed.nix
   ];
 }
