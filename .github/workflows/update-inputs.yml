@@ -1,0 +1,23 @@
+name: Update Nix Inputs
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 4 * * *" # 12:00 UTC+8
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - run: nix run .#update-inputs
+      - run: nix flake check --all-systems
+      - uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: "update inputs"
+          file_pattern: flake.lock
