@@ -10,7 +10,7 @@ let
   cfg = config.my.win11-vm;
 
   # VM memory size in GiB, backed by 1G hugepages
-  vmMemoryGiB = 40;
+  vmMemoryGiB = 32;
 
   # Front panel USB ports on bus 1 (PCH xHCI controller)
   vmFrontPanelPorts = [
