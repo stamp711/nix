@@ -3,7 +3,7 @@ let
   username = "stamp";
   hostname = "VIA";
   system = "x86_64-linux";
-  hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICq8tSt+rdX9EJXMNsmy716vCBABcwL7nGslkPEvUw9b";
+  hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG21GuCJYYrjfsyvKO2LeQVTS4zYkPDEXf4JVpWoujdY";
 in
 {
   flake.nixosConfigurations.${hostname} = self.lib.mkNixos {
