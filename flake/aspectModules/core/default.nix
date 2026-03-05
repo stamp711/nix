@@ -6,10 +6,7 @@ let
   collectClass = class: builtins.filter (x: x != null) (map (c: c.${class} or null) children);
 in
 {
-  nixos = {
-    imports = collectClass "nixos";
-  };
-  homeManager = {
-    imports = collectClass "homeManager";
-  };
+  nixos.imports = collectClass "nixos";
+  darwin.imports = collectClass "darwin";
+  homeManager.imports = collectClass "homeManager";
 }

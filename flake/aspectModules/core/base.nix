@@ -87,6 +87,25 @@ in
       };
     };
 
+  darwin = {
+    system.stateVersion = 6;
+    determinateNix = {
+      enable = true;
+      customSettings = nixConfig // {
+        trusted-users = [
+          "root"
+          "@admin"
+        ];
+        eval-cores = 0; # Enables parallel evaluation
+        extra-experimental-features = [ ];
+      };
+    };
+    system.defaults.NSGlobalDomain = {
+      KeyRepeat = 1;
+      InitialKeyRepeat = 15;
+    };
+  };
+
   homeManager =
     { config, pkgs, ... }:
     {

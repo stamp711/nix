@@ -5,6 +5,11 @@ let
   system = "aarch64-darwin";
 in
 {
+  flake.darwinConfigurations.${hostname} = self.lib.mkDarwin {
+    inherit system;
+    primaryUser = username;
+  };
+
   flake.homeConfigurations."${username}@${hostname}" = self.lib.mkHome {
     inherit system username;
     modules = [

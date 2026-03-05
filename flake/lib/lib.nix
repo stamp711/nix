@@ -41,12 +41,30 @@ rec {
         inputs.disko.nixosModules.disko
         inputs.agenix.nixosModules.default
         inputs.agenix-rekey.nixosModules.default
-      ]
-      ++ extractAspects "nixos" (defaultAspects ++ aspects)
-      ++ modules
-      ++ [
         { nixpkgs.pkgs = self.lib.mkPkgs system; }
-      ];
+      ]
+      ++ modules
+      ++ extractAspects "nixos" (defaultAspects ++ aspects);
+    };
+
+  # Create a nix-darwin system configuration.
+  mkDarwin =
+    {
+      system,
+      primaryUser,
+      aspects ? [ ],
+      modules ? [ ],
+    }:
+    inputs.nix-darwin.lib.darwinSystem {
+      inherit system;
+      specialArgs = { inherit self inputs; };
+      modules = [
+        inputs.determinate.darwinModules.default
+        { nixpkgs.pkgs = self.lib.mkPkgs system; }
+        { system.primaryUser = primaryUser; }
+      ]
+      ++ modules
+      ++ extractAspects "darwin" (defaultAspects ++ aspects);
     };
 
   # Create a home-manager configuration from system, username, and modules.
@@ -61,15 +79,15 @@ rec {
       pkgs = self.lib.mkPkgs system;
       extraSpecialArgs = { inherit self inputs; };
       modules = [
-        { home.username = username; }
         inputs.agenix.homeManagerModules.default
         # TODO: use inputs.agenix-rekey.homeManagerModules.default once
         # https://github.com/oddlama/agenix-rekey/pull/143 is merged
         (import "${inputs.agenix-rekey}/modules/agenix-rekey.nix" inputs.nixpkgs)
+        { home.username = username; }
+        self.homeModules.core
       ]
-      ++ extractAspects "homeManager" (defaultAspects ++ aspects)
-      ++ [ self.homeModules.core ]
-      ++ modules;
+      ++ modules
+      ++ extractAspects "homeManager" (defaultAspects ++ aspects);
     };
 
   # Derive a stable secret name from a .age file path, relative to the flake root.

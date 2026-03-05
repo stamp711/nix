@@ -71,12 +71,18 @@
       url = "github:BatteredBunny/brew-nix";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.brew-api.follows = "brew-api";
+      inputs.nix-darwin.follows = "nix-darwin";
     };
     brew-api = {
       url = "github:BatteredBunny/brew-api";
       flake = false;
     };
     llm-agents.url = "github:numtide/llm-agents.nix";
+    nix-darwin = {
+      url = "github:nix-darwin/nix-darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
   };
 
 }
