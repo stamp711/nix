@@ -15,7 +15,11 @@ rec {
     import inputs.nixpkgs {
       inherit system;
       config.allowUnfree = true;
-      overlays = builtins.attrValues self.overlays;
+      overlays = builtins.attrValues self.overlays ++ [
+        inputs.agenix-rekey.overlays.default
+        inputs.llm-agents.overlays.default
+        inputs.brew-nix.overlays.default
+      ];
     };
 
   # Extract modules of a given class from a list of aspects.
