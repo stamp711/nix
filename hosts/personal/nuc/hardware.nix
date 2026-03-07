@@ -14,6 +14,8 @@
   hardware.bluetooth.enable = true;
 
   # Set intel_pstate EPP value to 64 (default 128)
+  # Disable power-profiles-daemon from GNOME
+  services.power-profiles-daemon.enable = false;
   boot.kernel.sysfs.devices.system.cpu."cpu[0-9]*".cpufreq.energy_performance_preference = 64;
 
   # Intel iGPU for host display
