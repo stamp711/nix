@@ -16,7 +16,34 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
       - run: nix run .#update-inputs
-      - run: nix flake check --all-systems
+      - uses: actions/upload-artifact@v7
+        with:
+          name: flake-lock
+          path: flake.lock
+
+  check:
+    needs: update
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v8
+        with:
+          name: flake-lock
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - run: nix flake check
+
+  commit:
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v8
+        with:
+          name: flake-lock
       - uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "update inputs"
