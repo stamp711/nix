@@ -1,6 +1,11 @@
 # Zsh with oh-my-zsh, starship prompt, and modern history
 { inputs, pkgs, ... }:
 {
+  programs.bash = {
+    enable = true;
+    enableVteIntegration = true;
+  };
+
   # Zsh configuration
   programs.zsh = {
     enable = true;
