@@ -45,6 +45,8 @@ in
       root = ghqRoot;
       user = "stamp711";
     };
+    url."ssh://git@github.com/".insteadOf = "https://github.com/";
+    url."ssh://git@code.byted.org/".insteadOf = "https://code.byted.org/";
   };
 
   # Delta diff viewer
