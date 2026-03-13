@@ -255,30 +255,6 @@ in
     virtualisation.libvirt.swtpm.enable = true;
     virtualisation.libvirtd.onShutdown = "shutdown";
 
-    # Fix hardcoded /usr/bin/sh in virt-secret-init-encryption.service
-    # https://github.com/NixOS/nixpkgs/pull/496839
-    virtualisation.libvirtd.package = pkgs.libvirt.overrideAttrs (old: {
-      postPatch =
-        (old.postPatch or "")
-        + (
-          let
-            script = pkgs.writeShellApplication {
-              name = "virt-secret-init-encryption-sh";
-              runtimeInputs = [
-                pkgs.coreutils
-                pkgs.systemd
-              ];
-              text = ''exec ${pkgs.runtimeShell} "$@"'';
-            };
-          in
-          ''
-            substituteInPlace src/secret/virt-secret-init-encryption.service.in \
-              --replace-fail /usr/bin/sh ${lib.getExe script}
-          ''
-        );
-    });
-    systemd.services.libvirtd.serviceConfig.StateDirectory = lib.mkAfter [ "libvirt/secrets" ];
-
     virtualisation.libvirt.connections."qemu:///system".domains = [
       {
         definition = inputs.NixVirt.lib.domain.writeXML win11;
