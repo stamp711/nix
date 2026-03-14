@@ -12,6 +12,11 @@
     default = { };
   };
 
+  options.flake.profiles = lib.mkOption {
+    type = lib.types.lazyAttrsOf (lib.types.lazyAttrsOf lib.types.deferredModule);
+    default = { };
+  };
+
   options.flake.deploy = lib.mkOption {
     type = lib.types.lazyAttrsOf (lib.types.lazyAttrsOf lib.types.raw);
     default = { };

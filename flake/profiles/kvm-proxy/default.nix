@@ -1,5 +1,5 @@
 {
-  nixos =
+  flake.profiles.nixos.kvm-proxy =
     { self, ... }:
     {
       imports = [

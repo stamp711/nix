@@ -1,5 +1,18 @@
 {
-  homeManager =
+  flake.profiles.homeManager.work-devbox =
+    { self, ... }:
+    {
+      imports = [
+        self.homeModules.shell
+        self.homeModules.tools
+      ];
+
+      my.maintenance.autoUpdate = true;
+      my.maintenance.autoClean = true;
+      my.zsh.secretEnvExtra = [ ./devbox-env.sh.age ];
+    };
+
+  flake.profiles.homeManager.work-laptop =
     { self, ... }:
     {
       imports = [

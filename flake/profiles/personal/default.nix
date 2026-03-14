@@ -1,5 +1,5 @@
 {
-  homeManager =
+  flake.profiles.homeManager.personal =
     { self, ... }:
     {
       imports = [
