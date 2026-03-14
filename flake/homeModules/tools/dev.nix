@@ -1,29 +1,32 @@
 # Development tools and language servers
-{ pkgs, ... }:
 {
-  home.packages = with pkgs; [
-    # Security
-    _1password-cli
+  flake.homeModules.tools =
+    { pkgs, ... }:
+    {
+      home.packages = with pkgs; [
+        # Security
+        _1password-cli
 
-    # Rust
-    cargo-expand
-    cargo-feature
-    cargo-nextest
-    cargo-watch
-    rustup
+        # Rust
+        cargo-expand
+        cargo-feature
+        cargo-nextest
+        cargo-watch
+        rustup
 
-    # Python
-    uv
+        # Python
+        uv
 
-    # NodeJS
-    volta
+        # NodeJS
+        volta
 
-    # Language servers
-    lua-language-server
-    nil
-    nixd
-    yaml-language-server
+        # Language servers
+        lua-language-server
+        nil
+        nixd
+        yaml-language-server
 
-    devenv
-  ];
+        devenv
+      ];
+    };
 }

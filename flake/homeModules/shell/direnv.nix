@@ -1,30 +1,33 @@
 # Direnv with nix-direnv integration & mise
-{ pkgs, ... }:
 {
-  # direnv
-  programs.direnv = {
-    enable = true;
-    nix-direnv.enable = true;
-    mise.enable = true;
-  };
+  flake.homeModules.shell =
+    { pkgs, ... }:
+    {
+      # direnv
+      programs.direnv = {
+        enable = true;
+        nix-direnv.enable = true;
+        mise.enable = true;
+      };
 
-  # Devenv
-  home.packages = with pkgs; [
-    devenv
-  ];
+      # Devenv
+      home.packages = with pkgs; [
+        devenv
+      ];
 
-  programs.git.ignores = [
-    # Devenv
-    ".devenv*"
-    "devenv.local.nix"
-    "devenv.local.yaml"
+      programs.git.ignores = [
+        # Devenv
+        ".devenv*"
+        "devenv.local.nix"
+        "devenv.local.yaml"
 
-    # direnv
-    ".direnv"
+        # direnv
+        ".direnv"
 
-    # pre-commit
-    ".pre-commit-config.yaml"
-  ];
+        # pre-commit
+        ".pre-commit-config.yaml"
+      ];
 
-  programs.mise.enable = true;
+      programs.mise.enable = true;
+    };
 }

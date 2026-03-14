@@ -1,5 +1,4 @@
-{ import-dir, inputs, ... }:
+{ import-dir, ... }:
 {
-  imports = [ inputs.home-manager.flakeModules.home-manager ];
-  flake.homeModules = import-dir ./. { };
+  imports = (import-dir ./. { collect = true; })._all;
 }

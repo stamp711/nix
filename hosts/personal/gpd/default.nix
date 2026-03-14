@@ -70,7 +70,6 @@ in
       self.homeModules.gnome
       self.profiles.homeManager.personal
       { age.rekey.hostPubkey = userPubkey; }
-      self.homeModules.desktop
     ];
   };
 
