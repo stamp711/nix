@@ -1,15 +1,17 @@
 {
-  services.fail2ban = {
-    enable = true;
-    maxretry = 3;
-    bantime = "10m";
-    bantime-increment = {
+  flake.nixosModules.fail2ban = {
+    services.fail2ban = {
       enable = true;
-      maxtime = "48h";
+      maxretry = 3;
+      bantime = "10m";
+      bantime-increment = {
+        enable = true;
+        maxtime = "48h";
+      };
+      ignoreIP = [
+        "127.0.0.0/8"
+        "::1"
+      ];
     };
-    ignoreIP = [
-      "127.0.0.0/8"
-      "::1"
-    ];
   };
 }

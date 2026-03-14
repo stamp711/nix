@@ -1,5 +1,7 @@
 { inputs, ... }:
 {
-  imports = [ inputs.solaar.nixosModules.default ];
-  services.solaar.enable = true;
+  flake.nixosModules.solaar = {
+    imports = [ inputs.solaar.nixosModules.default ];
+    services.solaar.enable = true;
+  };
 }
