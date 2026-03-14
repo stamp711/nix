@@ -6,7 +6,6 @@
 }:
 let
   system = "x86_64-linux";
-
   mkProxy = hostname: hostPubkey: {
     flake.nixosConfigurations.${hostname} = self.lib.mkNixos {
       inherit system;
@@ -34,7 +33,6 @@ let
   };
 in
 lib.mkMerge [
-  (mkProxy "ATT" "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKWTLSyOkQ48zjJfXLWrvUkEhf7uyq8O2wcU2bcoyG2T")
-  (mkProxy "NURO" "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB50dHwZLQyKtq7VV9pa9F4QJJtGW0jgJ+RsV/x2IpJI")
   (mkProxy "VIA" "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG21GuCJYYrjfsyvKO2LeQVTS4zYkPDEXf4JVpWoujdY")
+  (mkProxy "NURO" "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB50dHwZLQyKtq7VV9pa9F4QJJtGW0jgJ+RsV/x2IpJI")
 ]
