@@ -25,50 +25,8 @@ let
   # Test if the name of the entry would collide with collectAttr
   isCollectAttr = name: type: entryName name type == collectAttr;
 
-  # Known module classes for importModules leaf detection
-  knownClasses = [
-    "nixos"
-    "homeManager"
-    "darwin"
-  ];
-  isConfig = name: lib.hasPrefix "_" name;
-  isLeaf = v: builtins.isAttrs v && builtins.any (c: v ? ${c}) knownClasses;
-
 in
 rec {
-  # Import a directory of modules, deriving names from filenames and transposing
-  # { class = module; } into flake-parts output: { flake.OUTPUT.CLASS.NAME = module; }
-  # Files prefixed with _ are passed through as raw imports (e.g. _options.nix).
-  importModules =
-    outputAttr: dir:
-    let
-      tree = importDir dir { };
-
-      walk =
-        prefix: attrs:
-        lib.concatLists (
-          lib.mapAttrsToList (
-            name: value:
-            let
-              fullName = if prefix == "" then name else "${prefix}-${name}";
-            in
-            if isConfig name then
-              [ value ]
-            else if isLeaf value then
-              [
-                {
-                  flake.${outputAttr} = lib.mapAttrs (_: mod: { ${fullName} = mod; }) value;
-                }
-              ]
-            else if builtins.isAttrs value then
-              walk fullName value
-            else
-              [ value ]
-          ) attrs
-        );
-    in
-    walk "" tree;
-
   # Import .nix files and directories recursively into a nested attrset tree.
   # - .nix files become entries
   # - directories with default.nix become entries
