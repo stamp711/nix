@@ -46,23 +46,6 @@
           ${pkgs.deadnix}/bin/deadnix --fail ${self}
           touch $out
         '';
-        agenix-rekey =
-          let
-            rekey = self.lib.checkRekey {
-              nixosConfigurations = self.rekeyNixosConfigurations;
-              homeConfigurations = self.rekeyHomeConfigurations;
-            };
-            msg =
-              pkgs.lib.optionalString (
-                rekey.missing != [ ]
-              ) "Missing rekeyed secrets: ${builtins.concatStringsSep ", " rekey.missing}\n"
-              + pkgs.lib.optionalString (
-                rekey.orphaned != [ ]
-              ) "Orphaned files in agenix-rekey/: ${builtins.concatStringsSep ", " rekey.orphaned}\n"
-              + "Run 'agenix rekey -a' to fix.";
-          in
-          assert rekey.missing == [ ] && rekey.orphaned == [ ] || throw msg;
-          pkgs.runCommand "agenix-rekey-check" { } "touch $out";
       };
 
       devShells.default = pkgs.mkShell {

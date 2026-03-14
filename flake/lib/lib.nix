@@ -87,6 +87,5 @@ in
     in
     lib.removeSuffix ".age" (builtins.replaceStrings [ "/" ] [ "__" ] relative);
 
-  checkRekey = import ./check-rekey.nix { inherit self inputs; };
 }
 // import ./import.nix { inherit self inputs; }
