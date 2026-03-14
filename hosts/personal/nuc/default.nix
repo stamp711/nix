@@ -9,7 +9,7 @@ in
 {
   flake.nixosConfigurations.${hostname} = self.lib.mkNixos {
     inherit system;
-    aspects = [ self.aspectModules.gnome ];
+    aspects = [ self.aspects.gnome ];
     modules = [
       self.nixosModules.audio
       self.nixosModules.networking
@@ -73,7 +73,7 @@ in
 
   flake.homeConfigurations."${username}@${hostname}" = self.lib.mkHome {
     inherit system username;
-    aspects = [ self.aspectModules.gnome ];
+    aspects = [ self.aspects.gnome ];
     modules = [
       self.profiles.homeManager.personal
       { age.rekey.hostPubkey = userPubkey; }

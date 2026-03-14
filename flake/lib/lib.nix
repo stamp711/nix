@@ -26,7 +26,7 @@ rec {
   extractAspects = class: aspects: lib.filter (x: x != null) (map (a: a.${class} or null) aspects);
 
   # Aspects included in every configuration.
-  defaultAspects = with self.aspectModules; [
+  defaultAspects = with self.aspects; [
     core
     my
   ];
