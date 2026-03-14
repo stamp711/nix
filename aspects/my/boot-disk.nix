@@ -1,5 +1,5 @@
 {
-  nixos =
+  flake.nixosModules.my =
     { config, lib, ... }:
     let
       cfg = config.my.boot-disk;

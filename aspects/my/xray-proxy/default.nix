@@ -1,5 +1,5 @@
 {
-  nixos =
+  flake.nixosModules.my =
     {
       self,
       config,

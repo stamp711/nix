@@ -1,5 +1,5 @@
 {
-  homeManager =
+  flake.homeModules.my =
     {
       self,
       config,

@@ -2,7 +2,7 @@
 let
   inherit (inputs.nixpkgs) lib;
 in
-rec {
+{
   sshPublicKeys = {
     apricity = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG0Zuk/bYRvsX5WypXgY7aopBeoTNjma1rr6Txtp87JS ssh-apricity";
     age = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHdOxmUp8REg9IBoipLV40VYmLNiD6+TUUHb/ofyor60 ssh-age";
@@ -22,20 +22,10 @@ rec {
       ];
     };
 
-  # Extract modules of a given class from a list of aspects.
-  extractAspects = class: aspects: lib.filter (x: x != null) (map (a: a.${class} or null) aspects);
-
-  # Aspects included in every configuration.
-  defaultAspects = with self.aspects; [
-    core
-    my
-  ];
-
   # Create a NixOS system configuration.
   mkNixos =
     {
       system,
-      aspects ? [ ],
       modules ? [ ],
     }:
     lib.nixosSystem {
@@ -46,9 +36,10 @@ rec {
         inputs.agenix.nixosModules.default
         inputs.agenix-rekey.nixosModules.default
         { nixpkgs.pkgs = self.lib.mkPkgs system; }
+        self.nixosModules.core
+        self.nixosModules.my
       ]
-      ++ modules
-      ++ extractAspects "nixos" (defaultAspects ++ aspects);
+      ++ modules;
     };
 
   # Create a nix-darwin system configuration.
@@ -56,7 +47,6 @@ rec {
     {
       system,
       primaryUser,
-      aspects ? [ ],
       modules ? [ ],
     }:
     inputs.nix-darwin.lib.darwinSystem {
@@ -66,9 +56,10 @@ rec {
         inputs.determinate.darwinModules.default
         { nixpkgs.pkgs = self.lib.mkPkgs system; }
         { system.primaryUser = primaryUser; }
+        self.darwinModules.core
+        self.darwinModules.my
       ]
-      ++ modules
-      ++ extractAspects "darwin" (defaultAspects ++ aspects);
+      ++ modules;
     };
 
   # Create a home-manager configuration from system, username, and modules.
@@ -76,7 +67,6 @@ rec {
     {
       system,
       username,
-      aspects ? [ ],
       modules ? [ ],
     }:
     inputs.home-manager.lib.homeManagerConfiguration {
@@ -89,9 +79,9 @@ rec {
         (import "${inputs.agenix-rekey}/modules/agenix-rekey.nix" inputs.nixpkgs)
         { home.username = username; }
         self.homeModules.core
+        self.homeModules.my
       ]
-      ++ modules
-      ++ extractAspects "homeManager" (defaultAspects ++ aspects);
+      ++ modules;
     };
 
   # Derive a stable secret name from a .age file path, relative to the flake root.

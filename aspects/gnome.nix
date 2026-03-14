@@ -1,5 +1,5 @@
 {
-  nixos =
+  flake.nixosModules.gnome =
     { pkgs, ... }:
     {
       services.displayManager.gdm = {
@@ -22,7 +22,7 @@
       ];
     };
 
-  homeManager = {
+  flake.homeModules.gnome = {
     dconf.settings."org/gnome/desktop/peripherals/keyboard" = {
       delay = 225;
       repeat-interval = 15;

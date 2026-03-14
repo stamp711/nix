@@ -1,3 +1,5 @@
+# Automatic system and home update/cleanup via nh
+
 let
   maintenanceOptions = lib: {
     autoUpdate = lib.mkEnableOption "automatic update via nh";
@@ -29,9 +31,10 @@ let
   };
 in
 {
-  description = "Automatic system and home update/cleanup via nh";
 
-  nixos =
+  flake.darwinModules.my = { };
+
+  flake.nixosModules.my =
     {
       config,
       pkgs,
@@ -121,7 +124,7 @@ in
       ];
     };
 
-  homeManager =
+  flake.homeModules.my =
     {
       config,
       pkgs,

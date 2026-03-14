@@ -9,6 +9,7 @@
       {
         imports = [
           ./flake
+          ./aspects
           ./hosts
           ./per-system
         ];

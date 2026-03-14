@@ -1,10 +1,12 @@
 let
+  agePubKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHdOxmUp8REg9IBoipLV40VYmLNiD6+TUUHb/ofyor60 ssh-age";
+
   # Hosts using this module must set `age.rekey.hostPubkey`.
   rekeyConfig = self: {
     masterIdentities = [
       {
         identity = "${self}/ssh-age.pub";
-        pubkey = self.lib.sshPublicKeys.age;
+        pubkey = agePubKey;
       }
     ];
     storageMode = "local";
@@ -12,20 +14,18 @@ let
   };
 in
 {
-  nixos =
+  flake.nixosModules.core =
     { self, ... }:
     {
       age.rekey = rekeyConfig self;
     };
 
-  homeManager =
+  flake.homeModules.core =
     { self, config, ... }:
     {
       age.rekey = rekeyConfig self;
-      # secretsDir is only a symlink to secretsMountPoint, which still
-      # defaults to an ephemeral runtime dir. Override with a literal path
-      # so consumers like SSH Include can reference secret paths directly
-      # (the default uses a shell expression that only works in scripts).
+      # Default secretsDir is a shell expression, override with a literal path instead.
+      # It's only a symlink, the actual secrets are still in an ephemeral runtime dir.
       age.secretsDir = "${config.xdg.dataHome}/agenix";
     };
 }
