@@ -1,19 +1,12 @@
 {
   outputs =
     inputs:
-    inputs.flake-parts.lib.mkFlake
-      {
-        inherit inputs;
-        specialArgs.import-dir = (import ./flake/lib/import.nix { inherit inputs; }).importDir;
-      }
-      {
-        imports = [
-          ./flake
-          ./aspects
-          ./hosts
-          ./per-system
-        ];
-      };
+    let
+      import-dir = (import ./flake/lib/import.nix { inherit inputs; }).importDir;
+    in
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
+      imports = (import-dir ./flake { collect = true; })._all;
+    };
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";

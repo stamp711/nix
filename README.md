@@ -7,19 +7,19 @@ Personal Nix setup.
 ```
 .
 ├── flake.nix
-├── flake/
-│   ├── flakeModules.nix   # Custom flake option defs
-│   ├── overlays.nix
-│   ├── lib/               # Helper functions (mkNixos, mkDarwin, mkHome)
-│   ├── homeModules/
-│   ├── nixosModules/
-│   └── profiles/          # Composable profiles
-├── aspects/               # Cross-cutting config modules
-├── hosts/                 # Host defs, output nixos/hm/darwin/deploy configs
-│   ├── personal/
-│   ├── work/
-│   └── proxies.nix
-└── per-system/            # Per-system flake outputs (apps, formatter, devShell)
+└── flake/
+    ├── flakeModules.nix   # Custom flake option defs
+    ├── overlays.nix
+    ├── lib/               # Helper functions (mkNixos, mkDarwin, mkHome)
+    ├── aspects/           # Cross-cutting config modules
+    ├── homeModules/
+    ├── nixosModules/
+    ├── profiles/          # Composable profiles
+    ├── hosts/             # Host defs, output nixos/hm/darwin/deploy configs
+    │   ├── personal/
+    │   ├── work/
+    │   └── proxies.nix
+    └── per-system/        # Per-system flake outputs (apps, formatter, devShell)
 ```
 
 ## Usage

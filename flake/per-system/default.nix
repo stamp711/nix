@@ -1,12 +1,5 @@
+{ self, inputs, ... }:
 {
-  import-dir,
-  self,
-  inputs,
-  ...
-}:
-{
-  imports = (import-dir ./. { collect = true; })._all;
-
   systems = [
     "aarch64-darwin"
     "x86_64-linux"
