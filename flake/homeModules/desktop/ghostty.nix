@@ -3,7 +3,7 @@
 {
   programs.ghostty = {
     enable = true;
-    package = if pkgs.stdenv.isDarwin then pkgs.brewCasks.ghostty else pkgs.ghostty;
+    package = if pkgs.stdenv.isDarwin then pkgs.ghostty-bin else pkgs.ghostty;
     settings = {
       theme = "Modus Vivendi";
       font-family = "Monaco Nerd Font";
