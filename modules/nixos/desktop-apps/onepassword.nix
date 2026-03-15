@@ -1,5 +1,5 @@
 {
-  flake.nixosModules.onepassword =
+  flake.nixosModules.desktop-apps =
     { config, lib, ... }:
     {
       programs._1password.enable = true;

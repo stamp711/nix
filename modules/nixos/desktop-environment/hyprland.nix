@@ -1,5 +1,5 @@
 {
-  flake.nixosModules.hyprland = {
+  flake.nixosModules.desktop-environment = {
     programs.hyprland.enable = true;
   };
 }

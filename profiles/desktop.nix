@@ -4,16 +4,9 @@
     {
       imports = [
         self.profiles.nixos.headless
-        self.nixosModules.common-hardware
-        self.nixosModules.greetd
-        self.nixosModules.logind
-        self.nixosModules.gnome
-        self.nixosModules.hyprland
-        self.nixosModules.niri
-        self.nixosModules.audio
         self.nixosModules.networking
-        self.nixosModules.solaar
-        self.nixosModules.onepassword
+        self.nixosModules.desktop-environment
+        self.nixosModules.desktop-apps
       ];
 
     };
@@ -23,6 +16,7 @@
     {
       imports = [
         self.profiles.homeManager.headless
+        self.homeModules.desktop-environment
         self.homeModules.desktop-apps
       ];
     };

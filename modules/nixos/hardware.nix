@@ -1,5 +1,5 @@
 {
-  flake.nixosModules.common-hardware = {
+  flake.nixosModules.hardware = {
     hardware.enableRedistributableFirmware = true;
     hardware.bluetooth.enable = true;
     security.tpm2.enable = true;

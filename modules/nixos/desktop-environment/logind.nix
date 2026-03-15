@@ -1,5 +1,5 @@
 {
-  flake.nixosModules.logind =
+  flake.nixosModules.desktop-environment =
     { pkgs, ... }:
     {
       services.logind.settings.Login = {

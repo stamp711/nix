@@ -1,5 +1,5 @@
 {
-  flake.nixosModules.greetd =
+  flake.nixosModules.desktop-environment =
     { pkgs, config, ... }:
     let
       sessions = config.services.displayManager.sessionData.desktops;

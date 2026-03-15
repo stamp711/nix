@@ -16,6 +16,8 @@
     {
       imports = [
         self.profiles.nixos.minimal
+        self.nixosModules.hardware
+        self.nixosModules.tools
       ];
 
       my.maintenance.autoUpdate = true;
