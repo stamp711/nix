@@ -14,13 +14,9 @@ let
         self.nixosModules.allow-cloudflare-443
         self.nixosModules.fail2ban
         {
+          my.primaryUser = "stamp";
           networking.hostName = hostname;
           age.rekey.hostPubkey = hostPubkey;
-          users.users.stamp = {
-            uid = 1000;
-            isNormalUser = true;
-            extraGroups = [ "wheel" ];
-          };
 
           # KVM/virtio kernel modules
           boot.initrd.availableKernelModules = [

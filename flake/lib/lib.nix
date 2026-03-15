@@ -38,7 +38,6 @@ in
   mkDarwin =
     {
       system,
-      primaryUser,
       modules ? [ ],
     }:
     inputs.nix-darwin.lib.darwinSystem {
@@ -47,16 +46,14 @@ in
       modules = [
         inputs.determinate.darwinModules.default
         { nixpkgs.pkgs = self.lib.mkPkgs system; }
-        { system.primaryUser = primaryUser; }
       ]
       ++ modules;
     };
 
-  # Create a home-manager configuration from system, username, and modules.
+  # Create a home-manager configuration. Set my.primaryUser in modules.
   mkHome =
     {
       system,
-      username,
       modules ? [ ],
     }:
     inputs.home-manager.lib.homeManagerConfiguration {
@@ -67,7 +64,6 @@ in
         # TODO: use inputs.agenix-rekey.homeManagerModules.default once
         # https://github.com/oddlama/agenix-rekey/pull/143 is merged
         (import "${inputs.agenix-rekey}/modules/agenix-rekey.nix" inputs.nixpkgs)
-        { home.username = username; }
       ]
       ++ modules;
     };

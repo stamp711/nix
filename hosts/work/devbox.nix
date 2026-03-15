@@ -6,10 +6,11 @@ let
 in
 {
   flake.homeConfigurations."${username}@${hostname}" = self.lib.mkHome {
-    inherit system username;
+    inherit system;
     modules = [
       self.profiles.homeManager.headless
       {
+        my.primaryUser = username;
         age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGGfAr2tMhcrbtdxi2RjGCaXCTQGWB3dBlTEXN6/DUxE";
         my.zsh.secretEnvExtra = [ ./devbox-env.sh.age ];
       }

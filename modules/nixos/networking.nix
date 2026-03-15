@@ -1,6 +1,6 @@
 {
   flake.nixosModules.networking =
-    { lib, ... }:
+    { config, lib, ... }:
     {
       networking = {
         firewall.enable = lib.mkDefault false;
@@ -9,5 +9,6 @@
           wifi.powersave = true;
         };
       };
+      users.users.${config.my.primaryUser}.extraGroups = [ "networkmanager" ];
     };
 }

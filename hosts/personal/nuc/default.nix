@@ -14,6 +14,7 @@ in
       ./hardware.nix
       ./vm.nix
       {
+        my.primaryUser = username;
         networking.hostName = hostname;
         age.rekey.hostPubkey = hostPubkey;
 
@@ -23,16 +24,6 @@ in
         systemd.targets.hibernate.enable = false;
         systemd.targets.hybrid-sleep.enable = false;
         services.displayManager.gdm.autoSuspend = false;
-
-        # Primary user
-        users.users.${username} = {
-          uid = 1000;
-          isNormalUser = true;
-          extraGroups = [
-            "wheel"
-            "networkmanager"
-          ];
-        };
 
         specialisation.desktop.configuration = {
           system.nixos.tags = [ "desktop" ];
@@ -55,10 +46,11 @@ in
   };
 
   flake.homeConfigurations."${username}@${hostname}" = self.lib.mkHome {
-    inherit system username;
+    inherit system;
     modules = [
       self.profiles.homeManager.desktop
       {
+        my.primaryUser = username;
         age.rekey.hostPubkey = userPubkey;
         my.ssh.secretConfigFiles = [ ../ssh-hosts.conf.age ];
       }

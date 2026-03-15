@@ -15,6 +15,7 @@ in
       ./hardware.nix
       ./lte.nix
       {
+        my.primaryUser = username;
         networking.hostName = hostname;
         age.rekey.hostPubkey = hostPubkey;
 
@@ -24,25 +25,16 @@ in
           device = "/dev/nvme0n1";
           swapSize = "32G";
         };
-
-        # Primary user
-        users.users.${username} = {
-          uid = 1000;
-          isNormalUser = true;
-          extraGroups = [
-            "wheel"
-            "networkmanager"
-          ];
-        };
       }
     ];
   };
 
   flake.homeConfigurations."${username}@${hostname}" = self.lib.mkHome {
-    inherit system username;
+    inherit system;
     modules = [
       self.profiles.homeManager.desktop
       {
+        my.primaryUser = username;
         age.rekey.hostPubkey = userPubkey;
         my.ssh.secretConfigFiles = [ ../ssh-hosts.conf.age ];
       }

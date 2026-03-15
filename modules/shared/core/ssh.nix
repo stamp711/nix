@@ -38,7 +38,7 @@ in
   flake.darwinModules.core =
     { config, ... }:
     {
-      users.users.${config.system.primaryUser}.openssh.authorizedKeys.keys = [ sshPubKey ];
+      users.users.${config.my.primaryUser}.openssh.authorizedKeys.keys = [ sshPubKey ];
       services.eternal-terminal.enable = true;
     };
 }
