@@ -5,7 +5,11 @@
       import-dir = (import ./flake/lib/import.nix { inherit inputs; }).importDir;
     in
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
-      imports = (import-dir ./flake { collect = true; })._all;
+      imports =
+        (import-dir ./flake { collect = true; })._all
+        ++ (import-dir ./modules { collect = true; })._all
+        ++ (import-dir ./profiles { collect = true; })._all
+        ++ (import-dir ./hosts { collect = true; })._all;
     };
 
   inputs = {

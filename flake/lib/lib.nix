@@ -30,8 +30,6 @@ in
         inputs.agenix.nixosModules.default
         inputs.agenix-rekey.nixosModules.default
         { nixpkgs.pkgs = self.lib.mkPkgs system; }
-        self.nixosModules.core
-        self.nixosModules.my
       ]
       ++ modules;
     };
@@ -50,8 +48,6 @@ in
         inputs.determinate.darwinModules.default
         { nixpkgs.pkgs = self.lib.mkPkgs system; }
         { system.primaryUser = primaryUser; }
-        self.darwinModules.core
-        self.darwinModules.my
       ]
       ++ modules;
     };
@@ -72,8 +68,6 @@ in
         # https://github.com/oddlama/agenix-rekey/pull/143 is merged
         (import "${inputs.agenix-rekey}/modules/agenix-rekey.nix" inputs.nixpkgs)
         { home.username = username; }
-        self.homeModules.core
-        self.homeModules.my
       ]
       ++ modules;
     };
