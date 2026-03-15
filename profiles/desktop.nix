@@ -5,6 +5,7 @@
       imports = [
         self.profiles.nixos.headless
         self.nixosModules.common-hardware
+        self.nixosModules.greetd
         self.nixosModules.gnome
         self.nixosModules.audio
         self.nixosModules.networking

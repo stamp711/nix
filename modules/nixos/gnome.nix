@@ -2,10 +2,6 @@
   flake.nixosModules.gnome =
     { pkgs, lib, ... }:
     {
-      services.displayManager.gdm = {
-        enable = true;
-        wayland = true;
-      };
       services.desktopManager.gnome.enable = true;
 
       # Auto-rotation and tablet mode
