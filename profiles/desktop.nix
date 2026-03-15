@@ -6,7 +6,10 @@
         self.profiles.nixos.headless
         self.nixosModules.common-hardware
         self.nixosModules.greetd
+        self.nixosModules.logind
         self.nixosModules.gnome
+        self.nixosModules.hyprland
+        self.nixosModules.niri
         self.nixosModules.audio
         self.nixosModules.networking
         self.nixosModules.solaar
