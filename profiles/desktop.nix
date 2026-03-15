@@ -9,10 +9,9 @@
         self.nixosModules.audio
         self.nixosModules.networking
         self.nixosModules.solaar
+        self.nixosModules.onepassword
       ];
 
-      programs.steam.enable = true;
-      programs.steam.gamescopeSession.enable = true;
     };
 
   flake.profiles.homeManager.desktop =

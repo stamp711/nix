@@ -11,7 +11,6 @@ in
     inherit system;
     modules = [
       self.profiles.nixos.desktop
-      self.nixosModules.onepassword
       ./hardware.nix
       ./lte.nix
       {
@@ -25,6 +24,9 @@ in
           device = "/dev/nvme0n1";
           swapSize = "32G";
         };
+
+        programs.steam.enable = true;
+        programs.steam.gamescopeSession.enable = true;
       }
     ];
   };

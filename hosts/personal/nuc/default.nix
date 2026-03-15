@@ -29,18 +29,6 @@ in
           system.nixos.tags = [ "desktop" ];
           my.win11-vm.enable = false;
         };
-
-        specialisation.gaming.configuration = {
-          system.nixos.tags = [ "steam" ];
-          my.win11-vm.enable = false;
-          programs.gamemode.enable = true;
-          services.xserver.videoDrivers = [ "nvidia" ];
-          hardware.nvidia.modesetting.enable = true;
-          hardware.nvidia.open = true;
-          services.displayManager.autoLogin.enable = true;
-          services.displayManager.autoLogin.user = username;
-          services.displayManager.defaultSession = "steam";
-        };
       }
     ];
   };
