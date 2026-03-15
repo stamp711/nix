@@ -26,7 +26,7 @@
 
   my.boot-disk = {
     enable = true;
-    layout = "efi-btrfs-luks";
+    layout = "efi-luks-btrfs";
     device = "/dev/disk/by-id/nvme-Samsung_SSD_990_PRO_1TB_S6Z1NJ0W395410E";
     swapSize = "16G";
   };

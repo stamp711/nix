@@ -20,7 +20,7 @@ in
 
         my.boot-disk = {
           enable = true;
-          layout = "efi-btrfs-luks";
+          layout = "efi-luks-btrfs";
           device = "/dev/nvme0n1";
           swapSize = "32G";
         };
