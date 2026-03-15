@@ -11,12 +11,21 @@
 
     };
 
-  flake.profiles.homeManager.desktop =
+  flake.profiles.homeManager.desktop-linux =
     { self, ... }:
     {
       imports = [
         self.profiles.homeManager.headless
         self.homeModules.desktop-environment
+        self.homeModules.desktop-apps
+      ];
+    };
+
+  flake.profiles.homeManager.desktop-darwin =
+    { self, ... }:
+    {
+      imports = [
+        self.profiles.homeManager.headless
         self.homeModules.desktop-apps
       ];
     };

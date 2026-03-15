@@ -16,7 +16,7 @@ in
   flake.homeConfigurations."${username}@${hostname}" = self.lib.mkHome {
     inherit system;
     modules = [
-      self.profiles.homeManager.desktop
+      self.profiles.homeManager.desktop-darwin
       {
         my.primaryUser = username;
         age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO1MxOTUJLMz6ehWbLVHAnhG8CR25DjmoXXUGIw3s/wN";
