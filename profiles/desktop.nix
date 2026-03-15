@@ -33,6 +33,9 @@
   flake.profiles.darwin.desktop =
     { self, ... }:
     {
-      imports = [ self.profiles.darwin.minimal ];
+      imports = [
+        self.profiles.darwin.minimal
+        self.darwinModules.desktop-environment
+      ];
     };
 }
