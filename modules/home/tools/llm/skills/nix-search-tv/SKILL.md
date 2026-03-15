@@ -1,6 +1,7 @@
 ---
 name: nix-search-tv
 description: Search and query NixOS packages, NixOS/Home Manager/nix-darwin options using nix-search-tv. Use when you need to find packages, get package details, view source code locations, or find NixOS/Home Manager/nix-darwin options.
+allowed-tools: Bash(nix-search-tv *)
 source: https://github.com/0xferrous/agent-stuff/tree/main/skills/nix-search
 ---
 
