@@ -4,8 +4,8 @@
     {
       imports = [
         self.profiles.homeManager.minimal
-        self.homeModules.shell
-        self.homeModules.tools
+        self.homeModules.cli-environment
+        self.homeModules.cli-programs
       ];
 
       my.maintenance.autoUpdate = true;
@@ -17,9 +17,9 @@
     {
       imports = [
         self.profiles.nixos.minimal
-        self.nixosModules.shell
+        self.nixosModules.cli-environment
         self.nixosModules.hardware
-        self.nixosModules.tools
+        self.nixosModules.cli-programs
       ];
 
       my.maintenance.autoUpdate = true;
@@ -31,6 +31,7 @@
     {
       imports = [
         self.profiles.darwin.minimal
+        self.darwinModules.cli-environment
       ];
 
       # TODO: impl darwinModules.my.maintenance
