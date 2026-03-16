@@ -2,8 +2,6 @@ let
   sshPubKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG0Zuk/bYRvsX5WypXgY7aopBeoTNjma1rr6Txtp87JS ssh-apricity";
 in
 {
-  flake.homeModules.core = { };
-
   flake.nixosModules.core =
     { lib, ... }:
     {
@@ -40,5 +38,20 @@ in
     {
       users.users.${config.my.primaryUser}.openssh.authorizedKeys.keys = [ sshPubKey ];
       services.eternal-terminal.enable = true;
+    };
+
+  flake.homeModules.core =
+    { pkgs, lib, ... }:
+    let
+      ssh-agent-switcher = pkgs.ssh-agent-switcher.overrideAttrs { doCheck = false; };
+    in
+    {
+      # SSH agent switcher daemon for stable agent forwarding in tmux/zellij
+      programs.zsh.initContent = ''
+        if [ -n "$SSH_CONNECTION" ]; then
+          export SSH_AUTH_SOCK="/tmp/ssh-agent-switcher.''${USER}.sock"
+          ${lib.getExe ssh-agent-switcher} --daemon --socket-path="$SSH_AUTH_SOCK" 2>/dev/null || true
+        fi
+      '';
     };
 }

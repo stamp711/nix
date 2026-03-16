@@ -1,6 +1,6 @@
 # Fonts including Nerd Font for terminal icons
 {
-  flake.homeModules.core =
+  flake.homeModules.desktop-environment =
     { inputs, pkgs, ... }:
     let
       monaco = pkgs.stdenv.mkDerivation {

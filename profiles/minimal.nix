@@ -5,7 +5,6 @@
       imports = [
         self.homeModules.core
         self.homeModules.my
-        self.homeModules.shell
       ];
     };
 

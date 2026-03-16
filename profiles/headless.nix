@@ -4,6 +4,7 @@
     {
       imports = [
         self.profiles.homeManager.minimal
+        self.homeModules.shell
         self.homeModules.tools
       ];
 
@@ -12,18 +13,28 @@
     };
 
   flake.profiles.nixos.headless =
-    { self, pkgs, ... }:
+    { self, ... }:
     {
       imports = [
         self.profiles.nixos.minimal
+        self.nixosModules.shell
         self.nixosModules.hardware
         self.nixosModules.tools
       ];
 
       my.maintenance.autoUpdate = true;
       my.maintenance.autoClean = true;
+    };
 
-      programs.zsh.enable = true;
-      users.defaultUserShell = pkgs.zsh;
+  flake.profiles.darwin.headless =
+    { self, ... }:
+    {
+      imports = [
+        self.profiles.darwin.minimal
+      ];
+
+      # TODO: impl darwinModules.my.maintenance
+      # my.maintenance.autoUpdate = true;
+      # my.maintenance.autoClean = true;
     };
 }

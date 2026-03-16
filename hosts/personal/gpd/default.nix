@@ -34,7 +34,7 @@ in
   flake.homeConfigurations."${username}@${hostname}" = self.lib.mkHome {
     inherit system;
     modules = [
-      self.profiles.homeManager.desktop-linux
+      self.profiles.homeManager.desktop
       {
         my.primaryUser = username;
         age.rekey.hostPubkey = userPubkey;

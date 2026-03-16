@@ -1,5 +1,12 @@
 # Zsh with oh-my-zsh, starship prompt, and modern history
 {
+  flake.nixosModules.shell =
+    { pkgs, ... }:
+    {
+      programs.zsh.enable = true;
+      users.defaultUserShell = pkgs.zsh;
+    };
+
   flake.homeModules.shell =
     { inputs, pkgs, ... }:
     {

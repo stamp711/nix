@@ -11,7 +11,7 @@
 
     };
 
-  flake.profiles.homeManager.desktop-linux =
+  flake.profiles.homeManager.desktop =
     { self, ... }:
     {
       imports = [
@@ -21,21 +21,13 @@
       ];
     };
 
-  flake.profiles.homeManager.desktop-darwin =
-    { self, ... }:
-    {
-      imports = [
-        self.profiles.homeManager.headless
-        self.homeModules.desktop-apps
-      ];
-    };
-
   flake.profiles.darwin.desktop =
     { self, ... }:
     {
       imports = [
-        self.profiles.darwin.minimal
+        self.profiles.darwin.headless
         self.darwinModules.desktop-environment
+        self.darwinModules.desktop-apps
       ];
     };
 }
