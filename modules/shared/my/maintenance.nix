@@ -36,9 +36,9 @@ in
 
   flake.nixosModules.my =
     {
+      lib,
       config,
       pkgs,
-      lib,
       ...
     }:
     let
@@ -126,9 +126,9 @@ in
 
   flake.homeModules.my =
     {
+      lib,
       config,
       pkgs,
-      lib,
       ...
     }:
     let

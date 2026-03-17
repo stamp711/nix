@@ -1,10 +1,10 @@
+{ self, ... }:
 {
   flake.nixosModules.my =
     {
-      self,
+      lib,
       config,
       pkgs,
-      lib,
       ...
     }:
     let

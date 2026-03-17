@@ -1,11 +1,7 @@
+{ inputs, ... }:
 {
   flake.darwinModules.cli-environment =
-    {
-      config,
-      inputs,
-      pkgs,
-      ...
-    }:
+    { config, pkgs, ... }:
     {
       nix-homebrew = {
         enable = true;

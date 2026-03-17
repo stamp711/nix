@@ -41,7 +41,7 @@ in
     };
 
   flake.homeModules.core =
-    { pkgs, lib, ... }:
+    { lib, pkgs, ... }:
     let
       ssh-agent-switcher = pkgs.ssh-agent-switcher.overrideAttrs { doCheck = false; };
     in

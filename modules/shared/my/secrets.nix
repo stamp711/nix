@@ -1,11 +1,7 @@
+{ self, ... }:
 {
   flake.homeModules.my =
-    {
-      self,
-      config,
-      lib,
-      ...
-    }:
+    { lib, config, ... }:
     let
       sshCfg = config.my.ssh;
       sshSecretNames = map self.lib.ageSecretName sshCfg.secretConfigFiles;

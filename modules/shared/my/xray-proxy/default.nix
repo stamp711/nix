@@ -1,11 +1,7 @@
+{ self, ... }:
 {
   flake.nixosModules.my =
-    {
-      self,
-      config,
-      lib,
-      ...
-    }:
+    { lib, config, ... }:
     let
       cfg = config.my.xray-proxy;
       secretNames = map self.lib.ageSecretName cfg.secretEnvFiles;

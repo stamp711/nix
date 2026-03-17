@@ -1,4 +1,5 @@
 # Zsh with oh-my-zsh, starship prompt, and modern history
+{ inputs, ... }:
 {
   flake.nixosModules.cli-environment =
     { pkgs, ... }:
@@ -8,7 +9,7 @@
     };
 
   flake.homeModules.cli-environment =
-    { inputs, pkgs, ... }:
+    { pkgs, ... }:
     {
       programs.bash = {
         enable = true;

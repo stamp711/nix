@@ -11,6 +11,7 @@ in
     inherit system;
     modules = [
       self.profiles.nixos.desktop
+      inputs.nixos-hardware.nixosModules.gpd-pocket-4
       ./hardware.nix
       ./lte.nix
       {

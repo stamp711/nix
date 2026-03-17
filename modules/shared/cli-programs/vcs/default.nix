@@ -1,11 +1,11 @@
 # Git configuration with signing, delta, and GitHub CLI & other VCS tools
+{ self, ... }:
 {
   flake.homeModules.cli-programs =
     {
-      self,
-      pkgs,
-      config,
       lib,
+      config,
+      pkgs,
       ...
     }:
     let

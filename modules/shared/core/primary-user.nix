@@ -1,6 +1,6 @@
 {
   flake.nixosModules.core =
-    { config, lib, ... }:
+    { lib, config, ... }:
     {
       options.my.primaryUser = lib.mkOption {
         type = lib.types.str;
@@ -17,7 +17,7 @@
     };
 
   flake.darwinModules.core =
-    { config, lib, ... }:
+    { lib, config, ... }:
     {
       options.my.primaryUser = lib.mkOption {
         type = lib.types.str;
@@ -30,7 +30,7 @@
     };
 
   flake.homeModules.core =
-    { config, lib, ... }:
+    { lib, config, ... }:
     {
       options.my.primaryUser = lib.mkOption {
         type = lib.types.str;

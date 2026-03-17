@@ -1,9 +1,9 @@
 {
   flake.nixosModules.my =
     {
+      lib,
       config,
       pkgs,
-      lib,
       ...
     }:
     with lib;

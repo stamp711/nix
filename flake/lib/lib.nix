@@ -24,7 +24,6 @@ in
     }:
     lib.nixosSystem {
       inherit system;
-      specialArgs = { inherit self inputs; };
       modules = [
         inputs.disko.nixosModules.disko
         inputs.agenix.nixosModules.default
@@ -42,7 +41,6 @@ in
     }:
     inputs.nix-darwin.lib.darwinSystem {
       inherit system;
-      specialArgs = { inherit self inputs; };
       modules = [
         inputs.determinate.darwinModules.default
         inputs.nix-homebrew.darwinModules.nix-homebrew
@@ -59,7 +57,6 @@ in
     }:
     inputs.home-manager.lib.homeManagerConfiguration {
       pkgs = self.lib.mkPkgs system;
-      extraSpecialArgs = { inherit self inputs; };
       modules = [
         inputs.agenix.homeManagerModules.default
         # TODO: use inputs.agenix-rekey.homeManagerModules.default once

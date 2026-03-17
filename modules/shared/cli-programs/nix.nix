@@ -1,7 +1,8 @@
 # Nix development and workflow tools
+{ inputs, ... }:
 {
   flake.homeModules.cli-programs =
-    { inputs, pkgs, ... }:
+    { pkgs, ... }:
     {
       imports = [
         inputs.nix-index-database.homeModules.nix-index

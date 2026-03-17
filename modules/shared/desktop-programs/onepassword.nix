@@ -1,6 +1,6 @@
 {
   flake.nixosModules.desktop-programs =
-    { config, lib, ... }:
+    { lib, config, ... }:
     {
       programs._1password.enable = true;
       programs._1password-gui = {

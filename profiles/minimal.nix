@@ -1,28 +1,23 @@
+{ self, ... }:
 {
-  flake.profiles.homeManager.minimal =
-    { self, ... }:
-    {
-      imports = [
-        self.homeModules.core
-        self.homeModules.my
-      ];
-    };
+  flake.profiles.homeManager.minimal = {
+    imports = [
+      self.homeModules.core
+      self.homeModules.my
+    ];
+  };
 
-  flake.profiles.nixos.minimal =
-    { self, ... }:
-    {
-      imports = [
-        self.nixosModules.core
-        self.nixosModules.my
-      ];
-    };
+  flake.profiles.nixos.minimal = {
+    imports = [
+      self.nixosModules.core
+      self.nixosModules.my
+    ];
+  };
 
-  flake.profiles.darwin.minimal =
-    { self, ... }:
-    {
-      imports = [
-        self.darwinModules.core
-        self.darwinModules.my
-      ];
-    };
+  flake.profiles.darwin.minimal = {
+    imports = [
+      self.darwinModules.core
+      self.darwinModules.my
+    ];
+  };
 }

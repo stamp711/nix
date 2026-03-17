@@ -7,12 +7,16 @@ let
   userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDbNYaZnOCmlfKtRpPEq12Ot3iaVjq0AFj7vsB3DcjQ+";
 in
 {
+  imports = [
+    ./hardware.nix
+    ./vm.nix
+  ];
   flake.nixosConfigurations.${hostname} = self.lib.mkNixos {
     inherit system;
     modules = [
       self.profiles.nixos.desktop
-      ./hardware.nix
-      ./vm.nix
+      self.nixosModules.nuc-hardware
+      self.nixosModules.nuc-vm
       {
         my.primaryUser = username;
         networking.hostName = hostname;

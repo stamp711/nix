@@ -1,7 +1,7 @@
 # Performance profiling, tracing, and benchmarking tools
 {
   flake.homeModules.cli-programs =
-    { pkgs, lib, ... }:
+    { lib, pkgs, ... }:
     {
       home.packages =
         with pkgs;

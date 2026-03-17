@@ -1,7 +1,7 @@
 # Binary inspection, reverse engineering, and debugging tools
 {
   flake.homeModules.cli-programs =
-    { pkgs, lib, ... }:
+    { lib, pkgs, ... }:
     {
       home.packages =
         with pkgs;
