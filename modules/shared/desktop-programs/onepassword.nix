@@ -16,6 +16,7 @@
   flake.darwinModules.desktop-programs =
     { config, ... }:
     {
+      homebrew.casks = [ "1password" ];
       launchd.user.agents.onepassword-ssh-auth-sock = {
         serviceConfig = {
           Label = "com.1password.SSH_AUTH_SOCK";

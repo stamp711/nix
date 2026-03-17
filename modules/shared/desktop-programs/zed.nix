@@ -1,10 +1,14 @@
 {
+  flake.darwinModules.desktop-programs = {
+    homebrew.casks = [ "zed" ];
+  };
+
   flake.homeModules.desktop-programs =
     { pkgs, ... }:
     {
       programs.zed-editor = {
         enable = true;
-        package = if pkgs.stdenv.isDarwin then pkgs.brewCasks.zed else pkgs.zed-editor;
+        package = if pkgs.stdenv.isDarwin then null else pkgs.zed-editor;
         installRemoteServer = true;
         extensions = [
           "zed-wakatime"
@@ -15,16 +19,13 @@
           "kanagawa-themes"
           "modus-themes"
         ];
-
         userSettings = {
-
           # Essentials
           telemetry.diagnostics = false;
           telemetry.metrics = false;
           cursor_blink = false;
           session.trust_all_worktrees = true;
           vim_mode = true;
-
           # Appearance
           ui_font_family = "Monaco Nerd Font";
           buffer_font_family = "Monaco Nerd Font";
@@ -33,7 +34,6 @@
             light = "Modus Operandi Tinted";
             dark = "XY-Zed";
           };
-
           # LLM
           edit_predictions.mode = "subtle";
           agent = {
@@ -42,7 +42,6 @@
             single_file_review = true;
             play_sound_when_agent_done = true;
           };
-
           # Language formatters
           languages = {
             YAML.formatter.external = {
@@ -61,8 +60,6 @@
             };
           };
         };
-
       };
-
     };
 }

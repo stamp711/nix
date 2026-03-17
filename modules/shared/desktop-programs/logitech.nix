@@ -5,6 +5,7 @@
     services.solaar.enable = true;
   };
 
-  # TODO: manage logi-options+ on darwin
-  flake.darwinModules.desktop-programs = { };
+  flake.darwinModules.desktop-programs = {
+    homebrew.casks = [ "logi-options+" ];
+  };
 }

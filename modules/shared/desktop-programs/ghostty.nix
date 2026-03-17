@@ -4,7 +4,7 @@
     {
       programs.ghostty = {
         enable = true;
-        package = if pkgs.stdenv.isDarwin then pkgs.ghostty-bin else pkgs.ghostty;
+        package = if pkgs.stdenv.isDarwin then null else pkgs.ghostty;
         settings = {
           theme = "Modus Vivendi";
           font-family = "Monaco Nerd Font";
@@ -23,4 +23,8 @@
         };
       };
     };
+
+  flake.darwinModules.desktop-programs = {
+    homebrew.casks = [ "ghostty" ];
+  };
 }
