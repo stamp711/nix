@@ -45,6 +45,7 @@ in
       specialArgs = { inherit self inputs; };
       modules = [
         inputs.determinate.darwinModules.default
+        inputs.nix-homebrew.darwinModules.nix-homebrew
         { nixpkgs.pkgs = self.lib.mkPkgs system; }
       ]
       ++ modules;
