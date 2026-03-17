@@ -16,6 +16,7 @@
 
     home.shellAliases = {
       nix-init = "nix flake init -t github:the-nix-way/dev-templates#";
+      sshproxy = "ssh -R 6152:127.0.0.1:6152 -R 6153:127.0.0.1:6153";
     };
   };
 }
