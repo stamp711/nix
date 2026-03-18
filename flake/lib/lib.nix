@@ -42,7 +42,6 @@ in
     inputs.nix-darwin.lib.darwinSystem {
       inherit system;
       modules = [
-        inputs.determinate.darwinModules.default
         inputs.nix-homebrew.darwinModules.nix-homebrew
         { nixpkgs.pkgs = self.lib.mkPkgs system; }
       ]

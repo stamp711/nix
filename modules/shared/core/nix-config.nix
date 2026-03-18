@@ -1,3 +1,4 @@
+{ inputs, ... }:
 let
   nixConfig = {
     experimental-features = [
@@ -23,22 +24,19 @@ in
     };
 
   flake.darwinModules.core = {
-    determinateNix = {
-      enable = true;
-      customSettings = nixConfig // {
-        auto-optimise-store = true;
-        trusted-users = [
-          "root"
-          "@admin"
-        ];
-        eval-cores = 0; # Enables parallel evaluation
-        extra-experimental-features = [ ];
-      };
+    nix.registry.nixpkgs.flake = inputs.nixpkgs;
+    nix.settings = nixConfig // {
+      auto-optimise-store = true;
+      trusted-users = [
+        "root"
+        "@admin"
+      ];
     };
   };
 
   flake.nixosModules.core = {
     nix.channel.enable = false;
+    nix.registry.nixpkgs.flake = inputs.nixpkgs;
     nix.settings = nixConfig // {
       auto-optimise-store = true;
       trusted-users = [

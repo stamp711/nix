@@ -80,7 +80,6 @@
       url = "github:nix-darwin/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
   };
 
