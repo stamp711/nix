@@ -4,10 +4,6 @@ let
   maintenanceOptions = lib: {
     autoUpdate = lib.mkEnableOption "automatic update via nh";
     autoClean = lib.mkEnableOption "automatic Nix garbage collection via nh";
-    flake = lib.mkOption {
-      type = lib.types.str;
-      default = "github:stamp711/nix";
-    };
     updateDates = lib.mkOption {
       type = lib.types.str;
       default = "daily";
@@ -53,7 +49,7 @@ in
         name = "nh-update";
         text = ''
           echo "Updating NixOS configuration via nh"
-          NH_BYPASS_ROOT_CHECK=true nh os boot --no-nom "${cfg.flake}" -- --refresh
+          NH_BYPASS_ROOT_CHECK=true nh os boot --no-nom "${config.my.flake}" -- --refresh
         '';
         inherit runtimeInputs;
       };
@@ -143,7 +139,7 @@ in
         name = "nh-update";
         text = ''
           echo "Updating Home Manager configuration via nh"
-          nh home switch --no-nom "${cfg.flake}" -- --refresh
+          nh home switch --no-nom "${config.my.flake}" -- --refresh
         '';
         inherit runtimeInputs;
       };

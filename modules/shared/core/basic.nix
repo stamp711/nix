@@ -16,23 +16,25 @@
       };
 
       programs.nh.enable = true;
-      programs.nh.flake = "github:stamp711/nix";
+      programs.nh.flake = config.my.flake;
     };
 
   flake.darwinModules.core = {
     system.stateVersion = 6;
   };
 
-  flake.nixosModules.core = {
-    system.stateVersion = "26.05";
-    time.timeZone = "Asia/Shanghai";
-    i18n.defaultLocale = "en_US.UTF-8";
-    security.sudo.wheelNeedsPassword = false;
-    environment.enableAllTerminfo = true; # Terminfo for ghostty, kitty, foot, etc.
-    programs.nix-ld.enable = true; # Run unpatched dynamic binaries on NixOS
+  flake.nixosModules.core =
+    { config, ... }:
+    {
+      system.stateVersion = "26.05";
+      time.timeZone = "Asia/Shanghai";
+      i18n.defaultLocale = "en_US.UTF-8";
+      security.sudo.wheelNeedsPassword = false;
+      environment.enableAllTerminfo = true; # Terminfo for ghostty, kitty, foot, etc.
+      programs.nix-ld.enable = true; # Run unpatched dynamic binaries on NixOS
 
-    programs.nh.enable = true;
-    programs.nh.flake = "github:stamp711/nix";
-  };
+      programs.nh.enable = true;
+      programs.nh.flake = config.my.flake;
+    };
 
 }
