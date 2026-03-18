@@ -1,4 +1,4 @@
-{ self, ... }:
+{ self, lib, ... }:
 let
   agePubKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHdOxmUp8REg9IBoipLV40VYmLNiD6+TUUHb/ofyor60 ssh-age";
 
@@ -11,7 +11,7 @@ let
       }
     ];
     storageMode = "local";
-    localStorageDir = "${self}/.rekey";
+    localStorageDir = lib.mkDefault "${self}/.rekey";
   };
 in
 {
