@@ -31,6 +31,7 @@
         oh-my-zsh = {
           enable = true;
           theme = "";
+          extraConfig = "ZSH_DISABLE_COMPFIX=true"; # nix store paths are read-only, skip permission audit
           plugins = [
             "aliases"
             # Productivity
