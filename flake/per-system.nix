@@ -1,9 +1,6 @@
 { self, inputs, ... }:
 {
-  systems = [
-    "aarch64-darwin"
-    "x86_64-linux"
-  ];
+  systems = import inputs.systems;
 
   perSystem =
     { pkgs, system, ... }:
