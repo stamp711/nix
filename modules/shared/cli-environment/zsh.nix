@@ -9,7 +9,7 @@
     };
 
   flake.homeModules.cli-environment =
-    { pkgs, ... }:
+    { lib, pkgs, ... }:
     {
       programs.bash = {
         enable = true;
@@ -34,25 +34,18 @@
           extraConfig = "ZSH_DISABLE_COMPFIX=true"; # nix store paths are read-only, skip permission audit
           plugins = [
             "aliases"
-            # Productivity
-            "command-not-found"
+            # "command-not-found" # provided by nix-index
             "encode64"
             "extract"
-            "fbterm"
-            "urltools"
-            "web-search"
-            # Build tools
             "git"
             "gitignore"
             "gnu-utils"
             "jj"
             "kubectl"
-            # Distro-related
-            "systemd"
-            # macOS
             "brew"
-            "macos"
-          ];
+          ]
+          ++ lib.optionals pkgs.stdenv.isLinux [ "systemd" ]
+          ++ lib.optionals pkgs.stdenv.isDarwin [ "macos" ];
         };
         plugins = [
           {
