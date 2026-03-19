@@ -17,6 +17,7 @@ in
     { pkgs, ... }:
     {
       nix.package = pkgs.nix;
+      nix.registry.nixpkgs.flake = inputs.nixpkgs;
       nix.settings = nixConfig;
       xdg.configFile."nixpkgs/config.nix".text = ''
         { allowUnfree = true; allowUnfreePredicate = _: true; }
