@@ -5,6 +5,9 @@
     {
       nix-homebrew = {
         enable = true;
+        # Causes slow shell init: brew shellenv is idempotent and skips fpath
+        # prepend when HOMEBREW_PREFIX is inherited, breaking OMZ compinit cache.
+        enableZshIntegration = false;
         autoMigrate = true; # auto migrate existing Homebrew installation
         user = config.my.primaryUser;
       };
