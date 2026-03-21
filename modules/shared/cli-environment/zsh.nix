@@ -1,15 +1,49 @@
-# Zsh with oh-my-zsh, starship prompt, and modern history
+# Zsh with starship prompt, completion, and keybindings
 { self, inputs, ... }:
 {
   flake.nixosModules.cli-environment =
     { pkgs, ... }:
     {
-      programs.zsh.enable = true;
       users.defaultUserShell = pkgs.zsh;
+      programs.zsh.enable = true;
+      # Handled by user zsh config
+      programs.zsh.enableCompletion = false;
+      programs.zsh.enableBashCompletion = false;
+      programs.zsh.promptInit = "";
     };
 
+  flake.darwinModules.cli-environment = {
+    # Handled by user zsh config
+    programs.zsh.enableCompletion = false;
+    programs.zsh.enableBashCompletion = false;
+    programs.zsh.promptInit = "";
+  };
+
   flake.homeModules.cli-environment =
-    { lib, pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    let
+      omz = "${pkgs.oh-my-zsh}/share/oh-my-zsh";
+      omzLib = name: {
+        name = "omz-lib-${name}";
+        src = omz;
+        file = "lib/${name}.zsh";
+      };
+      omzPlugin = name: {
+        name = "omz-plugin-${name}";
+        src = omz;
+        file = "plugins/${name}/${name}.plugin.zsh";
+      };
+      fromPkg = pkg: file: {
+        name = pkg.pname or pkg.name;
+        src = pkg;
+        inherit file;
+      };
+    in
     {
       programs.bash = {
         enable = true;
@@ -19,43 +53,23 @@
       # Zsh configuration
       programs.zsh = {
         enable = true;
-        autosuggestion.enable = true;
         enableVteIntegration = true;
-        syntaxHighlighting.enable = true;
         history = {
           size = 100000;
           save = 100000;
           expireDuplicatesFirst = true;
           extended = true;
         };
-        oh-my-zsh = {
-          enable = true;
-          theme = "";
-          extraConfig = "ZSH_DISABLE_COMPFIX=true"; # nix store paths are read-only, skip permission audit
-          plugins = [
-            "aliases"
-            # "command-not-found" # provided by nix-index
-            "encode64"
-            "extract"
-            "git"
-            "gitignore"
-            "gnu-utils"
-            "jj"
-            "kubectl"
-            "brew"
-          ]
-          ++ lib.optionals pkgs.stdenv.isLinux [ "systemd" ]
-          ++ lib.optionals pkgs.stdenv.isDarwin [ "macos" ];
-        };
         plugins = [
-          {
-            name = "you-should-use";
-            src = pkgs.zsh-you-should-use;
-            file = "share/zsh/plugins/you-should-use/you-should-use.plugin.zsh";
-          }
+          # OMZ libs: must be sync for terminal/input behavior
+          (omzLib "key-bindings")
+          (omzLib "functions") # needed by termsupport (omz_urlencode)
+          (omzLib "clipboard")
+          (omzLib "termsupport")
         ];
 
         initContent = lib.mkMerge [
+          # - 500 (mkBefore): Early initialization (replaces initExtraFirst)
           (lib.mkBefore ''
             # zsh startup profiling: run `zsh-prof` to see what's slow
             if [[ -n "$ZPROF" ]]; then
@@ -63,13 +77,14 @@
             fi
           '')
 
+          # - 1000 (default): General configuration (replaces initExtra)
           ''
-            export YSU_MESSAGE_FORMAT="💡 $(tput setab 22)$(tput setaf 231) %alias $(tput sgr0)"
             [ -f ~/.config/op/plugins.sh ] && source ~/.config/op/plugins.sh
             # source extra rc in home dir if found
             [ -f ~/.zshrc_extra ] && source ~/.zshrc_extra
           ''
 
+          # - 1500 (mkAfter): Last to run configuration
           (lib.mkAfter ''
             # print profiling results if enabled
             if [[ -n "$ZPROF" ]]; then
@@ -79,11 +94,63 @@
         ];
       };
 
-      programs.fzf.enable = true;
+      # Deferred loading via zsh-defer
+      my.zsh-defer =
+        let
+          omz-jj-aliases = pkgs.runCommand "omz-jj-aliases" { } ''
+            mkdir -p $out/share/zsh/plugins/omz-jj-aliases
+            grep '^alias ' ${omz}/plugins/jj/jj.plugin.zsh > $out/share/zsh/plugins/omz-jj-aliases/omz-jj-aliases.plugin.zsh
+          '';
+        in
+        {
+          enable = true;
+          enableCompletion = true;
+          enableAutosuggestion = true;
+          enableSyntaxHighlighting = true;
+          completionInit =
+            let
+              zcompdump = "${config.programs.zsh.dotDir}/.zcompdump";
+            in
+            ''
+              autoload -U compinit zrecompile && compinit -u -d "${zcompdump}"
+              # zcompile the completion dump file if the .zwc is older or missing.
+              if command mkdir "${zcompdump}.lock" 2>/dev/null; then
+                zrecompile -q -p "${zcompdump}"
+                command rm -rf "${zcompdump}.zwc.old" "${zcompdump}.lock"
+              fi
+            '';
+          plugins = [
+            # OMZ libs/plugins - load after deferred compinit
+            (omzLib "completion")
+            (omzLib "directories")
+            (omzPlugin "aliases")
+            (omzPlugin "git")
+            (fromPkg omz-jj-aliases "share/zsh/plugins/omz-jj-aliases/omz-jj-aliases.plugin.zsh")
+            (fromPkg pkgs.zsh-you-should-use "share/zsh/plugins/you-should-use/you-should-use.plugin.zsh")
+          ];
+          initContent = [
+            {
+              content = ''export YSU_MESSAGE_FORMAT="💡 $(tput setab 22)$(tput setaf 231) %alias $(tput sgr0)"'';
+            }
+            {
+              content = ''
+                if [[ $options[zle] = on ]]; then
+                  eval "$(${lib.getExe config.programs.atuin.package} init zsh ${lib.escapeShellArgs config.programs.atuin.flags})"
+                fi
+              '';
+            }
+          ];
+        };
+
+      programs.fzf = {
+        enable = true;
+        enableZshIntegration = false; # atuin handles ctrl-r, disable the rest
+      };
       programs.television.enable = true;
 
       programs.atuin = {
         enable = true;
+        enableZshIntegration = false; # deferred
         flags = [ "--disable-up-arrow" ];
         settings = {
           style = "auto";

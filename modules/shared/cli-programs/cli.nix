@@ -1,7 +1,12 @@
 # General CLI tools and utilities
 {
   flake.homeModules.cli-programs =
-    { pkgs, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     {
       home.packages = with pkgs; [
         # Search
@@ -34,7 +39,15 @@
       };
 
       # Smarter cd command
-      programs.zoxide.enable = true;
+      programs.zoxide = {
+        enable = true;
+        enableZshIntegration = false; # deferred
+      };
+      my.zsh-defer.initContent = [
+        {
+          content = ''eval "$(${lib.getExe config.programs.zoxide.package} init zsh ${lib.concatStringsSep " " config.programs.zoxide.options})"'';
+        }
+      ];
 
       # Terminal multiplexers
       programs.tmux = {
