@@ -1,6 +1,6 @@
 {
   flake.nixosModules.networking =
-    { lib, config, ... }:
+    { config, lib, ... }:
     {
       networking = {
         firewall.enable = lib.mkDefault false;
