@@ -1,5 +1,5 @@
 # Zsh with oh-my-zsh, starship prompt, and modern history
-{ inputs, ... }:
+{ self, inputs, ... }:
 {
   flake.nixosModules.cli-environment =
     { pkgs, ... }:
@@ -54,12 +54,29 @@
             file = "share/zsh/plugins/you-should-use/you-should-use.plugin.zsh";
           }
         ];
-        initContent = ''
-          export YSU_MESSAGE_FORMAT="💡 $(tput setab 22)$(tput setaf 231) %alias $(tput sgr0)"
-          [ -f ~/.config/op/plugins.sh ] && source ~/.config/op/plugins.sh
-          # source extra rc in home dir if found
-          [ -f ~/.zshrc_extra ] && source ~/.zshrc_extra
-        '';
+
+        initContent = lib.mkMerge [
+          (lib.mkBefore ''
+            # zsh startup profiling: run `zsh-prof` to see what's slow
+            if [[ -n "$ZPROF" ]]; then
+              zmodload zsh/zprof
+            fi
+          '')
+
+          ''
+            export YSU_MESSAGE_FORMAT="💡 $(tput setab 22)$(tput setaf 231) %alias $(tput sgr0)"
+            [ -f ~/.config/op/plugins.sh ] && source ~/.config/op/plugins.sh
+            # source extra rc in home dir if found
+            [ -f ~/.zshrc_extra ] && source ~/.zshrc_extra
+          ''
+
+          (lib.mkAfter ''
+            # print profiling results if enabled
+            if [[ -n "$ZPROF" ]]; then
+              zprof
+            fi
+          '')
+        ];
       };
 
       programs.fzf.enable = true;
@@ -78,6 +95,7 @@
       # Starship prompt
       home.packages = [
         inputs.jj-starship.packages.${pkgs.stdenv.hostPlatform.system}.default
+        self.packages.${pkgs.stdenv.hostPlatform.system}.zsh-bench
       ];
       programs.starship = {
         enable = true;

@@ -693,7 +693,8 @@
         "nixpkgs": "nixpkgs_2",
         "solaar": "solaar",
         "systems": "systems_6",
-        "treefmt-nix": "treefmt-nix_3"
+        "treefmt-nix": "treefmt-nix_3",
+        "zsh-bench": "zsh-bench"
       }
     },
     "solaar": {
@@ -902,6 +903,22 @@
         "owner": "gytis-ivaskevicius",
         "repo": "flake-utils-plus",
         "rev": "afcb15b845e74ac5e998358709b2b5fe42a948d1",
+        "type": "github"
+      }
+    },
+    "zsh-bench": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1768636007,
+        "narHash": "sha256-GDYFkObLPTaj+qPVf2sXXqNKkPdD31hfO1bbM5j4lCc=",
+        "owner": "romkatv",
+        "repo": "zsh-bench",
+        "rev": "a3c48d65b9078ee1f8bbd4da8631a8fbc885c52a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "romkatv",
+        "repo": "zsh-bench",
         "type": "github"
       }
     }

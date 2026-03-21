@@ -5,6 +5,18 @@
   perSystem =
     { pkgs, system, ... }:
     {
+      packages.zsh-bench = pkgs.stdenvNoCC.mkDerivation {
+        name = "zsh-bench";
+        src = inputs.zsh-bench;
+        dontBuild = true;
+        installPhase = ''
+          mkdir -p $out/share/zsh-bench
+          cp -r . $out/share/zsh-bench
+          mkdir -p $out/bin
+          ln -s $out/share/zsh-bench/zsh-bench $out/bin/zsh-bench
+          ln -s $out/share/zsh-bench/human-bench $out/bin/human-bench
+        '';
+      };
       _module.args.pkgs = self.lib.mkPkgs system;
 
       checks = {
