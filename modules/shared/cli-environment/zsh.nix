@@ -75,6 +75,17 @@
             if [[ -n "$ZPROF" ]]; then
               zmodload zsh/zprof
             fi
+
+            # Powerlevel10k instant prompt (must be near top of zshrc)
+            if [[ -r "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh" ]]; then
+              source "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh"
+            fi
+
+            # Load p10k theme
+            source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme
+
+            # Load p10k config
+            source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/config/p10k-pure.zsh
           '')
 
           # - 1000 (default): General configuration (replaces initExtra)
@@ -165,7 +176,7 @@
         self.packages.${pkgs.stdenv.hostPlatform.system}.zsh-bench
       ];
       programs.starship = {
-        enable = true;
+        enable = false;
         settings = {
           # Replaced by jj-starship
           git_branch.disabled = true;
