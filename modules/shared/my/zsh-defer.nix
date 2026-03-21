@@ -14,6 +14,15 @@
 
       pluginsDir = "${config.xdg.configHome}/zsh/deferred-plugins";
 
+      # Compile .zsh files to .zwc bytecode at build time
+      compilePlugin =
+        src:
+        pkgs.runCommand "${baseNameOf (toString src)}-zwc" { nativeBuildInputs = [ pkgs.zsh ]; } ''
+          cp -rL ${src} $out
+          chmod -R u+w $out
+          find $out -name '*.zsh' -exec zsh -c 'zcompile {}' \;
+        '';
+
       pluginModule = types.submodule (
         { config, ... }:
         {
@@ -72,6 +81,13 @@
     {
       options.my.zsh-defer = {
         enable = lib.mkEnableOption "zsh-defer lazy loading";
+
+        lib.compilePlugin = mkOption {
+          type = types.functionTo types.package;
+          readOnly = true;
+          default = compilePlugin;
+          description = "Compile .zsh files in a plugin source to .zwc bytecode at build time.";
+        };
 
         enableCompletion = mkOption {
           type = types.bool;
@@ -180,7 +196,7 @@
 
             home.file = lib.mergeAttrsList (
               map (plugin: {
-                "${pluginsDir}/${plugin.name}".source = plugin.src;
+                "${pluginsDir}/${plugin.name}".source = compilePlugin plugin.src;
               }) cfg.plugins
             );
 

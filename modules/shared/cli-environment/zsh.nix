@@ -27,7 +27,8 @@
       ...
     }:
     let
-      omz = "${pkgs.oh-my-zsh}/share/oh-my-zsh";
+      compile = config.my.zsh-defer.lib.compilePlugin;
+      omz = compile "${pkgs.oh-my-zsh}/share/oh-my-zsh";
       omzLib = name: {
         name = "omz-lib-${name}";
         src = omz;
@@ -40,7 +41,7 @@
       };
       fromPkg = pkg: file: {
         name = pkg.pname or pkg.name;
-        src = pkg;
+        src = compile pkg;
         inherit file;
       };
     in
