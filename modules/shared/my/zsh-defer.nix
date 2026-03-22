@@ -20,7 +20,7 @@
         pkgs.runCommand "${baseNameOf (toString src)}-zwc" { nativeBuildInputs = [ pkgs.zsh ]; } ''
           cp -rL ${src} $out
           chmod -R u+w $out
-          find $out -name '*.zsh' -exec zsh -c 'zcompile {}' \;
+          find $out -name '*.zsh' -exec zsh -c 'zcompile "$0"' {} \;
         '';
 
       # Re-bind autosuggestion ZLE widgets.
