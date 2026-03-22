@@ -118,7 +118,7 @@
           enable = true;
           enableCompletion = true;
           enableAutosuggestion = true;
-          enableSyntaxHighlighting = true;
+          enableFastSyntaxHighlighting = true;
           completionInit =
             let
               zcompdump = "${config.programs.zsh.dotDir}/.zcompdump";

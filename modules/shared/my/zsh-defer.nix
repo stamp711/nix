@@ -23,6 +23,17 @@
           find $out -name '*.zsh' -exec zsh -c 'zcompile {}' \;
         '';
 
+      # Re-highlight current buffer after deferred syntax highlighting loads.
+      # Registers and invokes a ZLE widget for $region_highlight access.
+      rehighlightContent = ''
+        zsh-defer-rehighlight_() {
+          _ZSH_HIGHLIGHT_PRIOR_BUFFER=
+          (( $+functions[_zsh_highlight] )) && _zsh_highlight
+        }
+        zle -N zsh-defer-rehighlight_
+        zle zsh-defer-rehighlight_
+      '';
+
       pluginModule = types.submodule (
         { config, ... }:
         {
@@ -125,12 +136,23 @@
           type = types.bool;
           default = false;
           description = ''
-            Enable deferred zsh syntax highlighting. When enabled,
+            Enable deferred zsh-syntax-highlighting. When enabled,
             {option}`programs.zsh.syntaxHighlighting.enable` is disabled and the
             plugin is loaded via zsh-defer at order 1200 instead.
 
             Configure highlighters, patterns and styles via
             {option}`programs.zsh.syntaxHighlighting`.
+          '';
+        };
+
+        enableFastSyntaxHighlighting = mkOption {
+          type = types.bool;
+          default = false;
+          description = ''
+            Enable deferred fast-syntax-highlighting. When enabled,
+            the plugin is loaded via zsh-defer at order 1200.
+
+            Configure via `fast-theme` command or theme files.
           '';
         };
 
@@ -294,7 +316,17 @@
             }
           ))
 
-          # Deferred syntax highlighting
+          # Mutual exclusion: syntax highlighting plugins
+          {
+            assertions = [
+              {
+                assertion = !(cfg.enableSyntaxHighlighting && cfg.enableFastSyntaxHighlighting);
+                message = "my.zsh-defer.enableSyntaxHighlighting and my.zsh-defer.enableFastSyntaxHighlighting are mutually exclusive.";
+              }
+            ];
+          }
+
+          # Deferred zsh-syntax-highlighting
           (lib.mkIf cfg.enableSyntaxHighlighting (
             let
               sh = config.programs.zsh.syntaxHighlighting;
@@ -336,22 +368,33 @@
                   );
                 }
                 ++ [
+                  # Re-highlight current buffer after loading.
                   {
-                    # Re-highlight current buffer after loading.
-                    # Registers and invokes a ZLE widget for $region_highlight access.
                     order = 1202;
-                    content = ''
-                      zsh-defer-rehighlight_() {
-                        _ZSH_HIGHLIGHT_PRIOR_BUFFER=
-                        (( $+functions[_zsh_highlight] )) && _zsh_highlight
-                      }
-                      zle -N zsh-defer-rehighlight_
-                      zle zsh-defer-rehighlight_
-                    '';
+                    content = rehighlightContent;
                   }
                 ];
             }
           ))
+
+          # Deferred fast-syntax-highlighting
+          (lib.mkIf cfg.enableFastSyntaxHighlighting {
+            my.zsh-defer.plugins = [
+              {
+                name = "fast-syntax-highlighting";
+                src = "${pkgs.zsh-fast-syntax-highlighting}/share/zsh/plugins/fast-syntax-highlighting";
+                file = "fast-syntax-highlighting.plugin.zsh";
+                order = 1200;
+              }
+            ];
+            my.zsh-defer.initContent = [
+              # Re-highlight current buffer after loading.
+              {
+                order = 1202;
+                content = rehighlightContent;
+              }
+            ];
+          })
         ]
       );
     };
