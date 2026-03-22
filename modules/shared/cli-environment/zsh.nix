@@ -160,6 +160,9 @@
       };
       programs.television.enable = true;
 
+      # Suppress macOS "Last login" message
+      home.file.".hushlogin".text = "";
+
       programs.atuin = {
         enable = true;
         enableZshIntegration = false; # deferred
