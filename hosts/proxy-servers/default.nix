@@ -38,7 +38,7 @@ let
           my.boot-disk = {
             enable = true;
             layout = "mbr-ext4";
-            device = "/dev/vda";
+            device = "/dev/sda";
           };
 
           networking.firewall.enable = true;
@@ -73,6 +73,6 @@ let
   };
 in
 lib.mkMerge [
-  (mkProxy "VIA" "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG21GuCJYYrjfsyvKO2LeQVTS4zYkPDEXf4JVpWoujdY")
+  (mkProxy "VIA" "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOBNcyBV9afV2SIW9kRj5XCTbymx79o2qOiMsgLXTza4")
   (mkProxy "NURO" "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB50dHwZLQyKtq7VV9pa9F4QJJtGW0jgJ+RsV/x2IpJI")
 ]
