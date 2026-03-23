@@ -25,6 +25,17 @@
         zsh-trace = "zsh-trace-startup";
       };
 
+      programs.zsh.initExtra = ''
+        zmodload zsh/net/tcp
+        if ztcp localhost 6153 2>/dev/null; then
+          ztcp -c
+          export {http,https}_proxy="http://localhost:6152"
+          export {HTTP,HTTPS}_PROXY="http://localhost:6152"
+          export {all_proxy,ALL_PROXY}="socks5h://localhost:6153"
+          export {no_proxy,NO_PROXY}="localhost,127.0.0.1,::1"
+        fi
+      '';
+
       home.packages = [
         (pkgs.writeShellScriptBin "zsh-trace-startup" ''
           trace_log=$(mktemp)
