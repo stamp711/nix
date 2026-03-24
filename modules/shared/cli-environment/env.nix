@@ -25,7 +25,7 @@
         zsh-trace = "zsh-trace-startup";
       };
 
-      programs.zsh.initExtra = ''
+      programs.zsh.initContent = ''
         zmodload zsh/net/tcp
         if ztcp localhost 6153 2>/dev/null; then
           ztcp -c
