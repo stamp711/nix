@@ -34,7 +34,7 @@ jobs:
           name: flake-lock
       - uses: DeterminateSystems/nix-installer-action@main
       - uses: DeterminateSystems/magic-nix-cache-action@main
-      - run: nix flake check
+      - run: nix run github:Mic92/nix-fast-build -- --no-nom --skip-cached
 
   commit:
     needs: check
