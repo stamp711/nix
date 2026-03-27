@@ -3,7 +3,12 @@
   systems = import inputs.systems;
 
   perSystem =
-    { pkgs, system, ... }:
+    {
+      lib,
+      pkgs,
+      system,
+      ...
+    }:
     {
       packages.zsh-bench = pkgs.stdenvNoCC.mkDerivation {
         name = "zsh-bench";
@@ -19,16 +24,34 @@
       };
       _module.args.pkgs = self.lib.mkPkgs system;
 
-      checks = {
-        statix = pkgs.runCommand "statix" { } ''
-          ${pkgs.statix}/bin/statix check ${self} -c ${self}/statix.toml
-          touch $out
-        '';
-        deadnix = pkgs.runCommand "deadnix" { } ''
-          ${pkgs.deadnix}/bin/deadnix --fail ${self}
-          touch $out
-        '';
-      };
+      checks =
+        let
+          # Build checks for all configurations targeting this system.
+          homeChecks = lib.mapAttrs' (name: cfg: lib.nameValuePair "home-${name}" cfg.activationPackage) (
+            lib.filterAttrs (_: cfg: cfg.pkgs.stdenv.system == system) (self.homeConfigurations or { })
+          );
+
+          darwinChecks = lib.mapAttrs' (name: cfg: lib.nameValuePair "darwin-${name}" cfg.system) (
+            lib.filterAttrs (_: cfg: cfg.pkgs.stdenv.system == system) (self.darwinConfigurations or { })
+          );
+
+          nixosChecks = lib.mapAttrs' (
+            name: cfg: lib.nameValuePair "nixos-${name}" cfg.config.system.build.toplevel
+          ) (lib.filterAttrs (_: cfg: cfg.pkgs.stdenv.system == system) (self.nixosConfigurations or { }));
+        in
+        {
+          statix = pkgs.runCommand "statix" { } ''
+            ${pkgs.statix}/bin/statix check ${self} -c ${self}/statix.toml
+            touch $out
+          '';
+          deadnix = pkgs.runCommand "deadnix" { } ''
+            ${pkgs.deadnix}/bin/deadnix --fail ${self}
+            touch $out
+          '';
+        }
+        // homeChecks
+        // darwinChecks
+        // nixosChecks;
 
       apps = {
         update-inputs = {
