@@ -17,6 +17,8 @@
           sysbench # system performance benchmark suite
         ]
         ++ lib.optionals pkgs.stdenv.isLinux [
+          sysstat
+
           # Profiling (Linux)
           perf # hardware counters, kernel-level profiling
 
