@@ -23,6 +23,7 @@
           # Tracing (Linux)
           bpftrace # eBPF-based tracing: probe syscalls, uprobes, kprobes
           bcc # BPF toolkit: Python/C library + 100 pre-built tools (funccount, trace, etc.)
+          bpftop
         ];
     };
 }
