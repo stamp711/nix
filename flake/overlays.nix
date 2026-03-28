@@ -10,12 +10,14 @@
     # };
 
     # Custom modifications to packages
-    # modifications = _: _: {
-    #   # Example: override a package
-    #   # somePackage = prev.somePackage.overrideAttrs (oldAttrs: {
-    #   #   version = "custom";
-    #   # });
-    # };
+    # TODO: Remove once NixOS/nixpkgs#502769 lands in nixpkgs-unstable
+    modifications = _: prev: {
+      direnv = prev.direnv.overrideAttrs (_: {
+        postPatch = ''
+          substituteInPlace GNUmakefile --replace-fail " -linkmode=external" ""
+        '';
+      });
+    };
 
     # Add access to x86_64 packages on Apple Silicon
     # apple-silicon =
