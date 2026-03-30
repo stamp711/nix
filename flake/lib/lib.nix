@@ -33,6 +33,26 @@ in
       ++ modules;
     };
 
+  # Create a system-manager configuration (for non-NixOS Linux).
+  mkSystem =
+    {
+      system,
+      modules ? [ ],
+    }:
+    inputs.system-manager.lib.makeSystemConfig {
+      overlays = [
+        inputs.agenix-rekey.overlays.default
+        inputs.llm-agents.overlays.default
+      ];
+      modules = [
+        {
+          nixpkgs.hostPlatform = system;
+          nixpkgs.config.allowUnfree = true;
+        }
+      ]
+      ++ modules;
+    };
+
   # Create a nix-darwin system configuration.
   mkDarwin =
     {

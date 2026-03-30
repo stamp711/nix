@@ -20,4 +20,10 @@
       self.darwinModules.my
     ];
   };
+
+  flake.profiles.systemManager.minimal = {
+    imports = [
+      self.systemModules.core
+    ];
+  };
 }

@@ -33,4 +33,10 @@
     # my.maintenance.autoUpdate = true;
     # my.maintenance.autoClean = true;
   };
+
+  flake.profiles.systemManager.headless = {
+    imports = [
+      self.profiles.systemManager.minimal
+    ];
+  };
 }

@@ -38,6 +38,14 @@
           nixosChecks = lib.mapAttrs' (
             name: cfg: lib.nameValuePair "nixos-${name}" cfg.config.system.build.toplevel
           ) (lib.filterAttrs (_: cfg: cfg.pkgs.stdenv.system == system) (self.nixosConfigurations or { }));
+
+          systemChecks =
+            lib.mapAttrs' (name: cfg: lib.nameValuePair "system-${name}" cfg.config.build.toplevel)
+              (
+                lib.filterAttrs (_: cfg: cfg.config.nixpkgs.pkgs.stdenv.system == system) (
+                  self.systemConfigs or { }
+                )
+              );
         in
         {
           statix = pkgs.runCommand "statix" { } ''
@@ -51,7 +59,8 @@
         }
         // homeChecks
         // darwinChecks
-        // nixosChecks;
+        // nixosChecks
+        // systemChecks;
 
       apps = {
         update-inputs = {
