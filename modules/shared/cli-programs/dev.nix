@@ -7,13 +7,6 @@
         # Security
         _1password-cli
 
-        # Rust
-        cargo-expand
-        cargo-feature
-        cargo-nextest
-        cargo-watch
-        rustup
-
         # Python
         uv
 
