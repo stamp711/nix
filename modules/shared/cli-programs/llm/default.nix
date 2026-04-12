@@ -21,6 +21,7 @@
         skillsDir = ./skills;
 
         settings = {
+          effortLevel = "high";
           permissions = {
             allow = [
               "WebSearch"
