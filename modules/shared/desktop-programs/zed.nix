@@ -11,7 +11,7 @@
         package = if pkgs.stdenv.isDarwin then null else pkgs.zed-editor;
         installRemoteServer = true;
         extensions = [
-          "zed-wakatime"
+          "wakatime"
           "nix"
           "xy-zed"
           "cyan-light-theme"
