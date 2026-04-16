@@ -59,6 +59,7 @@
               ];
             };
           };
+          "document_symbols" = "on";
         };
       };
     };
