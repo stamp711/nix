@@ -48,12 +48,12 @@
         skills = ./skills;
       };
 
-      # programs.codex = {
-      #   enable = true;
-      #   package = llm-agents.codex;
-      #   enableMcpIntegration = true;
-      #   skills = ./skills;
-      # };
+      programs.codex = {
+        enable = true;
+        package = llm-agents.codex;
+        enableMcpIntegration = true;
+        skills = ./skills;
+      };
 
       # programs.gemini-cli = {
       #   enable = true;
