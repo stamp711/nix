@@ -28,21 +28,29 @@
         let
           # Build checks for all configurations targeting this system.
           homeChecks = lib.mapAttrs' (name: cfg: lib.nameValuePair "home-${name}" cfg.activationPackage) (
-            lib.filterAttrs (_: cfg: cfg.pkgs.stdenv.system == system) (self.homeConfigurations or { })
+            lib.filterAttrs (_: cfg: cfg.pkgs.stdenv.hostPlatform.system == system) (
+              self.homeConfigurations or { }
+            )
           );
 
           darwinChecks = lib.mapAttrs' (name: cfg: lib.nameValuePair "darwin-${name}" cfg.system) (
-            lib.filterAttrs (_: cfg: cfg.pkgs.stdenv.system == system) (self.darwinConfigurations or { })
+            lib.filterAttrs (_: cfg: cfg.pkgs.stdenv.hostPlatform.system == system) (
+              self.darwinConfigurations or { }
+            )
           );
 
-          nixosChecks = lib.mapAttrs' (
-            name: cfg: lib.nameValuePair "nixos-${name}" cfg.config.system.build.toplevel
-          ) (lib.filterAttrs (_: cfg: cfg.pkgs.stdenv.system == system) (self.nixosConfigurations or { }));
+          nixosChecks =
+            lib.mapAttrs' (name: cfg: lib.nameValuePair "nixos-${name}" cfg.config.system.build.toplevel)
+              (
+                lib.filterAttrs (_: cfg: cfg.pkgs.stdenv.hostPlatform.system == system) (
+                  self.nixosConfigurations or { }
+                )
+              );
 
           systemChecks =
             lib.mapAttrs' (name: cfg: lib.nameValuePair "system-${name}" cfg.config.build.toplevel)
               (
-                lib.filterAttrs (_: cfg: cfg.config.nixpkgs.pkgs.stdenv.system == system) (
+                lib.filterAttrs (_: cfg: cfg.config.nixpkgs.pkgs.stdenv.hostPlatform.system == system) (
                   self.systemConfigs or { }
                 )
               );
