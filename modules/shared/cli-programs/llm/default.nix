@@ -18,7 +18,7 @@
         enable = true;
         package = llm-agents.claude-code;
         enableMcpIntegration = true;
-        skillsDir = ./skills;
+        skills = ./skills;
 
         settings = {
           effortLevel = "high";
