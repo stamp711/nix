@@ -40,7 +40,7 @@
             expand_terminal_card = false;
             enable_feedback = false;
             single_file_review = true;
-            play_sound_when_agent_done = true;
+            play_sound_when_agent_done = "when_hidden";
           };
           # Language formatters
           languages = {
