@@ -20,6 +20,7 @@
       ];
       homebrew = {
         enable = true;
+        taps = [ "buo/cask-upgrade" ];
       };
     };
 }
