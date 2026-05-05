@@ -27,6 +27,7 @@ in
     inherit system;
     modules = [
       self.profiles.homeManager.headless
+      self.homeModules.wakatime
       {
         my.primaryUser = username;
         age.rekey.hostPubkey = userPubkey;
