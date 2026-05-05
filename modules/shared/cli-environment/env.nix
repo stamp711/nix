@@ -25,13 +25,15 @@
       };
 
       programs.zsh.initContent = ''
-        zmodload zsh/net/tcp
-        if ztcp 127.0.0.1 6153 2>/dev/null; then
-          ztcp -c
-          export {http,https}_proxy="http://127.0.0.1:6152"
-          export {HTTP,HTTPS}_PROXY="http://127.0.0.1:6152"
-          export {all_proxy,ALL_PROXY}="socks5://127.0.0.1:6153"
-          export {no_proxy,NO_PROXY}="localhost,127.0.0.1,::1"
+        if [[ -z $WSL_DISTRO_NAME ]]; then
+          zmodload zsh/net/tcp
+          if ztcp 127.0.0.1 6153 2>/dev/null; then
+            ztcp -c
+            export {http,https}_proxy="http://127.0.0.1:6152"
+            export {HTTP,HTTPS}_PROXY="http://127.0.0.1:6152"
+            export {all_proxy,ALL_PROXY}="socks5://127.0.0.1:6153"
+            export {no_proxy,NO_PROXY}="localhost,127.0.0.1,::1"
+          fi
         fi
       '';
 
