@@ -7,7 +7,7 @@ host=$(hostname -s)
 # Parse JSON without jq
 cwd=$(echo "$input" | grep -o '"current_dir":"[^"]*"' | head -1 | sed 's/"current_dir":"//;s/"$//')
 model=$(echo "$input" | grep -o '"display_name":"[^"]*"' | head -1 | sed 's/"display_name":"//;s/"$//')
-used=$(echo "$input" | grep -o '"used_percentage":[0-9]*' | sed 's/"used_percentage"://')
+used=$(echo "$input" | grep -o '"used_percentage":[0-9]*' | head -1 | sed 's/"used_percentage"://')
 
 # Shorten home directory to ~
 if [ -n "$cwd" ]; then
