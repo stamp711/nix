@@ -28,7 +28,9 @@
           vim_mode = true;
           # Appearance
           ui_font_family = "Monaco Nerd Font";
+          ui_font_size = 14;
           buffer_font_family = "Monaco Nerd Font";
+          buffer_font_size = 13;
           theme = {
             mode = "system";
             light = "Modus Operandi Tinted";
