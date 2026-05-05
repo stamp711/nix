@@ -15,8 +15,8 @@
           command = "${pkgs.gersemi}/bin/gersemi";
           options = [ "-i" ];
           includes = [
-            "**/CMakeLists.txt"
-            "**/*.cmake"
+            "{,**/}CMakeLists.txt"
+            "{,**/}*.cmake"
           ];
         };
       };
