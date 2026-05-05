@@ -1,6 +1,6 @@
 { self, ... }:
 {
-  flake.homeModules.wakatime =
+  flake.homeModules.personal =
     { config, ... }:
     let
       file = ./wakatime.cfg.age;

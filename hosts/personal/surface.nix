@@ -27,11 +27,10 @@ in
     inherit system;
     modules = [
       self.profiles.homeManager.headless
-      self.homeModules.wakatime
+      self.homeModules.personal
       {
         my.primaryUser = username;
         age.rekey.hostPubkey = userPubkey;
-        my.ssh.secretConfigFiles = [ ./ssh-hosts.conf.age ];
       }
     ];
   };

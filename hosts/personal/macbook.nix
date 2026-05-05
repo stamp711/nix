@@ -17,11 +17,10 @@ in
     inherit system;
     modules = [
       self.profiles.homeManager.desktop
-      self.homeModules.wakatime
+      self.homeModules.personal
       {
         my.primaryUser = username;
         age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO1MxOTUJLMz6ehWbLVHAnhG8CR25DjmoXXUGIw3s/wN";
-        my.ssh.secretConfigFiles = [ ./ssh-hosts.conf.age ];
       }
     ];
   };

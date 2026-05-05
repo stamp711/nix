@@ -40,11 +40,10 @@ in
     inherit system;
     modules = [
       self.profiles.homeManager.desktop
-      self.homeModules.wakatime
+      self.homeModules.personal
       {
         my.primaryUser = username;
         age.rekey.hostPubkey = userPubkey;
-        my.ssh.secretConfigFiles = [ ../ssh-hosts.conf.age ];
       }
     ];
   };
