@@ -31,6 +31,7 @@
               "mcp__claude_ai_DeepWiki__ask_question"
             ]
             ++ allowRead "~/code/**"
+            ++ allowRead "~/Developer/**"
             ++ allowRead "/nix/store/**"
             ++ allowRead "/tmp/**";
           };
