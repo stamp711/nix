@@ -34,7 +34,7 @@
           theme = {
             mode = "system";
             light = "Modus Operandi Tinted";
-            dark = "XY-Zed";
+            dark = "Kanagawa Dragon - No Italics";
           };
           # LLM
           edit_predictions.mode = "subtle";
