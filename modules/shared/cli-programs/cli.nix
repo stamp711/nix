@@ -59,7 +59,6 @@
         enable = true;
         terminal = "xterm-256color";
       };
-      programs.zellij.enable = true;
 
       # Manual pages
       programs.tealdeer = {
