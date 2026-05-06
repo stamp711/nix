@@ -117,6 +117,14 @@
           document_symbols = "on";
           diagnostics.inline.enabled = true;
           inlay_hints.toggle_on_modifiers_press.control = true;
+
+          # SSH servers
+          ssh_connections = [
+            {
+              host = "NUC.home";
+              args = [ "-A" ];
+            }
+          ];
         };
       };
     };
