@@ -49,6 +49,11 @@
         }
       ];
 
+      programs.yazi = {
+        enable = true;
+        enableZshIntegration = true;
+      };
+
       # Terminal multiplexers
       programs.tmux = {
         enable = true;
