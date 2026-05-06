@@ -14,11 +14,20 @@
       # VM memory size in GiB, backed by 1G hugepages
       vmMemoryGiB = 32;
 
-      # Front panel USB ports on bus 1 (PCH xHCI controller)
-      vmFrontPanelPorts = [
-        9
-        10
-        11
+      # USB ports on bus 1 (PCH xHCI controller)
+      vmUsbPassthroughPorts = [
+        9 # front left
+        10 # front right
+        11 # front USB-C
+      ];
+
+      # USB devices by VID:PID
+      vmUsbPassthroughIds = [
+        # 8BitDo Ultimate 2
+        {
+          vendor = "2dc8";
+          product = "6013";
+        }
       ];
 
       pci = bus: slot: function: {
@@ -64,17 +73,31 @@
         done
       '';
 
-      # Callback: scan front-panel USB ports and attach connected devices
+      # Callback: replay "add" uevents so the udev rules below attach already-connected devices.
       usbPassthroughScan = pkgs.writeShellScript "usb-passthrough-scan" ''
         VM="$1"
-        echo "Scanning front-panel USB ports for $VM"
-        for PORT in ${builtins.concatStringsSep " " (map toString vmFrontPanelPorts)}; do
-          SYSPATH="/sys/bus/usb/devices/1-$PORT"
-          [ -f "$SYSPATH/busnum" ] && ${virshUsbPassthrough} attach "$VM" "$SYSPATH"
-        done
+        echo "Re-firing USB add events to trigger passthrough for $VM"
+
+        # Ports
+        ${builtins.concatStringsSep "\n" (
+          map (
+            port:
+            "${pkgs.systemd}/bin/udevadm trigger --action=add --subsystem-match=usb --attr-match=busnum=1 --attr-match=devpath=${toString port}"
+          ) vmUsbPassthroughPorts
+        )}
+
+        # VID:PID
+        ${builtins.concatStringsSep "\n" (
+          map (
+            id:
+            "${pkgs.systemd}/bin/udevadm trigger --action=add --subsystem-match=usb --attr-match=idVendor=${id.vendor} --attr-match=idProduct=${id.product}"
+          ) vmUsbPassthroughIds
+        )}
       '';
 
-      # Attach/detach a single USB device (by sysfs path) to a VM via virsh
+      # Attach/detach a single USB device (by sysfs path) to a VM via virsh.
+      # Idempotent: skips if the (bus, dev) pair is already in the desired state.
+      # Serialized per-VM via flock to close TOCTOU races between concurrent invocations.
       virshUsbPassthrough = pkgs.writeShellScript "virsh-usb-passthrough" ''
         ACTION="$1"   # attach or detach
         VM="$2"       # VM name
@@ -88,8 +111,41 @@
           exit 0
         fi
 
+        # Serialize concurrent attach/detach for this VM
+        LOCK="/run/virsh-usb-passthrough.$VM.lock"
+        exec 9>"$LOCK"
+        ${pkgs.util-linux}/bin/flock -w 30 9 || { echo "timed out waiting for $LOCK"; exit 1; }
+
+        # Re-check post-lock: device may have been hot-removed during the wait
+        if [ ! -f "$SYSPATH/busnum" ] || [ ! -f "$SYSPATH/devnum" ]; then
+          echo "device gone at $SYSPATH, skipping $ACTION"
+          exit 0
+        fi
+
         BUSNUM=$(cat "$SYSPATH/busnum")
         DEVNUM=$(cat "$SYSPATH/devnum")
+
+        if "$VIRSH" dumpxml "$VM" 2>/dev/null | grep -qE "bus='$BUSNUM'[[:space:]]+device='$DEVNUM'/>"; then
+          ATTACHED=1
+        else
+          ATTACHED=0
+        fi
+
+        case "$ACTION" in
+          attach)
+            if [ "$ATTACHED" -eq 1 ]; then
+              echo "bus=$BUSNUM dev=$DEVNUM already attached to $VM"
+              exit 0
+            fi
+            ;;
+          detach)
+            if [ "$ATTACHED" -eq 0 ]; then
+              echo "bus=$BUSNUM dev=$DEVNUM not attached to $VM"
+              exit 0
+            fi
+            ;;
+        esac
+
         echo "$ACTION bus=$BUSNUM dev=$DEVNUM ($SYSPATH) -> $VM"
 
         XML="<hostdev mode='subsystem' type='usb' managed='yes'>
@@ -308,11 +364,14 @@
           };
         };
 
-        # Hot-plug: attach USB devices on front panel ports when plugged in while VM is running
+        # Hot-plug: attach configured USB devices when plugged in while VM is running
         services.udev.extraRules = builtins.concatStringsSep "\n" (
-          map (port: ''
+          (map (port: ''
             ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTR{busnum}=="1", ATTR{devpath}=="${toString port}", RUN+="${virshUsbPassthrough} attach win11 /sys$env{DEVPATH}"
-          '') vmFrontPanelPorts
+          '') vmUsbPassthroughPorts)
+          ++ (map (id: ''
+            ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTR{idVendor}=="${id.vendor}", ATTR{idProduct}=="${id.product}", RUN+="${virshUsbPassthrough} attach win11 /sys$env{DEVPATH}"
+          '') vmUsbPassthroughIds)
         );
 
         environment.systemPackages = [ pkgs.virt-manager ];
