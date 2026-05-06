@@ -23,10 +23,15 @@
 
       # USB devices by VID:PID
       vmUsbPassthroughIds = [
-        # 8BitDo Ultimate 2
+        # 8BitDo Ultimate 2 (docked)
         {
           vendor = "2dc8";
           product = "6013";
+        }
+        # 8BitDo 8BitDo Ultimate 2 Wireless Controller for PC (undocked)
+        {
+          vendor = "2dc8";
+          product = "310b";
         }
       ];
 
@@ -51,12 +56,13 @@
         VIRSH="${pkgs.libvirt}/bin/virsh"
 
         # Catch VM already running (delayed to let event listener connect first)
-        (sleep 5 && "$VIRSH" domstate "$VM" 2>/dev/null | grep -qE 'running|paused' && "$CALLBACK" "$VM") &
+        (sleep 5 && "$VIRSH" domstate "$VM" 2>/dev/null | grep -qE 'running|paused' && echo "VM already running, running callback" && "$CALLBACK" "$VM") &
 
         # Watch for all future events, filter by pattern
         "$VIRSH" event --domain "$VM" --all --loop | while read -r line; do
           echo "$line"
           if echo "$line" | grep -qiE "$PATTERN"; then
+            echo "Matched pattern '$PATTERN', running callback"
             "$CALLBACK" "$VM"
           fi
         done
@@ -249,6 +255,14 @@
             (pci 8 0 0) # TB4 NHI              (08:00.0)
             (pci (lib.fromHexString "3c") 0 0) # TB4 USB  (3c:00.0)
           ];
+          # Bump USB hostdev capacity from default 4 to 15 (qemu-xhci max)
+          controller = [
+            {
+              type = "usb";
+              model = "qemu-xhci";
+              ports = 15;
+            }
+          ];
           channel = [
             {
               type = "unix";
@@ -337,7 +351,7 @@
 
         # Auto-passthrough front panel USB ports to win11 VM on start
         systemd.services.win11-usb-passthrough-watcher = {
-          description = "Watch for win11 VM starts and attach front-panel USB devices";
+          description = "Watch for win11 VM starts and attach USB devices";
           after = [ "libvirtd.service" ];
           wantedBy = [ "multi-user.target" ];
           serviceConfig = {
