@@ -113,6 +113,18 @@
               YAML.formatter = prettierFormatter;
             };
 
+          lsp.clangd = {
+            "binary" = {
+              "arguments" = [
+                "--background-index"
+                "--clang-tidy"
+                "--completion-style=detailed"
+                "--function-arg-placeholders=0"
+                "--all-scopes-completion"
+              ];
+            };
+          };
+
           code_lens = "on";
           document_symbols = "on";
           diagnostics.inline.enabled = true;
