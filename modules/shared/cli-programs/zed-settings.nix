@@ -51,12 +51,13 @@
           ui_font_size = 14;
           buffer_font_family = "Monaco Nerd Font";
           buffer_font_size = 13;
-          tabs.git_status = true;
           theme = {
             mode = "system";
             light = "Modus Operandi Tinted";
             dark = "Kanagawa Dragon - No Italics";
           };
+          tabs.git_status = true;
+          relative_line_numbers = "enabled";
 
           # Behaviour
           format_on_save = "on";
