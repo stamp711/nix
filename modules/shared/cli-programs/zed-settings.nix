@@ -126,6 +126,7 @@
           document_symbols = "on";
           diagnostics.inline.enabled = true;
           inlay_hints.toggle_on_modifiers_press.control = true;
+          inlay_hints.show_background = true;
 
           # SSH servers
           ssh_connections = [
