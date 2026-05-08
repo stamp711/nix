@@ -10,6 +10,10 @@
         enableZshIntegration = false;
         autoMigrate = true; # auto migrate existing Homebrew installation
         user = config.my.primaryUser;
+        taps = {
+          "homebrew/homebrew-core" = inputs.homebrew-core;
+          "homebrew/homebrew-cask" = inputs.homebrew-cask;
+        };
       };
       # https://github.com/zhaofengli/nix-homebrew/issues/77
       environment.systemPackages = [
@@ -20,7 +24,7 @@
       ];
       homebrew = {
         enable = true;
-        taps = [ "buo/cask-upgrade" ];
+        taps = builtins.attrNames config.nix-homebrew.taps;
       };
     };
 }
