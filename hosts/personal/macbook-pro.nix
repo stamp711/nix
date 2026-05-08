@@ -1,7 +1,7 @@
 { self, ... }:
 let
   username = "stamp";
-  hostname = "Lius-MacBook";
+  hostname = "Lius-MacBook-Pro";
   system = "aarch64-darwin";
 in
 {
@@ -20,7 +20,7 @@ in
       self.homeModules.personal
       {
         my.primaryUser = username;
-        age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOPY4NM06jrH6RsmcDvJaV0qzCLjQofmCDET89fIzyBK";
+        age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO1MxOTUJLMz6ehWbLVHAnhG8CR25DjmoXXUGIw3s/wN";
       }
     ];
   };
