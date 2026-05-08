@@ -110,15 +110,20 @@
               YAML.formatter = prettierFormatter;
             };
 
-          lsp.clangd = {
-            "binary" = {
-              "arguments" = [
-                "--background-index"
-                "--clang-tidy"
-                "--completion-style=detailed"
-                "--function-arg-placeholders=0"
-                "--all-scopes-completion"
-              ];
+          lsp = {
+            clangd.binary.arguments = [
+              "--background-index"
+              "--clang-tidy"
+              "--completion-style=detailed"
+              "--function-arg-placeholders=0"
+              "--all-scopes-completion"
+            ];
+            nil.settings.nix = {
+              maxMemoryMB = 4096;
+              flake = {
+                autoArchive = true;
+                autoEvalInputs = true;
+              };
             };
           };
 
