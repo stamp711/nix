@@ -51,11 +51,21 @@
         url."ssh://git@code.byted.org/".insteadOf = "https://code.byted.org/";
       };
 
-      # Delta diff viewer
+      # Diff viewers
+      programs.difftastic.enable = true;
+      programs.difftastic.options.display = "side-by-side-show-both";
+      # programs.difftastic.git.enable = true;
+      # programs.difftastic.git.diffToolMode = true;
+      # programs.difftastic.jujutsu.enable = true;
+
       programs.delta.enable = true;
       programs.delta.enableGitIntegration = true;
       programs.delta.enableJujutsuIntegration = true;
       programs.delta.options.side-by-side = true;
+
+      programs.mergiraf.enable = true;
+      programs.mergiraf.enableGitIntegration = true;
+      programs.mergiraf.enableJujutsuIntegration = true;
 
       # Global ignores
       programs.git.ignores = [
