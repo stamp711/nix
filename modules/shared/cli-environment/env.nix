@@ -6,7 +6,6 @@
       home.sessionPath = [
         "$HOME/.local/bin"
         "$VOLTA_HOME/bin"
-        "$HOME/.cargo/bin"
         "/opt/homebrew/bin"
       ];
 
