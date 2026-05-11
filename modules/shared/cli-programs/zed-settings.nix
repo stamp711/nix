@@ -29,6 +29,11 @@
             bindings."s" = "vim::PushSneak";
             bindings."shift-s" = "vim::PushSneakBackward";
           }
+          {
+            context = "VimControl && !menu";
+            bindings."ctrl-j" = "vim::ScrollDown";
+            bindings."ctrl-k" = "vim::ScrollUp";
+          }
         ];
 
         mutableUserSettings = false;
