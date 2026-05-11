@@ -23,14 +23,16 @@
         zsh-trace = "zsh-trace-startup";
       };
 
+      my.services.glider-proxy.enable = true;
+
       programs.zsh.initContent = ''
         if [[ -z $WSL_DISTRO_NAME ]]; then
           zmodload zsh/net/tcp
-          if ztcp 127.0.0.1 6153 2>/dev/null; then
+          if ztcp 127.0.0.1 6154 2>/dev/null; then
             ztcp -c
-            export {http,https}_proxy="http://127.0.0.1:6152"
-            export {HTTP,HTTPS}_PROXY="http://127.0.0.1:6152"
-            export {all_proxy,ALL_PROXY}="socks5://127.0.0.1:6153"
+            export {http,https}_proxy="http://127.0.0.1:6154"
+            export {HTTP,HTTPS}_PROXY="http://127.0.0.1:6154"
+            export {all_proxy,ALL_PROXY}="socks5://127.0.0.1:6154"
             export {no_proxy,NO_PROXY}="localhost,127.0.0.1,::1"
           fi
         fi
