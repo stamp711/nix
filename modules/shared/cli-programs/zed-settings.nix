@@ -20,34 +20,53 @@
         userKeymaps = [
           {
             bindings."ctrl-\\" = "workspace::NewCenterTerminal";
+            bindings."alt-o" = "editor::SwitchSourceHeader";
           }
           {
-            bindings."alt-o" = "editor::SwitchSourceHeader";
+            context = "Editor";
+            bindings."ctrl ctrl" = "editor::ScrollCursorCenter";
           }
           {
             context = "vim_mode == normal || vim_mode == visual";
             bindings."s" = "vim::PushSneak";
             bindings."shift-s" = "vim::PushSneakBackward";
+            bindings."g w" = "vim::HelixJumpToWord";
           }
-          {
-            context = "VimControl && !menu";
-            bindings."ctrl-j" = [
-              "workspace::SendKeystrokes"
-              "4 down"
-            ];
-            bindings."ctrl-k" = [
-              "workspace::SendKeystrokes"
-              "4 up"
-            ];
-            bindings."alt-j" = [
-              "workspace::SendKeystrokes"
-              "4 ctrl-e"
-            ];
-            bindings."alt-k" = [
-              "workspace::SendKeystrokes"
-              "4 ctrl-y"
-            ];
-          }
+          (
+            let
+              lines = 2;
+              sequence = actions: [
+                "action::Sequence"
+                actions
+              ];
+              repeat = count: xs: builtins.concatLists (lib.replicate count xs);
+            in
+            {
+              context = "VimControl && !menu";
+              bindings."j" = sequence [
+                "vim::Down"
+                # "editor::LineDown"
+              ];
+              bindings."k" = sequence [
+                "vim::Up"
+                # "editor::LineUp"
+              ];
+              bindings."ctrl-j" = sequence (
+                repeat lines [
+                  "vim::Down"
+                  # "editor::LineDown"
+                ]
+              );
+              bindings."ctrl-k" = sequence (
+                repeat lines [
+                  "vim::Up"
+                  # "editor::LineUp"
+                ]
+              );
+              bindings."alt-j" = sequence (repeat lines [ "editor::LineUp" ]);
+              bindings."alt-k" = sequence (repeat lines [ "editor::LineDown" ]);
+            }
+          )
         ];
 
         mutableUserSettings = false;
@@ -58,6 +77,7 @@
           cursor_blink = false;
           session.trust_all_worktrees = true;
           vim_mode = true;
+          vertical_scroll_margin = 20;
 
           # Layout
           outline_panel.dock = "left";
