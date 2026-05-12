@@ -31,8 +31,22 @@
           }
           {
             context = "VimControl && !menu";
-            bindings."ctrl-j" = "vim::ScrollDown";
-            bindings."ctrl-k" = "vim::ScrollUp";
+            bindings."ctrl-j" = [
+              "workspace::SendKeystrokes"
+              "4 down"
+            ];
+            bindings."ctrl-k" = [
+              "workspace::SendKeystrokes"
+              "4 up"
+            ];
+            bindings."alt-j" = [
+              "workspace::SendKeystrokes"
+              "4 ctrl-e"
+            ];
+            bindings."alt-k" = [
+              "workspace::SendKeystrokes"
+              "4 ctrl-y"
+            ];
           }
         ];
 
