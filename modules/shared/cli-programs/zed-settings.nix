@@ -43,28 +43,18 @@
             in
             {
               context = "VimControl && !menu";
-              bindings."j" = sequence [
+              bindings."j" = sequence [ "vim::Down" ];
+              bindings."k" = sequence [ "vim::Up" ];
+              bindings."ctrl-j" = sequence [
                 "vim::Down"
-                # "editor::LineDown"
+                "editor::LineDown"
               ];
-              bindings."k" = sequence [
+              bindings."ctrl-k" = sequence [
                 "vim::Up"
-                # "editor::LineUp"
+                "editor::LineUp"
               ];
-              bindings."ctrl-j" = sequence (
-                repeat lines [
-                  "vim::Down"
-                  # "editor::LineDown"
-                ]
-              );
-              bindings."ctrl-k" = sequence (
-                repeat lines [
-                  "vim::Up"
-                  # "editor::LineUp"
-                ]
-              );
-              bindings."alt-j" = sequence (repeat lines [ "editor::LineUp" ]);
-              bindings."alt-k" = sequence (repeat lines [ "editor::LineDown" ]);
+              bindings."alt-j" = sequence (repeat lines [ "editor::LineDown" ]);
+              bindings."alt-k" = sequence (repeat lines [ "editor::LineUp" ]);
             }
           )
         ];
