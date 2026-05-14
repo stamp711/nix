@@ -23,10 +23,6 @@
             bindings."alt-o" = "editor::SwitchSourceHeader";
           }
           {
-            context = "Editor";
-            bindings."ctrl ctrl" = "editor::ScrollCursorCenter";
-          }
-          {
             context = "vim_mode == normal || vim_mode == visual";
             bindings."s" = "vim::PushSneak";
             bindings."shift-s" = "vim::PushSneakBackward";
