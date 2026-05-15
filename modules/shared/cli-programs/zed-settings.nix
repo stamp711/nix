@@ -79,7 +79,7 @@
           theme = {
             mode = "system";
             light = "Modus Operandi Tinted";
-            dark = "Kanagawa Dragon - No Italics";
+            dark = "Gruvbox Dark";
           };
           tabs.git_status = true;
           sticky_scroll.enabled = true;
