@@ -10,12 +10,16 @@
     # };
 
     # Custom modifications to packages
-    # TODO: Remove once NixOS/nixpkgs#502769 lands in nixpkgs-unstable
     modifications = _: prev: {
+      # TODO: Remove once NixOS/nixpkgs#502769 lands in nixos-unstable
       direnv = prev.direnv.overrideAttrs (_: {
         postPatch = ''
           substituteInPlace GNUmakefile --replace-fail " -linkmode=external" ""
         '';
+      });
+      # TODO: Remove once NixOS/nixpkgs#515956 lands in nixos-unstable
+      openldap = prev.openldap.overrideAttrs (_: {
+        doCheck = false;
       });
     };
 
