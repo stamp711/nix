@@ -37,4 +37,15 @@
         monaco-nerd-font
       ];
     };
+
+  flake.nixosModules.desktop-environment =
+    { pkgs, ... }:
+    {
+      fonts.packages = with pkgs; [
+        source-han-sans
+        source-han-serif
+        sarasa-gothic
+        lxgw-wenkai
+      ];
+    };
 }

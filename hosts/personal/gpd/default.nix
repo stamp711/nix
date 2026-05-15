@@ -11,6 +11,7 @@ in
     inherit system;
     modules = [
       self.profiles.nixos.desktop
+      self.nixosModules.linux-gaming
       inputs.nixos-hardware.nixosModules.gpd-pocket-4
       ./hardware.nix
       ./lte.nix
@@ -25,9 +26,6 @@ in
           device = "/dev/nvme0n1";
           swapSize = "32G";
         };
-
-        programs.steam.enable = true;
-        programs.steam.gamescopeSession.enable = true;
       }
     ];
   };
@@ -37,6 +35,7 @@ in
     modules = [
       self.profiles.homeManager.desktop
       self.homeModules.personal
+      self.homeModules.linux-gaming
       {
         my.primaryUser = username;
         age.rekey.hostPubkey = userPubkey;

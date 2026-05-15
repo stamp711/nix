@@ -18,6 +18,13 @@
       # Intel iGPU for host display
       hardware.graphics.enable = true;
 
+      # NVIDIA proprietary driver with open kernel module
+      services.xserver.videoDrivers = [ "nvidia" ];
+      hardware.nvidia = {
+        open = true;
+        modesetting.enable = true;
+      };
+
       # Disable Energy Efficient Ethernet on igc NIC to prevent link flapping
       services.udev.extraRules = ''
         ACTION=="add", SUBSYSTEM=="net", DRIVERS=="igc", RUN+="${pkgs.ethtool}/bin/ethtool --set-eee $name eee off"

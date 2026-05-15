@@ -17,6 +17,7 @@ in
       self.profiles.nixos.desktop
       self.nixosModules.nuc-hardware
       self.nixosModules.nuc-vm
+      self.nixosModules.linux-gaming
       {
         my.primaryUser = username;
         networking.hostName = hostname;
@@ -41,6 +42,7 @@ in
     modules = [
       self.profiles.homeManager.desktop
       self.homeModules.personal
+      self.homeModules.linux-gaming
       {
         my.primaryUser = username;
         age.rekey.hostPubkey = userPubkey;
