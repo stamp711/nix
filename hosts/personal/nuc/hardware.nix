@@ -21,7 +21,7 @@
       # NVIDIA proprietary driver with open kernel module
       services.xserver.videoDrivers = [ "nvidia" ];
       hardware.nvidia = {
-        open = true;
+        open = false;
         modesetting.enable = true;
       };
 
