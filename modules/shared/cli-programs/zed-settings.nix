@@ -82,6 +82,7 @@
             dark = "Kanagawa Dragon - No Italics";
           };
           tabs.git_status = true;
+          sticky_scroll.enabled = true;
 
           # Behaviour
           format_on_save = "on";
