@@ -21,6 +21,8 @@
           {
             bindings."ctrl-\\" = "workspace::NewCenterTerminal";
             bindings."alt-o" = "editor::SwitchSourceHeader";
+            bindings."cmd-[" = "workspace::ActivatePreviousPane";
+            bindings."cmd-]" = "workspace::ActivateNextPane";
           }
           {
             context = "vim_mode == normal || vim_mode == visual";
