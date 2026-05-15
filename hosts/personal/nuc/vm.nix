@@ -294,9 +294,7 @@
       };
     in
     {
-      options.my.win11-vm.enable = lib.mkEnableOption "Windows 11 VM with VFIO GPU passthrough" // {
-        default = true;
-      };
+      options.my.win11-vm.enable = lib.mkEnableOption "Windows 11 VM with VFIO GPU passthrough";
 
       imports = [ inputs.NixVirt.nixosModules.default ];
 

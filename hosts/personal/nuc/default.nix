@@ -28,9 +28,9 @@ in
         systemd.targets.hibernate.enable = false;
         systemd.targets.hybrid-sleep.enable = false;
 
-        specialisation.desktop.configuration = {
-          system.nixos.tags = [ "desktop" ];
-          my.win11-vm.enable = false;
+        specialisation.vm.configuration = {
+          system.nixos.tags = [ "vm" ];
+          my.win11-vm.enable = true;
         };
       }
     ];
