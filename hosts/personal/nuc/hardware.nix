@@ -20,10 +20,7 @@
 
       # NVIDIA proprietary driver with open kernel module
       services.xserver.videoDrivers = [ "nvidia" ];
-      hardware.nvidia = {
-        open = false;
-        modesetting.enable = true;
-      };
+      hardware.nvidia.open = true;
 
       # Disable Energy Efficient Ethernet on igc NIC to prevent link flapping
       services.udev.extraRules = ''
