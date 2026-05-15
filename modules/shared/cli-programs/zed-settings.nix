@@ -157,7 +157,7 @@
           diagnostics.inline.enabled = true;
           inlay_hints.toggle_on_modifiers_press.control = true;
           inlay_hints.show_background = true;
-          auto_signature_help = true;
+          show_signature_help_after_edits = true;
 
           # SSH servers
           ssh_connections = [
