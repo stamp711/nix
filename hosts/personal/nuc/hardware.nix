@@ -39,6 +39,22 @@
         efiDeviceHandle = "HD2b";
       };
 
+      # Keep Windows Boot Manager NVRAM entry inactive so it doesn't self-promote.
+      # https://www.yhi.moe/blog/en/preventing-windows-from-modifying-your-uefi-boot-sequence
+      systemd.services.deactivate-windows-boot-entry = {
+        description = "Deactivate Windows Boot Manager NVRAM entry";
+        wantedBy = [ "multi-user.target" ];
+        path = [ pkgs.efibootmgr ];
+        serviceConfig.Type = "oneshot";
+        script = ''
+          efibootmgr | grep -E '^Boot[0-9A-Fa-f]{4}\* Windows Boot Manager' | while read -r line; do
+            num="''${line:4:4}"
+            echo "Deactivating: $line"
+            efibootmgr --bootnum "$num" --inactive
+          done
+        '';
+      };
+
       boot.initrd.availableKernelModules = [
         "nvme"
         "xhci_pci"
