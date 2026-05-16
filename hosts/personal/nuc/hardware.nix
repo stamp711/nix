@@ -33,6 +33,12 @@
         device = "/dev/disk/by-id/nvme-Samsung_SSD_990_PRO_1TB_S6Z1NJ0W395410E";
         swapSize = "16G";
       };
+
+      boot.loader.systemd-boot.windows."11" = {
+        title = "Windows 11";
+        efiDeviceHandle = "HD2b";
+      };
+
       boot.initrd.availableKernelModules = [
         "nvme"
         "xhci_pci"
@@ -41,6 +47,7 @@
         "thunderbolt"
         "tpm_crb"
       ];
+
       boot.kernelParams = [
         "intel_iommu=on"
         "iommu=pt"
