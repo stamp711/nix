@@ -22,45 +22,48 @@
           enable = true;
           package = null; # nixosModule handles the binary
           portalPackage = null; # nixosModule handles the portal
-          settings = {
-            "$mod" = "SUPER";
+          settings =
+            let
+              bind = key: lua: {
+                _args = [
+                  key
+                  (lib.generators.mkLuaInline lua)
+                ];
+              };
+            in
+            {
+              bind = [
+                # App launchers
+                (bind "SUPER + RETURN" ''hl.dsp.exec_cmd("ghostty")'')
 
-            monitor = [ ", preferred, auto, auto" ];
+                # Window management
+                (bind "SUPER + Q" "hl.dsp.window.close()")
+                (bind "SUPER + V" ''hl.dsp.window.float({ action = "toggle" })'')
+                (bind "SUPER + F" ''hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" })'')
 
-            bind = [
-              # App launchers
-              "$mod, RETURN, exec, ghostty"
+                # Focus
+                (bind "SUPER + H" ''hl.dsp.focus({ direction = "left" })'')
+                (bind "SUPER + L" ''hl.dsp.focus({ direction = "right" })'')
+                (bind "SUPER + K" ''hl.dsp.focus({ direction = "up" })'')
+                (bind "SUPER + J" ''hl.dsp.focus({ direction = "down" })'')
 
-              # Window management
-              "$mod, Q, killactive"
-              "$mod, V, togglefloating"
-              "$mod, F, fullscreen, 0"
+                # Workspaces
+                (bind "SUPER + 1" "hl.dsp.focus({ workspace = 1 })")
+                (bind "SUPER + 2" "hl.dsp.focus({ workspace = 2 })")
+                (bind "SUPER + 3" "hl.dsp.focus({ workspace = 3 })")
+                (bind "SUPER + 4" "hl.dsp.focus({ workspace = 4 })")
+                (bind "SUPER + 5" "hl.dsp.focus({ workspace = 5 })")
+                (bind "SUPER + SHIFT + 1" "hl.dsp.window.move({ workspace = 1 })")
+                (bind "SUPER + SHIFT + 2" "hl.dsp.window.move({ workspace = 2 })")
+                (bind "SUPER + SHIFT + 3" "hl.dsp.window.move({ workspace = 3 })")
+                (bind "SUPER + SHIFT + 4" "hl.dsp.window.move({ workspace = 4 })")
+                (bind "SUPER + SHIFT + 5" "hl.dsp.window.move({ workspace = 5 })")
 
-              # Focus
-              "$mod, H, movefocus, l"
-              "$mod, L, movefocus, r"
-              "$mod, K, movefocus, u"
-              "$mod, J, movefocus, d"
-
-              # Workspaces
-              "$mod, 1, workspace, 1"
-              "$mod, 2, workspace, 2"
-              "$mod, 3, workspace, 3"
-              "$mod, 4, workspace, 4"
-              "$mod, 5, workspace, 5"
-              "$mod SHIFT, 1, movetoworkspace, 1"
-              "$mod SHIFT, 2, movetoworkspace, 2"
-              "$mod SHIFT, 3, movetoworkspace, 3"
-              "$mod SHIFT, 4, movetoworkspace, 4"
-              "$mod SHIFT, 5, movetoworkspace, 5"
-
-              # Pop-up terminal (scratchpad)
-              "$mod, GRAVE, togglespecialworkspace, term"
-              "$mod SHIFT, GRAVE, movetoworkspacesilent, special:term"
-            ];
-
-            animations.enabled = true;
-          };
+                # Pop-up terminal (scratchpad)
+                (bind "SUPER + GRAVE" ''hl.dsp.workspace.toggle_special("term")'')
+                (bind "SUPER + SHIFT + GRAVE" ''hl.dsp.window.move({ workspace = "special:term", follow = false })'')
+              ];
+            };
         };
       };
     };
