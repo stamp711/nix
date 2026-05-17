@@ -10,11 +10,12 @@
 
       # Screen locker via waylock
       environment.systemPackages = [ pkgs.waylock ];
+      security.pam.services.waylock = { };
       # https://git.sr.ht/~whynothugo/systemd-lock-handler
       services.systemd-lock-handler.enable = true;
       systemd.user.services.waylock = {
         description = "Screen locker (waylock)";
-        # If swaylock exits cleanly, unlock the session:
+        # If waylock exits cleanly, unlock the session:
         onSuccess = [ "unlock.target" ];
         # When lock.target is stopped, stops this too:
         partOf = [ "lock.target" ];
