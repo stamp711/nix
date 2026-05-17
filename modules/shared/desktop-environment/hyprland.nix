@@ -15,7 +15,8 @@
       config = lib.mkIf pkgs.stdenv.isLinux {
         programs.caelestia = {
           enable = true;
-          systemd.target = "hyprland-session.target";
+          # Scope to Hyprland-UWSM session; default is config.wayland.systemd.target and leaks into other DEs.
+          systemd.target = "wayland-session-xdg-autostart@hyprland.desktop.target";
         };
 
         wayland.windowManager.hyprland = {
