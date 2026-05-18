@@ -22,6 +22,7 @@
 
         settings = {
           effortLevel = "high";
+          tui = "fullscreen";
           permissions = {
             allow = [
               "WebSearch"
