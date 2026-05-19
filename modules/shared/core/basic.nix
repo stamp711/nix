@@ -12,7 +12,7 @@
       programs.ssh = {
         enable = true;
         enableDefaultConfig = false;
-        matchBlocks."*".extraOptions.StrictHostKeyChecking = "accept-new";
+        settings."*".StrictHostKeyChecking = "accept-new";
       };
 
       programs.nh.enable = true;
