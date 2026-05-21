@@ -23,6 +23,7 @@
         settings = {
           effortLevel = "high";
           tui = "fullscreen";
+          worktree.bgIsolation = "none";
           permissions = {
             allow = [
               "WebSearch"
