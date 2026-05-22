@@ -13,6 +13,7 @@ in
   ];
   flake.nixosConfigurations.${hostname} = self.lib.mkNixos {
     inherit system;
+    nixpkgsConfig.cudaSupport = true;
     modules = [
       self.profiles.nixos.desktop
       self.nixosModules.nuc-hardware

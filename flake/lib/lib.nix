@@ -5,10 +5,16 @@ in
 {
   # Create a nixpkgs instance with our standard configuration.
   mkPkgs =
-    system:
+    {
+      system,
+      config ? { },
+    }:
     import inputs.nixpkgs {
       inherit system;
-      config.allowUnfree = true;
+      config = {
+        allowUnfree = true;
+      }
+      // config;
       overlays = builtins.attrValues self.overlays ++ [
         inputs.agenix-rekey.overlays.default
         inputs.llm-agents.overlays.default
@@ -20,6 +26,7 @@ in
   mkNixos =
     {
       system,
+      nixpkgsConfig ? { },
       modules ? [ ],
     }:
     lib.nixosSystem {
@@ -28,7 +35,12 @@ in
         inputs.disko.nixosModules.disko
         inputs.agenix.nixosModules.default
         inputs.agenix-rekey.nixosModules.default
-        { nixpkgs.pkgs = self.lib.mkPkgs system; }
+        {
+          nixpkgs.pkgs = self.lib.mkPkgs {
+            inherit system;
+            config = nixpkgsConfig;
+          };
+        }
       ]
       ++ modules;
     };
@@ -63,7 +75,7 @@ in
       inherit system;
       modules = [
         inputs.nix-homebrew.darwinModules.nix-homebrew
-        { nixpkgs.pkgs = self.lib.mkPkgs system; }
+        { nixpkgs.pkgs = self.lib.mkPkgs { inherit system; }; }
       ]
       ++ modules;
     };
@@ -75,7 +87,7 @@ in
       modules ? [ ],
     }:
     inputs.home-manager.lib.homeManagerConfiguration {
-      pkgs = self.lib.mkPkgs system;
+      pkgs = self.lib.mkPkgs { inherit system; };
       modules = [
         inputs.agenix.homeManagerModules.default
         # TODO: use inputs.agenix-rekey.homeManagerModules.default once

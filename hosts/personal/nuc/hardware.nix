@@ -22,8 +22,6 @@
       services.xserver.videoDrivers = [ "nvidia" ];
       hardware.nvidia.open = true;
 
-      services.wivrn.package = pkgs.wivrn.override { cudaSupport = true; };
-
       # Disable Energy Efficient Ethernet on igc NIC to prevent link flapping
       services.udev.extraRules = ''
         ACTION=="add", SUBSYSTEM=="net", DRIVERS=="igc", RUN+="${pkgs.ethtool}/bin/ethtool --set-eee $name eee off"

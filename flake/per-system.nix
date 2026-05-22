@@ -22,7 +22,7 @@
           ln -s $out/share/zsh-bench/human-bench $out/bin/human-bench
         '';
       };
-      _module.args.pkgs = self.lib.mkPkgs system;
+      _module.args.pkgs = self.lib.mkPkgs { inherit system; };
 
       checks =
         let
