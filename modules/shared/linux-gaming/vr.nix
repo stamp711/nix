@@ -1,28 +1,25 @@
 {
-  flake.nixosModules.linux-gaming =
-    { pkgs, ... }:
-    {
-      services.wivrn = {
+  flake.nixosModules.linux-gaming = {
+    services.wivrn = {
+      enable = true;
+      # package = pkgs.wivrn.override { cudaSupport = true; }; # override moved to NUC hardware.nix
+      autoStart = true;
+      openFirewall = true;
+      highPriority = true;
+      steam.importOXRRuntimes = true;
+      config = {
         enable = true;
-        # package = pkgs.wivrn.override { cudaSupport = true; }; # override moved to NUC hardware.nix
-        autoStart = true;
-        openFirewall = true;
-        highPriority = true;
-        steam.importOXRRuntimes = true;
-        config = {
-          enable = true;
-          json = {
-            bit-depth = 10;
-            application = [ pkgs.wayvr ];
-            hid-forwarding = true;
-          };
+        json = {
+          bit-depth = 10;
+          hid-forwarding = true;
         };
       };
-      programs.alvr = {
-        enable = true;
-        openFirewall = true;
-      };
     };
+    programs.alvr = {
+      enable = true;
+      openFirewall = true;
+    };
+  };
 
   flake.homeModules.linux-gaming =
     {
@@ -32,7 +29,10 @@
       ...
     }:
     {
-      home.packages = [ pkgs.xrizer ];
+      home.packages = [
+        pkgs.xrizer
+        pkgs.wayvr
+      ];
 
       # Register xrizer as the OpenVR runtime so OpenVR games forward through
       # xrizer ➡️ OpenXR ➡️ WiVRn instead of looking for SteamVR.
