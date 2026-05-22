@@ -5,7 +5,18 @@
       users.users.${config.my.primaryUser} = {
         uid = 1000;
         isNormalUser = true;
-        extraGroups = [ "wheel" ];
+        extraGroups = [
+          "wheel"
+          "networkmanager"
+
+          "video"
+          "render"
+          "input"
+          "uinput"
+          "dialout"
+          "kvm"
+          "tss" # TPM access
+        ];
       };
     };
 
