@@ -1,10 +1,17 @@
+{ self, ... }:
+let
+  passwordSecretName = self.lib.ageSecretName ./password.age;
+in
 {
   flake.nixosModules.core =
     { config, ... }:
     {
+      age.secrets.${passwordSecretName}.rekeyFile = ./password.age;
+
       users.users.${config.my.primaryUser} = {
         uid = 1000;
         isNormalUser = true;
+        hashedPasswordFile = config.age.secrets.${passwordSecretName}.path;
         extraGroups = [
           "wheel"
           "networkmanager"

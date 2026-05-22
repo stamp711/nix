@@ -29,6 +29,7 @@
       system.stateVersion = "26.05";
       time.timeZone = "Asia/Shanghai";
       i18n.defaultLocale = "en_US.UTF-8";
+      users.mutableUsers = false;
       security.sudo.wheelNeedsPassword = false;
       environment.enableAllTerminfo = true; # Terminfo for ghostty, kitty, foot, etc.
       programs.nix-ld.enable = true; # Run unpatched dynamic binaries on NixOS
