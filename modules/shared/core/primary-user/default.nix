@@ -11,6 +11,7 @@ in
       users.users.${config.my.primaryUser} = {
         uid = 1000;
         isNormalUser = true;
+        linger = true;
         hashedPasswordFile = config.age.secrets.${passwordSecretName}.path;
         extraGroups = [
           "wheel"
