@@ -1,7 +1,7 @@
 # LLM coding assistants
 {
   flake.homeModules.cli-programs =
-    { pkgs, ... }:
+    { lib, pkgs, ... }:
     let
       inherit (pkgs) llm-agents;
 
@@ -12,13 +12,17 @@
         "Bash(ls ${pattern})"
         "Bash(cat ${pattern})"
       ];
+
+      skills = lib.genAttrs (builtins.attrNames (builtins.readDir ./skills)) (
+        name: ./skills + "/${name}"
+      );
     in
     {
       programs.claude-code = {
         enable = true;
         package = llm-agents.claude-code;
         enableMcpIntegration = true;
-        skills = ./skills;
+        inherit skills;
 
         settings = {
           effortLevel = "high";
@@ -48,14 +52,14 @@
         enable = true;
         package = llm-agents.opencode;
         enableMcpIntegration = true;
-        skills = ./skills;
+        inherit skills;
       };
 
       programs.codex = {
         enable = true;
         package = llm-agents.codex;
         enableMcpIntegration = true;
-        skills = ./skills;
+        inherit skills;
       };
 
       # programs.gemini-cli = {
