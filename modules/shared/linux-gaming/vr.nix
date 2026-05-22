@@ -4,7 +4,7 @@
     {
       services.wivrn = {
         enable = true;
-        package = pkgs.wivrn.override { cudaSupport = true; };
+        # package = pkgs.wivrn.override { cudaSupport = true; }; # override moved to NUC hardware.nix
         autoStart = true;
         openFirewall = true;
         highPriority = true;
