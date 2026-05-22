@@ -1,17 +1,28 @@
 {
-  flake.nixosModules.linux-gaming = {
-    services.wivrn = {
-      enable = true;
-      autoStart = true;
-      openFirewall = true;
-      highPriority = true;
-      steam.importOXRRuntimes = true;
+  flake.nixosModules.linux-gaming =
+    { pkgs, ... }:
+    {
+      services.wivrn = {
+        enable = true;
+        package = pkgs.wivrn.override { cudaSupport = true; };
+        autoStart = true;
+        openFirewall = true;
+        highPriority = true;
+        steam.importOXRRuntimes = true;
+        config = {
+          enable = true;
+          json = {
+            bit-depth = 10;
+            application = [ pkgs.wayvr ];
+            hid-forwarding = true;
+          };
+        };
+      };
+      programs.alvr = {
+        enable = true;
+        openFirewall = true;
+      };
     };
-    programs.alvr = {
-      enable = true;
-      openFirewall = true;
-    };
-  };
 
   flake.homeModules.linux-gaming =
     {
