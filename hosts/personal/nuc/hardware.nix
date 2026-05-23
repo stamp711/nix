@@ -23,6 +23,22 @@
       hardware.nvidia.open = true;
       hardware.nvidia.modesetting.enable = true;
 
+      # VRR sidesteps NVIDIA+LG OLED+gamescope flip-cadence flicker.
+      # Requires VRR enabled in TV's Game Optimizer menu.
+      # Refresh override: EDID-preferred mode is 60Hz; TV supports 165.
+      programs.steam.gamescopeSession.args = [
+        "--adaptive-sync"
+        "--immediate-flips"
+        "--output-width"
+        "3840"
+        "--output-height"
+        "2160"
+        "--nested-refresh"
+        "165"
+      ];
+      # Keep VRR active even when Steam overlays show, else HDR toggle re-flickers.
+      programs.steam.gamescopeSession.env.gamescope_adaptive_sync_ignore_overlay = "true";
+
       # Disable Energy Efficient Ethernet on igc NIC to prevent link flapping
       services.udev.extraRules = ''
         ACTION=="add", SUBSYSTEM=="net", DRIVERS=="igc", RUN+="${pkgs.ethtool}/bin/ethtool --set-eee $name eee off"
