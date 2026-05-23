@@ -19,22 +19,30 @@ in
       self.nixosModules.nuc-hardware
       self.nixosModules.nuc-vm
       self.nixosModules.linux-gaming
-      {
-        my.primaryUser = username;
-        networking.hostName = hostname;
-        age.rekey.hostPubkey = hostPubkey;
+      (
+        { pkgs, ... }:
+        {
+          my.primaryUser = username;
+          networking.hostName = hostname;
+          age.rekey.hostPubkey = hostPubkey;
 
-        # Always-on desktop - disable all sleep states
-        systemd.targets.sleep.enable = false;
-        systemd.targets.suspend.enable = false;
-        systemd.targets.hibernate.enable = false;
-        systemd.targets.hybrid-sleep.enable = false;
+          # Always-on desktop - disable all sleep states
+          systemd.targets.sleep.enable = false;
+          systemd.targets.suspend.enable = false;
+          systemd.targets.hibernate.enable = false;
+          systemd.targets.hybrid-sleep.enable = false;
 
-        specialisation.vm.configuration = {
-          system.nixos.tags = [ "vm" ];
-          my.win11-vm.enable = true;
-        };
-      }
+          specialisation.vm.configuration = {
+            system.nixos.tags = [ "vm" ];
+            my.win11-vm.enable = true;
+          };
+
+          specialisation.lts.configuration = {
+            system.nixos.tags = [ "lts" ];
+            boot.kernelPackages = pkgs.linuxPackages;
+          };
+        }
+      )
     ];
   };
 

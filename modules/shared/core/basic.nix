@@ -24,9 +24,17 @@
   };
 
   flake.nixosModules.core =
-    { config, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     {
       system.stateVersion = "26.05";
+
+      boot.kernelPackages = lib.mkDefault pkgs.linuxPackages_latest;
+
       time.timeZone = "Asia/Shanghai";
       i18n.defaultLocale = "en_US.UTF-8";
       users.mutableUsers = false;
