@@ -14,5 +14,10 @@
     boot.initrd.services.udev.rules = ''
       ACTION=="add", SUBSYSTEM=="thunderbolt", ATTR{authorized}=="0", ATTR{authorized}="1"
     '';
+
+    my.persistence.directories = [
+      "/var/lib/bluetooth" # paired devices; bluez refuses symlinks, needs real bind
+      "/var/lib/boltd" # authorized Thunderbolt devices
+    ];
   };
 }
