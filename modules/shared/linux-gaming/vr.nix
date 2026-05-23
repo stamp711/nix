@@ -1,3 +1,4 @@
+{ lib, ... }:
 {
   flake.nixosModules.linux-gaming = {
     services.wivrn = {
@@ -16,6 +17,10 @@
         };
       };
     };
+    # Let wivrn inherit the user-manager PATH (set via env.d generator in
+    # core/systemd-user-path.nix) so its dashboard can launch apps installed
+    # in HM and system profiles.
+    systemd.user.services.wivrn.path = lib.mkForce [ ];
     programs.alvr = {
       enable = true;
       openFirewall = true;
