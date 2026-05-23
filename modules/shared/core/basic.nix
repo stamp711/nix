@@ -36,6 +36,17 @@
 
       programs.nh.enable = true;
       programs.nh.flake = config.my.flake;
+
+      # System-core state that must survive @root wipes (impermanence).
+      my.persistence.directories = [
+        "/var/lib/nixos" # uid/gid maps for declarative users
+        "/var/lib/systemd" # random-seed, timers, timesync, linger, credentials
+        "/var/log" # system logs across boots
+      ];
+      my.persistence.files = [
+        "/etc/machine-id" # systemd machine identity / journald
+        "/etc/adjtime" # hwclock drift correction
+      ];
     };
 
 }
