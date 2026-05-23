@@ -23,6 +23,45 @@
       hardware.nvidia.open = true;
       hardware.nvidia.modesetting.enable = true;
 
+      # Cold-reload NVIDIA modules at boot for a fresh DRM state.
+      # Ordered before display-manager and persistenced so nothing's holding modules yet.
+      # Ref: https://github.com/ValveSoftware/gamescope/issues/1593#issuecomment-4150595049
+      systemd.services.nvidia-drm-reset = {
+        description = "Reset NVIDIA DRM state before display services";
+        wantedBy = [ "multi-user.target" ];
+        after = [ "systemd-modules-load.service" ];
+        before = [
+          "display-manager.service"
+          "nvidia-persistenced.service"
+        ];
+        path = [
+          pkgs.kmod
+          pkgs.systemd
+          config.hardware.nvidia.package.bin
+        ];
+        # Boot-only, definition changes take effect on next boot.
+        restartIfChanged = false;
+        stopIfChanged = false;
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = true;
+        };
+        # nvidia_drm pulls in nvidia, nvidia_modeset, drm_ttm_helper;
+        # modprobe.d softdep then loads nvidia_uvm.
+        script = ''
+          echo "nvidia-drm-reset (boot): start"
+          modprobe -r nvidia_uvm nvidia_drm nvidia_modeset nvidia
+          echo "nvidia-drm-reset (boot): modprobe -r exit=$?"
+          modprobe nvidia_drm
+          echo "nvidia-drm-reset (boot): modprobe load exit=$?"
+          nvidia-smi --gpu-reset
+          echo "nvidia-drm-reset (boot): --gpu-reset exit=$?"
+          udevadm settle --timeout=5
+          echo "nvidia-drm-reset (boot): udevadm settle exit=$?"
+          echo "nvidia-drm-reset (boot): done"
+        '';
+      };
+
       # VRR sidesteps NVIDIA+LG OLED+gamescope flip-cadence flicker.
       # Requires VRR enabled in TV's Game Optimizer menu.
       # Refresh override: EDID-preferred mode is 60Hz; TV supports 165.
