@@ -90,7 +90,7 @@
         };
         wipeTargets = lib.mkOption {
           type = lib.types.listOf lib.types.str;
-          default = [ ];
+          default = [ "@root" ];
           example = [
             "@root"
             "@home"
