@@ -26,5 +26,18 @@
           };
         }
       ];
+
+      # GNOME-adjacent runtime state.
+      # Per-entry user/group are fresh-install safety nets (no-op on migration,
+      # since impermanence doesn't chmod/chown existing dirs).
+      my.persistence.directories = [
+        "/var/lib/AccountsService" # avatars, last-session, language per user
+        {
+          directory = "/var/lib/colord";
+          user = "colord";
+          group = "colord";
+        }
+        "/var/lib/upower" # battery history (no-op on desktops)
+      ];
     };
 }
