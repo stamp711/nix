@@ -2,7 +2,9 @@
   flake.nixosModules.linux-gaming = {
     programs.gamescope = {
       enable = true;
-      capSysNice = true;
+      # bwrap: setuid use of bubblewrap is not supported in this build
+      # https://github.com/NixOS/nixpkgs/issues/523200
+      capSysNice = false;
     };
   };
 }
