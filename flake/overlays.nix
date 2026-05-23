@@ -15,6 +15,20 @@
       openldap = prev.openldap.overrideAttrs (_: {
         doCheck = false;
       });
+
+      # termite (archived 2021) requires vte 0.84.0 which currently fails
+      # to build; stub it to keep environment.enableAllTerminfo working.
+      termite =
+        prev.runCommand "termite-stub"
+          {
+            outputs = [
+              "out"
+              "terminfo"
+            ];
+          }
+          ''
+            mkdir -p $out $terminfo/share/terminfo
+          '';
     };
 
     # Add access to x86_64 packages on Apple Silicon
