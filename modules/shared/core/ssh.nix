@@ -42,6 +42,14 @@ in
 
         # ET server - enable but no firewall setting, so not exposed on proxy servers
         services.eternal-terminal.enable = true;
+
+        # Read directly by openssh (not bind-mounted); declare for audit.
+        my.persistence.externalPaths = [
+          "/etc/ssh/ssh_host_ed25519_key"
+          "/etc/ssh/ssh_host_ed25519_key.pub"
+          "/etc/ssh/ssh_host_rsa_key"
+          "/etc/ssh/ssh_host_rsa_key.pub"
+        ];
       };
     };
 
