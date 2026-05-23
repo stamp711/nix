@@ -26,6 +26,18 @@ in
             PasswordAuthentication = false;
             PermitRootLogin = "no";
           };
+          # Keep host keys on /persist so they survive @root wipes (impermanence).
+          hostKeys = [
+            {
+              path = "/persist/etc/ssh/ssh_host_ed25519_key";
+              type = "ed25519";
+            }
+            {
+              path = "/persist/etc/ssh/ssh_host_rsa_key";
+              type = "rsa";
+              bits = 4096;
+            }
+          ];
         };
 
         # ET server - enable but no firewall setting, so not exposed on proxy servers

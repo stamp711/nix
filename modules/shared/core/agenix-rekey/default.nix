@@ -17,6 +17,9 @@ in
 {
   flake.nixosModules.core = {
     age.rekey = rekeyConfig;
+    # Decrypt using the persistent host key (matches services.openssh.hostKeys
+    # path in modules/shared/core/ssh.nix).
+    age.identityPaths = [ "/persist/etc/ssh/ssh_host_ed25519_key" ];
   };
 
   flake.homeModules.core =
