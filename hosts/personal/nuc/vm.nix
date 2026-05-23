@@ -325,6 +325,15 @@
         virtualisation.libvirt.swtpm.enable = true;
         virtualisation.libvirtd.onShutdown = "shutdown";
 
+        # VM state must survive @root wipes:
+        # - libvirt: domain XMLs, nwfilter, per-VM swtpm state, nvram, secrets.
+        # - swtpm-localca: vTPM CA + signkey. If wiped, Windows sees a new TPM and
+        #   triggers BitLocker recovery / Windows Hello / activation breakage.
+        my.persistence.directories = [
+          "/var/lib/libvirt"
+          "/var/lib/swtpm-localca"
+        ];
+
         virtualisation.libvirt.connections."qemu:///system".domains = [
           {
             definition = inputs.NixVirt.lib.domain.writeXML win11;
