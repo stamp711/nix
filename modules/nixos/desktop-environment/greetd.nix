@@ -17,5 +17,15 @@
             --sessions ${sessions}/share/wayland-sessions
         '';
       };
+
+      # tuigreet's --remember persists last-login user/session here.
+      # greeter user/group are fresh-install safety (no-op on migration).
+      my.persistence.directories = [
+        {
+          directory = "/var/cache/tuigreet";
+          user = "greeter";
+          group = "greeter";
+        }
+      ];
     };
 }
