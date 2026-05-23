@@ -292,13 +292,18 @@
           { value = "type=2,manufacturer=Intel Corporation,product=NUC13SBBi9"; }
         ];
       };
-    in
-    {
-      options.my.win11-vm.enable = lib.mkEnableOption "Windows 11 VM with VFIO GPU passthrough";
 
-      imports = [ inputs.NixVirt.nixosModules.default ];
+      # VM state must survive @root wipes:
+      # - libvirt: domain XMLs, nwfilter, per-VM swtpm state, nvram, secrets.
+      # - swtpm-localca: vTPM CA + signkey.
+      vmPersistenceConfig = {
+        my.persistence.directories = [
+          "/var/lib/libvirt"
+          "/var/lib/swtpm-localca"
+        ];
+      };
 
-      config = lib.mkIf cfg.enable {
+      vmConfig = {
         # VFIO: bind GPU, GPU audio, and 10GbE NIC to vfio-pci at boot
         boot.initrd.kernelModules = [
           "vfio_pci"
@@ -324,15 +329,6 @@
         virtualisation.libvirt.enable = true;
         virtualisation.libvirt.swtpm.enable = true;
         virtualisation.libvirtd.onShutdown = "shutdown";
-
-        # VM state must survive @root wipes:
-        # - libvirt: domain XMLs, nwfilter, per-VM swtpm state, nvram, secrets.
-        # - swtpm-localca: vTPM CA + signkey. If wiped, Windows sees a new TPM and
-        #   triggers BitLocker recovery / Windows Hello / activation breakage.
-        my.persistence.directories = [
-          "/var/lib/libvirt"
-          "/var/lib/swtpm-localca"
-        ];
 
         virtualisation.libvirt.connections."qemu:///system".domains = [
           {
@@ -398,5 +394,13 @@
         environment.systemPackages = [ pkgs.virt-manager ];
         environment.variables.LIBVIRT_DEFAULT_URI = "qemu:///system";
       };
+    in
+    {
+      options.my.win11-vm.enable = lib.mkEnableOption "Windows 11 VM with VFIO GPU passthrough";
+      imports = [ inputs.NixVirt.nixosModules.default ];
+      config = lib.mkMerge [
+        vmPersistenceConfig
+        (lib.mkIf cfg.enable vmConfig)
+      ];
     };
 }
