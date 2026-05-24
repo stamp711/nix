@@ -6,8 +6,9 @@
         enable = true;
         extraCompatPackages = [ pkgs.proton-ge-bin ];
         gamescopeSession.enable = true;
-        # New SteamOS3/GamepadUI; default is the older -tenfoot Big Picture.
+        # -steamdeck unlocks Deck UI surface and steamdeck_stable channel.
         gamescopeSession.steamArgs = [
+          "-steamdeck"
           "-steamos3"
           "-gamepadui"
           "-pipewire-dmabuf"
