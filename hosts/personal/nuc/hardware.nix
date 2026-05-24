@@ -96,6 +96,7 @@
         "2160"
         "--nested-refresh"
         "165"
+        "--mangoapp"
       ];
       # Keep VRR active even when Steam overlays show, else HDR toggle re-flickers.
       programs.steam.gamescopeSession.env.gamescope_adaptive_sync_ignore_overlay = "true";
