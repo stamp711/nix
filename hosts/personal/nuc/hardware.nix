@@ -2,7 +2,11 @@
 { inputs, ... }:
 {
   flake.nixosModules.nuc-hardware =
-    { pkgs, ... }:
+    {
+      config,
+      pkgs,
+      ...
+    }:
     {
       imports = [
         inputs.nixos-hardware.nixosModules.common-gpu-intel
@@ -60,6 +64,34 @@
           echo "nvidia-drm-reset (boot): udevadm settle exit=$?"
           echo "nvidia-drm-reset (boot): done"
         '';
+      };
+
+      # Reset NVIDIA modules + set persistence mode before each greetd login;
+      # Ref: https://github.com/ValveSoftware/gamescope/issues/1593#issuecomment-4150595049
+      security.pam.services.greetd.rules.session.nvidia-drm-reset = {
+        control = "optional";
+        modulePath = "${pkgs.linux-pam}/lib/security/pam_exec.so";
+        args = [
+          "${pkgs.writeShellScript "nvidia-drm-reset" ''
+            case "$PAM_USER" in
+              greeter|"") exit 0 ;;
+            esac
+            exec > >(${pkgs.systemd}/bin/systemd-cat) 2>&1
+            echo "nvidia-drm-reset: start user=$PAM_USER"
+            ${pkgs.kmod}/bin/modprobe -r nvidia_uvm nvidia_drm nvidia_modeset nvidia
+            echo "nvidia-drm-reset: modprobe -r exit=$?"
+            ${pkgs.kmod}/bin/modprobe nvidia_drm
+            echo "nvidia-drm-reset: modprobe load exit=$?"
+            ${config.hardware.nvidia.package.bin}/bin/nvidia-smi --gpu-reset
+            echo "nvidia-drm-reset: --gpu-reset exit=$?"
+            ${pkgs.systemd}/bin/udevadm settle --timeout=5
+            echo "nvidia-drm-reset: udevadm settle exit=$?"
+            ${config.hardware.nvidia.package.bin}/bin/nvidia-smi -pm 1
+            echo "nvidia-drm-reset: -pm 1 exit=$?"
+            echo "nvidia-drm-reset: done"
+          ''}"
+        ];
+        order = 11000;
       };
 
       # VRR sidesteps NVIDIA+LG OLED+gamescope flip-cadence flicker.
