@@ -84,22 +84,18 @@
         order = 11000;
       };
 
-      # VRR sidesteps NVIDIA+LG OLED+gamescope flip-cadence flicker.
-      # Requires VRR enabled in TV's Game Optimizer menu.
-      # Refresh override: EDID-preferred mode is 60Hz; TV supports 165.
+      # LG OLED needs --immediate-flips to avoid flickr; 165Hz from EDID DisplayID block.
       programs.steam.gamescopeSession.args = [
         "--adaptive-sync"
         "--immediate-flips"
+        "--hdr-enabled"
         "--output-width"
         "3840"
         "--output-height"
         "2160"
         "--nested-refresh"
         "165"
-        "--mangoapp"
       ];
-      # Keep VRR active even when Steam overlays show, else HDR toggle re-flickers.
-      programs.steam.gamescopeSession.env.gamescope_adaptive_sync_ignore_overlay = "true";
 
       # Disable Energy Efficient Ethernet on igc NIC to prevent link flapping
       services.udev.extraRules = ''
