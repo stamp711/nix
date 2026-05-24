@@ -2,30 +2,7 @@
 { inputs, ... }:
 {
   flake.nixosModules.nuc-hardware =
-    {
-      config,
-      pkgs,
-      ...
-    }:
-    let
-      # Shared core sequence: modprobe cycle + FLR + settle + persistence mode.
-      # Boot service exec's it directly. PAM hook wraps with PAM_USER guard
-      # and journal redirect before exec'ing it.
-      nvidiaReset = pkgs.writeShellScript "nvidia-reset" ''
-        echo "nvidia-reset: start"
-        ${pkgs.kmod}/bin/modprobe -r nvidia_uvm nvidia_drm nvidia_modeset nvidia
-        echo "nvidia-reset: modprobe -r exit=$?"
-        ${pkgs.kmod}/bin/modprobe nvidia_drm
-        echo "nvidia-reset: modprobe load exit=$?"
-        ${config.hardware.nvidia.package.bin}/bin/nvidia-smi --gpu-reset
-        echo "nvidia-reset: --gpu-reset exit=$?"
-        ${pkgs.systemd}/bin/udevadm settle --timeout=5
-        echo "nvidia-reset: udevadm settle exit=$?"
-        ${config.hardware.nvidia.package.bin}/bin/nvidia-smi -pm 1
-        echo "nvidia-reset: -pm 1 exit=$?"
-        echo "nvidia-reset: done"
-      '';
-    in
+    { pkgs, ... }:
     {
       imports = [
         inputs.nixos-hardware.nixosModules.common-gpu-intel
@@ -45,44 +22,6 @@
       services.xserver.videoDrivers = [ "nvidia" ];
       hardware.nvidia.open = true;
       hardware.nvidia.modesetting.enable = true;
-
-      # Reset NVIDIA driver state at boot for a fresh DRM handoff.
-      # Ordered before display-manager and persistenced so nothing's holding modules yet.
-      # Ref: https://github.com/ValveSoftware/gamescope/issues/1593#issuecomment-4150595049
-      systemd.services.nvidia-reset = {
-        description = "Reset NVIDIA driver state before display services";
-        wantedBy = [ "multi-user.target" ];
-        after = [ "systemd-modules-load.service" ];
-        before = [
-          "display-manager.service"
-          "nvidia-persistenced.service"
-        ];
-        # Boot-only, definition changes take effect on next boot.
-        restartIfChanged = false;
-        stopIfChanged = false;
-        serviceConfig = {
-          Type = "oneshot";
-          RemainAfterExit = true;
-        };
-        script = "exec ${nvidiaReset}";
-      };
-
-      # Same reset before each greetd login; covers logout/re-login flicker.
-      # Ref: https://github.com/ValveSoftware/gamescope/issues/1593#issuecomment-4150595049
-      security.pam.services.greetd.rules.session.nvidia-reset = {
-        control = "optional";
-        modulePath = "${pkgs.linux-pam}/lib/security/pam_exec.so";
-        args = [
-          "${pkgs.writeShellScript "nvidia-reset-pam" ''
-            case "$PAM_USER" in
-              greeter|"") exit 0 ;;
-            esac
-            exec > >(${pkgs.systemd}/bin/systemd-cat) 2>&1
-            exec ${nvidiaReset}
-          ''}"
-        ];
-        order = 11000;
-      };
 
       # LG OLED needs --immediate-flips to avoid flickr; 165Hz from EDID DisplayID block.
       programs.steam.gamescopeSession.args = [
