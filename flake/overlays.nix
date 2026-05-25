@@ -16,6 +16,12 @@
         doCheck = false;
       });
 
+      gamescope = prev.gamescope.overrideAttrs (old: {
+        patches = (old.patches or [ ]) ++ [
+          ../patches/gamescope-nvidia-hdr-toggle-flicker.patch
+        ];
+      });
+
       # Default clang-format to --fallback-style=none so it no-ops when no
       # .clang-format is present (instead of silently reformatting to LLVM).
       clang-tools = prev.symlinkJoin {

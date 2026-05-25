@@ -1,0 +1,42 @@
+diff --git a/src/steamcompmgr.cpp b/src/steamcompmgr.cpp
+index b64d4597dd..32805efc36 100644
+--- a/src/steamcompmgr.cpp
++++ b/src/steamcompmgr.cpp
+@@ -8713,17 +8713,28 @@
+ 				wlserver_unlock();
+ 			}
+ 
+-			// XXX(JoshA): Remake this. It sucks.
+-			if ( GetBackend()->UsesVulkanSwapchain() )
++			// Output FBs only need to be reallocated when dimensions change;
++			// HDR/refresh toggles keep the same width/height/format/modifier.
++			// On NVIDIA, recreating the FB pool on an HDR-only toggle leaves
++			// scanout in a persistently corrupted state.
++			const bool bGeometryChanged =
++				currentOutputWidth != g_nOutputWidth ||
++				currentOutputHeight != g_nOutputHeight;
++
++			if ( bGeometryChanged )
+ 			{
+-				vulkan_remake_swapchain();
+-
+-				while ( !acquire_next_image() )
++				// XXX(JoshA): Remake this. It sucks.
++				if ( GetBackend()->UsesVulkanSwapchain() )
++				{
+ 					vulkan_remake_swapchain();
+-			}
+-			else
+-			{
+-				vulkan_remake_output_images();
++
++					while ( !acquire_next_image() )
++						vulkan_remake_swapchain();
++				}
++				else
++				{
++					vulkan_remake_output_images();
++				}
+ 			}
+ 
+ 
