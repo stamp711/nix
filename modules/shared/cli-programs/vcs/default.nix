@@ -105,6 +105,17 @@
 
       programs.jujutsu.enable = true;
       programs.jujutsu.settings.ui.default-command = [ "log" ];
+      programs.jujutsu.settings."--scope" = [
+        {
+          "--when".repositories = [ "${ghqRoot}/github.com" ];
+          git.push = "stamp711";
+        }
+        {
+          "--when".repositories = [ "${ghqRoot}/github.com/stamp711" ];
+          git.push = "origin";
+        }
+      ];
+
       programs.jjui.enable = true;
 
       home.packages = with pkgs; [
