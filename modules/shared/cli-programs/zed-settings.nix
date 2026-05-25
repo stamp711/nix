@@ -88,6 +88,8 @@
 
           # Behaviour
           format_on_save = "on";
+          ensure_final_newline_on_save = false;
+          remove_trailing_whitespace_on_save = false;
           terminal.copy_on_select = true;
 
           # LLM
@@ -139,6 +141,7 @@
 
           lsp = {
             clangd.binary.arguments = [
+              "--fallback-style=none"
               "--background-index"
               "--clang-tidy"
               "--completion-style=detailed"
