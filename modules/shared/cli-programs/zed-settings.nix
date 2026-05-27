@@ -80,7 +80,7 @@
           buffer_font_size = 13;
           theme = {
             mode = "system";
-            light = "Cyan Light";
+            light = "Gruvbox Light";
             dark = "Gruvbox Dark";
           };
           tabs.git_status = true;
