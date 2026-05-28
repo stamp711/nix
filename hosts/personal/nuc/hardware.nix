@@ -53,6 +53,12 @@
         efiDeviceHandle = "HD2b";
       };
 
+      environment.systemPackages = [
+        (pkgs.writeShellScriptBin "reboot-windows" ''
+          exec systemctl reboot --boot-loader-entry=windows_11.conf
+        '')
+      ];
+
       # Keep Windows Boot Manager NVRAM entry inactive so it doesn't self-promote.
       # https://www.yhi.moe/blog/en/preventing-windows-from-modifying-your-uefi-boot-sequence
       systemd.services.deactivate-windows-boot-entry = {
