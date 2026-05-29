@@ -49,6 +49,7 @@
         };
         url."ssh://git@github.com/".insteadOf = "https://github.com/";
         url."ssh://git@code.byted.org/".insteadOf = "https://code.byted.org/";
+        aliases.cl = "!git clean -xdf -e .jj";
       };
 
       # Diff viewers
@@ -69,8 +70,6 @@
 
       # Global ignores
       programs.git.ignores = [
-        ".jj/" # so git clean doen't delete it
-
         # macOS
         ".DS_Store"
         "._*"
