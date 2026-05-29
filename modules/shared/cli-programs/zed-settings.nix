@@ -65,7 +65,7 @@
           cursor_blink = false;
           session.trust_all_worktrees = true;
           vim_mode = true;
-          vertical_scroll_margin = 20;
+          vertical_scroll_margin = 15;
 
           # Layout
           outline_panel.dock = "right";
