@@ -69,6 +69,8 @@
 
       # Global ignores
       programs.git.ignores = [
+        ".jj/" # so git clean doen't delete it
+
         # macOS
         ".DS_Store"
         "._*"
