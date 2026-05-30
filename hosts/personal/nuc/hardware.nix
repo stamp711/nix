@@ -59,6 +59,25 @@
         '')
       ];
 
+      # Windows D: drive.
+      fileSystems."/mnt/d" = {
+        device = "/dev/disk/by-uuid/D040534940533606";
+        fsType = "ntfs3";
+        options = [
+          "uid=1000"
+          "gid=100"
+          "umask=022"
+          "iocharset=utf8"
+          "windows_names"
+          "noatime"
+          "discard"
+          "prealloc"
+          "nofail"
+          "x-systemd.device-timeout=5"
+          "x-gvfs-show"
+        ];
+      };
+
       # Keep Windows Boot Manager NVRAM entry inactive so it doesn't self-promote.
       # https://www.yhi.moe/blog/en/preventing-windows-from-modifying-your-uefi-boot-sequence
       systemd.services.deactivate-windows-boot-entry = {
