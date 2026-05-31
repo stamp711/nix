@@ -35,9 +35,10 @@
       ...
     }:
     {
-      home.packages = [
-        pkgs.xrizer
-        pkgs.wayvr
+      home.packages = with pkgs; [
+        xrizer
+        wayvr
+        cage
       ];
 
       # Register xrizer as the OpenVR runtime so OpenVR games forward through
