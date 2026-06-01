@@ -41,8 +41,8 @@
             in
             {
               context = "VimControl && !menu";
-              bindings."j" = sequence [ "vim::Down" ];
-              bindings."k" = sequence [ "vim::Up" ];
+              bindings."j" = "vim::Down";
+              bindings."k" = "vim::Up";
               bindings."ctrl-j" = sequence [
                 "vim::Down"
                 "editor::LineDown"
