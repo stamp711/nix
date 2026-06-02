@@ -27,13 +27,9 @@
           file = ./git.personal-identity.ini.age;
           condition = "gitdir:${ghqRoot}/github.com/";
         }
-        {
-          file = ./git.work-identity.ini.age;
-          condition = "gitdir:${ghqRoot}/code.byted.org/";
-        }
       ];
 
-      jjIdentity = mkAgeSecret ./jj.identity.toml.age;
+      jjIdentity = mkAgeSecret ./jj.personal-identity.toml.age;
     in
     {
       programs.git.enable = true;
@@ -48,7 +44,6 @@
           user = "stamp711";
         };
         url."ssh://git@github.com/".insteadOf = "https://github.com/";
-        url."ssh://git@code.byted.org/".insteadOf = "https://code.byted.org/";
         aliases.cl = "!git clean -xdf -e .jj";
       };
 
