@@ -29,6 +29,7 @@
 
         # direnv
         ".direnv"
+        ".envrc" # default to ignore, track manually if desired
 
         # pre-commit
         ".pre-commit-config.yaml"
