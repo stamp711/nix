@@ -10,6 +10,7 @@
         extensions = [
           "wakatime"
           "nix"
+          "zig"
           "cyan-light-theme"
           "catppuccin"
           "kanagawa-themes"
