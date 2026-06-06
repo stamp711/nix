@@ -96,11 +96,11 @@
     "brew-api": {
       "flake": false,
       "locked": {
-        "lastModified": 1780715162,
-        "narHash": "sha256-KNRduvDFvmZRgjqq8uCMURFGC75wi3JPWHXoKNnoCVE=",
+        "lastModified": 1780770427,
+        "narHash": "sha256-yudhT6rXRe3UONMr6ZKYlVSVxpocSk1V62dtLaXyUyA=",
         "owner": "BatteredBunny",
         "repo": "brew-api",
-        "rev": "9a3b86fc3469e9f4ddddbc5ff2d19a948ca1ceaa",
+        "rev": "470420816ef1954530aa0d790bb3bbe38091b521",
         "type": "github"
       },
       "original": {
@@ -527,9 +527,7 @@
     },
     "flake-utils_3": {
       "inputs": {
-        "systems": [
-          "systems"
-        ]
+        "systems": "systems_8"
       },
       "locked": {
         "lastModified": 1731533236,
@@ -613,11 +611,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1780715002,
-        "narHash": "sha256-qg280My7xvKDUF3nzp94N+lEK9Xb8x5Jryx/1lKFGjM=",
+        "lastModified": 1780769867,
+        "narHash": "sha256-9I9cSUMuyQl/ZTTUOaKtVXLMHYwrtajKmZo1i1iGWQc=",
         "owner": "homebrew",
         "repo": "homebrew-cask",
-        "rev": "ee084085d1c2cc39d6e8605027e17803dc8f553b",
+        "rev": "1fb31e34898c2af2a153e6fd66d07a114972fc2f",
         "type": "github"
       },
       "original": {
@@ -629,11 +627,11 @@
     "homebrew-core": {
       "flake": false,
       "locked": {
-        "lastModified": 1780714266,
-        "narHash": "sha256-9bm7G8Mxye2a8EIYepjvGbo9sWHyfXPrcnH9xJL4A7c=",
+        "lastModified": 1780766999,
+        "narHash": "sha256-QIwyHBu0C9qQhmGN+dcHrF4QGWmK98ksOd2xc6vPQNY=",
         "owner": "homebrew",
         "repo": "homebrew-core",
-        "rev": "0655a9abf4daed55005fd1c80efc0ef424719f7a",
+        "rev": "6e7cd226181d54593841346dca88fa595cb353eb",
         "type": "github"
       },
       "original": {
@@ -696,11 +694,11 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1780708788,
-        "narHash": "sha256-BaHq9HXksp8OGe0kl6x7IxlyqIWgVQj5qHSaAqhAgDs=",
+        "lastModified": 1780773253,
+        "narHash": "sha256-mjqXe0eFbmk5lasGVT+jkaBjawMzsS+6C1xFUD/1uaw=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "364bfe7a69b3adbfe5c1fedd7a6abf7dd3c79928",
+        "rev": "0e21ef6d71aafb25cb958f9212691e98043d369f",
         "type": "github"
       },
       "original": {
@@ -833,11 +831,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1780704078,
-        "narHash": "sha256-Ktgje3rXwJK3c7nhub8qYgIy/VCYNVrUmIVaaeDhe0E=",
+        "lastModified": 1780765279,
+        "narHash": "sha256-md6QHmlIx40bQkun43M2eT8aav5GURGkXEMFwof6uZs=",
         "owner": "nix-community",
         "repo": "NixOS-WSL",
-        "rev": "ad4c358ded144d26da517b999ddb51295770c419",
+        "rev": "3e6d8af994e2a2d31af7a91863d7c0d6e278d951",
         "type": "github"
       },
       "original": {
@@ -892,11 +890,11 @@
     },
     "nixpkgs_3": {
       "locked": {
-        "lastModified": 1780365719,
-        "narHash": "sha256-QfWfccTN+70ZQ4m2qlU9PiKfz2Yppq94058iJyARNwc=",
+        "lastModified": 1780686478,
+        "narHash": "sha256-zLfvU5+FhNZVpdpAdCToKbxvJMtGWPOw1xfjkV45od0=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "ffa10e26ae11d676b2db836259889f1f571cb14f",
+        "rev": "891eaa77f0eed53352194677991bd30978f9b0ad",
         "type": "github"
       },
       "original": {
@@ -1145,6 +1143,21 @@
       }
     },
     "systems_7": {
+      "locked": {
+        "lastModified": 1681028828,
+        "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
+        "owner": "nix-systems",
+        "repo": "default",
+        "rev": "da67096a3b9bf56a91d16901293e51ba5b49a27e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-systems",
+        "repo": "default",
+        "type": "github"
+      }
+    },
+    "systems_8": {
       "locked": {
         "lastModified": 1681028828,
         "narHash": "sha256-Vy1rq5AaRuLzOxct8nz4T6wlgyUR7zLU309k9mBC768=",
