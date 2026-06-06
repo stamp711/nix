@@ -9,7 +9,8 @@
         (import-dir ./flake { collect = true; })._all
         ++ (import-dir ./modules { collect = true; })._all
         ++ (import-dir ./profiles { collect = true; })._all
-        ++ (import-dir ./hosts { collect = true; })._all;
+        ++ (import-dir ./hosts { collect = true; })._all
+        ++ (import-dir ./shells { collect = true; })._all;
     };
 
   inputs = {
@@ -115,6 +116,10 @@
     zsh-bench = {
       url = "github:romkatv/zsh-bench";
       flake = false;
+    };
+    zig2nix = {
+      url = "github:Cloudef/zig2nix";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
 
