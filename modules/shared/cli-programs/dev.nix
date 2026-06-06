@@ -13,6 +13,10 @@
         # NodeJS
         volta
 
+        # Zig
+        zig
+        zls
+
         # Language servers
         lua-language-server
         nil
