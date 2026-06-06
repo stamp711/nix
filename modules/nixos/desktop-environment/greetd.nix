@@ -8,14 +8,8 @@
       services.greetd = {
         enable = true;
         useTextGreeter = true;
-        settings.default_session.command = ''
-          ${pkgs.tuigreet}/bin/tuigreet \
-            --time \
-            --asterisks \
-            --remember \
-            --remember-session \
-            --sessions ${sessions}/share/wayland-sessions
-        '';
+        # Must be single-line, https://github.com/NixOS/nixpkgs/issues/527565
+        settings.default_session.command = "${pkgs.tuigreet}/bin/tuigreet --time --asterisks --remember --remember-session --sessions ${sessions}/share/wayland-sessions";
       };
 
       # tuigreet's --remember persists last-login user/session here.
