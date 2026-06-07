@@ -23,6 +23,13 @@
       hardware.nvidia.open = true;
       hardware.nvidia.modesetting.enable = true;
 
+      # Turn off NVIDIA GPU's on-card LED
+      systemd.services.gpu-led-off = {
+        wantedBy = [ "multi-user.target" ];
+        serviceConfig.Type = "oneshot";
+        script = "${pkgs.openrgb}/bin/openrgb --noautoconnect --device NVIDIA --mode Off";
+      };
+
       # LG OLED needs --immediate-flips to avoid flickr; 165Hz from EDID DisplayID block.
       programs.steam.gamescopeSession.args = [
         "--adaptive-sync"
