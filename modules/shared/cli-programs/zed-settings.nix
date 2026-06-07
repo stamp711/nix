@@ -2,6 +2,8 @@
   flake.homeModules.cli-programs =
     { lib, ... }:
     {
+      programs.git.ignores = [ ".zed/*" ];
+
       programs.zed-editor = {
         enable = true;
         package = lib.mkDefault null; # this is the headless profile
@@ -33,7 +35,6 @@
           }
           (
             let
-              lines = 2;
               sequence = actions: [
                 "action::Sequence"
                 actions
@@ -52,8 +53,8 @@
                 "vim::Up"
                 "editor::LineUp"
               ];
-              bindings."alt-j" = sequence (repeat lines [ "editor::LineDown" ]);
-              bindings."alt-k" = sequence (repeat lines [ "editor::LineUp" ]);
+              bindings."alt-j" = sequence (repeat 2 [ "editor::LineDown" ]);
+              bindings."alt-k" = sequence (repeat 2 [ "editor::LineUp" ]);
             }
           )
         ];
