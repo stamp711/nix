@@ -99,6 +99,7 @@
       url = "github:JuliusBrussee/caveman";
       flake = false;
     };
+    # no nixpkgs follows so cache.numtide.com hits
     llm-agents.url = "github:numtide/llm-agents.nix";
     nix-darwin = {
       url = "github:nix-darwin/nix-darwin";
