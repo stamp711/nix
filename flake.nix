@@ -95,6 +95,10 @@
       url = "github:BatteredBunny/brew-api";
       flake = false;
     };
+    caveman = {
+      url = "github:JuliusBrussee/caveman";
+      flake = false;
+    };
     llm-agents.url = "github:numtide/llm-agents.nix";
     nix-darwin = {
       url = "github:nix-darwin/nix-darwin";

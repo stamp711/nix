@@ -1,7 +1,15 @@
 # LLM coding assistants
+{ inputs, lib, ... }:
+let
+  importSkills =
+    root:
+    lib.mapAttrs' (name: _: lib.nameValuePair name (root + "/${name}")) (
+      lib.filterAttrs (_: type: type == "directory") (builtins.readDir root)
+    );
+in
 {
   flake.homeModules.cli-programs =
-    { lib, pkgs, ... }:
+    { pkgs, ... }:
     let
       inherit (pkgs) llm-agents;
 
@@ -13,9 +21,10 @@
         "Bash(cat ${pattern})"
       ];
 
-      skills = lib.genAttrs (builtins.attrNames (builtins.readDir ./skills)) (
-        name: ./skills + "/${name}"
-      );
+      localSkills = importSkills ./skills;
+      cavemanSkills = importSkills (inputs.caveman + "/skills");
+
+      skills = cavemanSkills // localSkills;
     in
     {
       programs.claude-code = {
