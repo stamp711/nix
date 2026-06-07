@@ -1023,7 +1023,9 @@
         "system-manager": "system-manager",
         "systems": "systems_7",
         "treefmt-nix": "treefmt-nix_3",
+        "zig-flake": "zig-flake",
         "zig2nix": "zig2nix",
+        "zls": "zls",
         "zsh-bench": "zsh-bench"
       }
     },
@@ -1317,6 +1319,26 @@
         "type": "github"
       }
     },
+    "zig-flake": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1780738656,
+        "narHash": "sha256-mRNx93vNiRyT0FCXykTzPKxJGhdDJ+thDxfgQ83Pg2M=",
+        "owner": "silversquirl",
+        "repo": "zig-flake",
+        "rev": "1a8424e4162a7d7e4cc5b6676cb23899fc2cb0d8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "silversquirl",
+        "repo": "zig-flake",
+        "type": "github"
+      }
+    },
     "zig2nix": {
       "inputs": {
         "flake-utils": "flake-utils_3",
@@ -1335,6 +1357,29 @@
       "original": {
         "owner": "Cloudef",
         "repo": "zig2nix",
+        "type": "github"
+      }
+    },
+    "zls": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "zig-flake": [
+          "zig-flake"
+        ]
+      },
+      "locked": {
+        "lastModified": 1779828480,
+        "narHash": "sha256-iWKBeY8I10sHZBgFdA12pvOBxTR6c28GKEmDx/YIQik=",
+        "owner": "zigtools",
+        "repo": "zls",
+        "rev": "8da87d4f3305a550e7b739bad764e34bf1e46a08",
+        "type": "github"
+      },
+      "original": {
+        "owner": "zigtools",
+        "repo": "zls",
         "type": "github"
       }
     },

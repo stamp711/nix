@@ -125,6 +125,15 @@
       url = "github:Cloudef/zig2nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    zig-flake = {
+      url = "github:silversquirl/zig-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    zls = {
+      url = "github:zigtools/zls";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.zig-flake.follows = "zig-flake";
+    };
   };
 
 }
