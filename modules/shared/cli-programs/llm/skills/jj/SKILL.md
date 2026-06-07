@@ -1,7 +1,18 @@
 ---
 name: jujutsu
 description: "**REQUIRED** - ALways activate FIRST on any git/VCS operations (commit, status, branch, push, etc.), especially when HEAD is detached. If `.jj/` exists -> this is a Jujutsu (jj) repo - git commands will corrupt data. Essential git safety instructions inside. DO NOT IGNORE."
-allowed-tools: Bash(jj st), Bash(jj status), Bash(jj log:*), Bash(jj diff:*), Bash(jj show:*), Bash(jj op log:*), Bash(jj bookmark list:*)
+allowed-tools:
+  - Bash(jj st)
+  - Bash(jj status)
+  - Bash(jj log:*)
+  - Bash(jj diff:*)
+  - Bash(jj show:*)
+  - Bash(jj op log:*)
+  - Bash(jj bookmark list:*)
+  - Bash(jj file show:*)
+  - Bash(jj file annotate:*)
+  - Bash(jj evolog:*)
+  - Bash(jj help:*)
 source: https://github.com/danverbraganza/jujutsu-skill
 ---
 
