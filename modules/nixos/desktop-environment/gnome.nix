@@ -16,16 +16,19 @@
       # Only install GNOME shell, not the bundled apps
       services.gnome.core-apps.enable = false;
       environment.systemPackages = with pkgs; [
-        gnome-terminal
         nautilus
+        gnomeExtensions.kimpanel
       ];
 
       # System-wide keyboard repeat settings
       programs.dconf.profiles.user.databases = [
         {
-          settings."org/gnome/desktop/peripherals/keyboard" = {
-            delay = lib.gvariant.mkUint32 225;
-            repeat-interval = lib.gvariant.mkUint32 15;
+          settings = {
+            "org/gnome/desktop/peripherals/keyboard" = {
+              delay = lib.gvariant.mkUint32 225;
+              repeat-interval = lib.gvariant.mkUint32 15;
+            };
+            "org/gnome/shell".enabled-extensions = [ "kimpanel@kde.org" ];
           };
         }
       ];
@@ -41,6 +44,7 @@
           group = "colord";
         }
         "/var/lib/upower" # battery history (no-op on desktops)
+        "/var/lib/power-profiles-daemon" # selected power profile for power-profiles-daemon
       ];
     };
 }
