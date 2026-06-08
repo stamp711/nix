@@ -74,6 +74,9 @@
         loginScreenSchema
       ];
 
+      # Match-on-host driver enrolled templates
+      my.persistence.directories = [ "/var/lib/fprint" ];
+
       # FocalTech sensors misbehave under USB autosuspend; keep this one powered.
       services.udev.extraRules = ''
         ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="2808", ATTR{idProduct}=="0752", ATTR{power/control}="on", ATTR{power/autosuspend}="-1"
