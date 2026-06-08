@@ -48,31 +48,12 @@
       });
 
       fprintd = pkgs.fprintd.override { libfprint = libfprint-focaltech; };
-
-      # gnome-control-center only shows the "Fingerprint Login" row when it can
-      # read org.gnome.login-screen/enable-fingerprint-authentication (see
-      # cc-user-page.c:update_fingerprint_row_state). That schema ships with GDM,
-      # which we don't run (greetd), so the row stays hidden even though fprintd
-      # works. Install just the schema (no gdm in the closure) so Settings shows it.
-      loginScreenSchema = pkgs.runCommandLocal "gnome-login-screen-schema" { } ''
-        install -Dm444 \
-          ${pkgs.gdm}/share/gsettings-schemas/*/glib-2.0/schemas/org.gnome.login-screen.gschema.xml \
-          -t $out/share/glib-2.0/schemas
-        ${pkgs.glib.dev}/bin/glib-compile-schemas $out/share/glib-2.0/schemas
-      '';
     in
     {
       services.fprintd = {
         enable = true;
         package = fprintd;
       };
-
-      # fprintd: enrollment/verification CLI (fprintd-enroll, -verify, -list).
-      # loginScreenSchema: makes GNOME Settings expose the fingerprint UI (above).
-      environment.systemPackages = [
-        fprintd
-        loginScreenSchema
-      ];
 
       # Match-on-host driver enrolled templates
       my.persistence.directories = [ "/var/lib/fprint" ];

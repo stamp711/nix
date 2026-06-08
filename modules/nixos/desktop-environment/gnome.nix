@@ -4,6 +4,9 @@
     {
       services.desktopManager.gnome.enable = true;
 
+      # Surfaces gdm's org.gnome.login-screen schema so GNOME shows fingerprint.
+      services.desktopManager.gnome.sessionPath = [ pkgs.gdm ];
+
       # Auto-rotation and tablet mode
       hardware.sensor.iio.enable = true;
 

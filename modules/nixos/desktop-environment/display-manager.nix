@@ -5,8 +5,11 @@
       sessions = config.services.displayManager.sessionData.desktops;
     in
     {
+      # To switch: comment out greetd below, uncomment gdm.
+      services.displayManager.gdm.enable = true;
+
       services.greetd = {
-        enable = true;
+        enable = false;
         useTextGreeter = true;
         # Must be single-line, https://github.com/NixOS/nixpkgs/issues/527565
         settings.default_session.command = "${pkgs.tuigreet}/bin/tuigreet --time --asterisks --remember --remember-session --sessions ${sessions}/share/wayland-sessions";
