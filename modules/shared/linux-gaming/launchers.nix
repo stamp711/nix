@@ -6,7 +6,6 @@
       programs.mangohud.enable = true;
 
       home.packages = with pkgs; [
-        cartridges
         umu-launcher
       ];
     };
