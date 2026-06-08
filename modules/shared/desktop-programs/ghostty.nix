@@ -18,6 +18,7 @@
           quick-terminal-screen = "macos-menu-bar";
           quick-terminal-animation-duration = 0;
           quick-terminal-autohide = false;
+          maximize = true;
           background-opacity = 0.90;
           background-blur-radius = 5;
         };

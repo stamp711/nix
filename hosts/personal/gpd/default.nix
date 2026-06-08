@@ -7,7 +7,10 @@ let
   userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBt5OaxhvkIQJWZ80eX8czcCESykRu8oNlx1UIFiQz0G";
 in
 {
-  imports = [ ./hardware.nix ];
+  imports = [
+    ./hardware.nix
+    ./fingerprint.nix
+  ];
 
   flake.nixosConfigurations.${hostname} = self.lib.mkNixos {
     inherit system;
@@ -15,6 +18,7 @@ in
       self.profiles.nixos.desktop
       self.nixosModules.linux-gaming
       self.nixosModules.gpd-hardware
+      self.nixosModules.gpd-fingerprint
       inputs.nixos-hardware.nixosModules.gpd-pocket-4
       ./lte.nix
       {

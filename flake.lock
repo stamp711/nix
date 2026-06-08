@@ -700,6 +700,23 @@
         "type": "github"
       }
     },
+    "libfprint-focaltech": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1777815125,
+        "narHash": "sha256-vDRsp+dNqiCiS2aM2Jm2xVr2IJDpRamFMJBTFSq4kDI=",
+        "ref": "focaltech-moh",
+        "rev": "19375e57cbb95839330505f465e3428c7120f0e5",
+        "revCount": 1851,
+        "type": "git",
+        "url": "https://gitlab.freedesktop.org/dtrunk90/libfprint.git"
+      },
+      "original": {
+        "ref": "focaltech-moh",
+        "type": "git",
+        "url": "https://gitlab.freedesktop.org/dtrunk90/libfprint.git"
+      }
+    },
     "llm-agents": {
       "inputs": {
         "blueprint": "blueprint",
@@ -1010,6 +1027,7 @@
         "homebrew-core": "homebrew-core",
         "impermanence": "impermanence",
         "jj-starship": "jj-starship",
+        "libfprint-focaltech": "libfprint-focaltech",
         "llm-agents": "llm-agents",
         "monaco": "monaco",
         "nix-alien": "nix-alien",
