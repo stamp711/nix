@@ -8,7 +8,7 @@
         settings = {
           theme = "Modus Vivendi";
           font-family = "Monaco Nerd Font";
-          font-size = 15;
+          font-size = 13;
           cursor-style-blink = false;
           shell-integration-features = "cursor,sudo,title,ssh-env,ssh-terminfo,path";
           macos-option-as-alt = true;
