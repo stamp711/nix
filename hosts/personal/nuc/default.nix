@@ -26,6 +26,11 @@ in
           networking.hostName = hostname;
           age.rekey.hostPubkey = hostPubkey;
 
+          # Accept GPD's host key for remote build offload
+          users.users.${username}.openssh.authorizedKeys.keys = [
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGTQLBSo+0ienoQG9TV4XyNt3vbN60uS10OD4TUDB1an"
+          ];
+
           # Always-on desktop - disable all sleep states
           systemd.targets.sleep.enable = false;
           systemd.targets.suspend.enable = false;
