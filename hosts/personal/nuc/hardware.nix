@@ -25,7 +25,8 @@
 
       # Turn off NVIDIA GPU's on-card LED
       systemd.services.gpu-led-off = {
-        wantedBy = [ "multi-user.target" ];
+        wantedBy = [ "graphical.target" ];
+        after = [ "graphical.target" ];
         serviceConfig.Type = "oneshot";
         script = "${pkgs.openrgb}/bin/openrgb --noautoconnect --device NVIDIA --mode Off";
       };
