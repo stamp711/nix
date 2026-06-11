@@ -79,6 +79,8 @@
         # build artifacts
         ".bundle"
         "compile_commands.json"
+
+        ".worktrees/"
       ];
 
       # GitHub CLI
