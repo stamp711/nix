@@ -27,7 +27,7 @@ in
         networking.hostName = hostname;
         age.rekey.hostPubkey = hostPubkey;
 
-        # Offload builds to the always-on NUC
+        # Offload builds to NUC
         nix.distributedBuilds = true;
         nix.settings.builders-use-substitutes = true;
         nix.buildMachines = [
