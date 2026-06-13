@@ -85,8 +85,40 @@
             light = "Modus Operandi Tinted";
             dark = "Gruvbox Dark";
           };
+          theme_overrides = {
+            "Gruvbox Dark".syntax = {
+              "comment".font_style = "normal";
+              "comment.doc".font_style = "normal";
+            };
+            "Modus Operandi Tinted" = {
+              "editor.active_line.background" = "#efeae3";
+              hint = "#8a8178"; # inline git blame & inlay hints etc
+              # hint = "#9a9088";
+              players = [
+                {
+                  background = "#c2bcb5";
+                  cursor = "#5a544c";
+                  selection = "#0000003d";
+                }
+              ];
+              syntax = {
+                "comment.doc" = {
+                  font_style = "normal";
+                  # font_weight = 700;
+                  # color = "#5f5448"; # deeper warm taupe, hint hue
+                  color = "#8a8178";
+                };
+                "comment" = {
+                  font_style = "normal";
+                  color = "#8a8178";
+                };
+              };
+            };
+          };
           tabs.git_status = true;
           sticky_scroll.enabled = true;
+          git.inline_blame.enabled = false;
+          git.inline_blame.show_commit_summary = true;
 
           # Behaviour
           format_on_save = "on";
@@ -159,7 +191,7 @@
             };
           };
 
-          code_lens = "on";
+          code_lens = "menu";
           document_symbols = "on";
           diagnostics.inline.enabled = true;
           inlay_hints.toggle_on_modifiers_press.control = true;
