@@ -73,5 +73,11 @@ in
           ${lib.getExe ssh-agent-switcher} --daemon --socket-path="$SSH_AUTH_SOCK" 2>/dev/null || true
         fi
       '';
+
+      home.packages = [ pkgs.connect ];
+
+      # Route ssh via the local proxy when $HTTP_PROXY is set.
+      programs.ssh.settings.${''Match host * exec "test x''${HTTP_PROXY:+set} = xset"''}.proxyCommand =
+        "${pkgs.connect}/bin/connect -h %h %p";
     };
 }
