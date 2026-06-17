@@ -6,6 +6,9 @@
       settings = {
         default_mode = "locked";
         session_serialization = false;
+        # Run the built-in web server, and share new sessions by default.
+        web_server = true;
+        web_sharing = "on";
       };
 
       # Copied from zellij "Unlock First" config
