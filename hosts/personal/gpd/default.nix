@@ -32,7 +32,7 @@ in
         nix.settings.builders-use-substitutes = true;
         nix.buildMachines = [
           {
-            hostName = "NUC.home";
+            hostName = "NUC";
             sshUser = username;
             sshKey = "/persist/etc/ssh/ssh_host_ed25519_key";
             systems = [ system ];
@@ -41,7 +41,7 @@ in
             supportedFeatures = self.nixosConfigurations.NUC.config.nix.settings.system-features;
           }
         ];
-        programs.ssh.knownHosts."NUC.home".publicKey =
+        programs.ssh.knownHosts."NUC".publicKey =
           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIClC3VLrypgdZbvJPhufSe6BeWcijyTrnl4JqBs/r566";
 
         my.boot-disk = {
