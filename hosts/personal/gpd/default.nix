@@ -21,6 +21,7 @@ in
       self.nixosModules.gpd-fingerprint
       inputs.nixos-hardware.nixosModules.gpd-pocket-4
       ./lte.nix
+      self.nixosModules.tailscale
       {
         my.primaryUser = username;
         networking.hostName = hostname;

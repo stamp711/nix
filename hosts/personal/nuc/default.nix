@@ -19,6 +19,7 @@ in
       self.nixosModules.nuc-hardware
       self.nixosModules.nuc-vm
       self.nixosModules.linux-gaming
+      self.nixosModules.tailscale
       (
         { pkgs, ... }:
         {
