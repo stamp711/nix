@@ -10,6 +10,7 @@ in
   imports = [
     ./hardware.nix
     ./vm.nix
+    ./tunnel.nix
   ];
   flake.nixosConfigurations.${hostname} = self.lib.mkNixos {
     inherit system;
@@ -18,6 +19,7 @@ in
       self.profiles.nixos.desktop
       self.nixosModules.nuc-hardware
       self.nixosModules.nuc-vm
+      self.nixosModules.nuc-tunnel
       self.nixosModules.linux-gaming
       self.nixosModules.tailscale
       (

@@ -39,6 +39,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware";
+    microvm = {
+      url = "github:microvm-nix/microvm.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # Open-source FocalTech FT9362 match-on-host fingerprint driver for the GPD
     # Pocket 4 (2808:0752). See hosts/personal/gpd/fingerprint.nix.
     # Upstream MR: https://gitlab.freedesktop.org/libfprint/libfprint/-/merge_requests/588
