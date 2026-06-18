@@ -11,6 +11,7 @@ in
     ./hardware.nix
     ./vm.nix
     ./ariadne.nix
+    ./charon.nix
   ];
   flake.nixosConfigurations.${hostname} = self.lib.mkNixos {
     inherit system;
@@ -20,6 +21,7 @@ in
       self.nixosModules.nuc-hardware
       self.nixosModules.nuc-vm
       self.nixosModules.ariadne
+      self.nixosModules.charon
       self.nixosModules.linux-gaming
       self.nixosModules.tailscale
       (
