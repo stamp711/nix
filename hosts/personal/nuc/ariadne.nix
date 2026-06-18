@@ -1,7 +1,7 @@
-# Reverse-SSH tunnel endpoint VM w/ passt networking.
+# ariadne: reverse-SSH tunnel anchor VM w/ passt networking.
 { inputs, ... }:
 {
-  flake.nixosModules.nuc-tunnel =
+  flake.nixosModules.ariadne =
     {
       config,
       lib,
@@ -27,37 +27,34 @@
         }
       ];
 
-      # passt private guest network; egress is firewalled off below.
-      guestGateway = "10.0.2.2";
-      guestAddress = "10.0.2.15";
-      guestPrefix = 24;
-
       # host:guest spec for passt --tcp-ports
       passtPorts = lib.concatMapStringsSep "," (f: "${toString f.host}:${toString f.guest}") ports;
-      passtSocket = "/run/passt-tunnel/passt.sock";
+
+      passtRuntimeDir = "passt/ariadne";
+      passtSocket = "/run/${passtRuntimeDir}/passt.sock";
     in
     {
       imports = [ inputs.microvm.nixosModules.host ];
 
-      my.persistence.directories = [ config.microvm.stateDir ];
+      my.persistence.directories = [ "${config.microvm.stateDir}/ariadne" ];
 
-      systemd.services.passt-tunnel = {
-        description = "passt networking for the tunnel microVM";
-        before = [ "microvm@tunnel.service" ];
-        requiredBy = [ "microvm@tunnel.service" ];
+      systemd.services.passt-ariadne = {
+        description = "passt networking for the ariadne microVM";
+        before = [ "microvm@ariadne.service" ];
+        requiredBy = [ "microvm@ariadne.service" ];
         after = [ "nftables.service" ]; # egress-guard set must exist before NFTSet
         serviceConfig = {
           User = "microvm";
-          RuntimeDirectory = "passt-tunnel";
-          NFTSet = "cgroup:inet:tunnel_egress:passt"; # adds passt's cgroup to the egress-guard set
+          RuntimeDirectory = passtRuntimeDir;
+          NFTSet = "cgroup:inet:ariadne_egress:ariadne"; # adds passt's cgroup to the egress-guard set
           ExecStart = lib.concatStringsSep " " [
             "${pkgs.passt}/bin/passt"
             "--foreground"
             "--quiet"
             "--socket ${passtSocket}"
-            "--address ${guestAddress}"
-            "--netmask ${toString guestPrefix}"
-            "--gateway ${guestGateway}"
+            "--address 10.0.2.15"
+            "--netmask 24"
+            "--gateway 10.0.2.2"
             "--tcp-ports ${passtPorts}"
             "--no-map-gw" # no route to the host
             "--no-dhcp-dns"
@@ -70,28 +67,27 @@
         };
       };
 
+      # Host backstop: only allow VM replies.
       networking.nftables.enable = true;
-      # The build-time check sandbox kernel lacks `socket cgroupv2` support.
-      networking.nftables.checkRuleset = false;
-      networking.nftables.tables.tunnel_egress = {
+      networking.nftables.checkRuleset = false; # build-time check sandbox kernel lacks `socket cgroupv2` support.
+      networking.nftables.tables.ariadne_egress = {
         family = "inet";
         content = ''
-          set passt {
+          set ariadne {
             type cgroupsv2
           }
           chain output {
             type filter hook output priority filter; policy accept;
-            socket cgroupv2 level 2 @passt jump passt-egress
+            socket cgroupv2 level 2 @ariadne jump ariadne-egress
           }
-          # inbound-only: allow replies, drop anything passt initiates
-          chain passt-egress {
+          chain ariadne-egress {
             ct state established,related accept
             counter drop
           }
         '';
       };
 
-      microvm.vms.tunnel.config =
+      microvm.vms.ariadne.config =
         { modulesPath, pkgs, ... }:
         {
           # nixpkgs' minimal profile (modulesPath = nixpkgs/nixos/modules).
@@ -117,6 +113,7 @@
 
           networking.nftables.enable = true;
           networking.firewall.allowedTCPPorts = map (f: f.guest) ports;
+
           # Egress lockdown: the VM may never initiate a connection.
           networking.nftables.tables.egress-lockdown = {
             family = "inet";
@@ -165,7 +162,7 @@
           powerManagement.enable = false;
           nix.enable = false;
 
-          # guest logs surface in host journalctl -u microvm@tunnel
+          # guest logs surface in host journalctl -u microvm@ariadne
           services.journald.extraConfig = "ForwardToConsole=yes";
 
           security.protectKernelImage = true; # no kexec
