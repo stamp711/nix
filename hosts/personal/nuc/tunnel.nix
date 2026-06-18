@@ -1,8 +1,13 @@
-# Reverse-SSH tunnel endpoint VM w/ QEMU user-mode networking.
+# Reverse-SSH tunnel endpoint VM w/ passt networking.
 { inputs, ... }:
 {
   flake.nixosModules.nuc-tunnel =
-    { config, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       userName = "tunnel";
 
@@ -22,11 +27,76 @@
           guest = 58082;
         }
       ];
+
+      # passt private guest network; egress is firewalled off below.
+      guestGateway = "10.0.2.2";
+      guestAddress = "10.0.2.15";
+      guestPrefix = 24;
+
+      # host:guest spec for passt --tcp-ports
+      passtPorts = lib.concatMapStringsSep "," (f: "${toString f.host}:${toString f.guest}") ports;
+      passtSocket = "/run/passt-tunnel/passt.sock";
     in
     {
       imports = [ inputs.microvm.nixosModules.host ];
 
       my.persistence.directories = [ config.microvm.stateDir ];
+
+      # passt gives the VM user-mode networking over a unix socket.
+      systemd.services.passt-tunnel = {
+        description = "passt networking for the tunnel microVM";
+        before = [ "microvm@tunnel.service" ];
+        requiredBy = [ "microvm@tunnel.service" ];
+        # After nftables so the egress-guard set exists when systemd registers
+        # this unit's cgroup into the NFTSet below.
+        after = [ "nftables.service" ];
+        serviceConfig = {
+          User = "microvm";
+          RuntimeDirectory = "passt-tunnel";
+          # Register this unit's cgroup into the egress-guard set.
+          NFTSet = "cgroup:inet:tunnel_egress:passt";
+          ExecStart = lib.concatStringsSep " " [
+            "${pkgs.passt}/bin/passt"
+            "--foreground"
+            "--quiet"
+            "--socket ${passtSocket}"
+            "--address ${guestAddress}"
+            "--netmask ${toString guestPrefix}"
+            "--gateway ${guestGateway}"
+            "--tcp-ports ${passtPorts}"
+            # Forward only the ports above; don't route to the host.
+            "--no-map-gw"
+            "--no-dhcp-dns"
+            "--no-udp"
+            "--no-icmp" # implies --no-ndp
+            "--no-dhcpv6"
+            "--no-ra"
+          ];
+          Restart = "on-failure";
+        };
+      };
+
+      # Host-side egress guard
+      networking.nftables.enable = true;
+      # The build-time check sandbox kernel lacks `socket cgroupv2` support.
+      networking.nftables.checkRuleset = false;
+      networking.nftables.tables.tunnel_egress = {
+        family = "inet";
+        content = ''
+          set passt {
+            type cgroupsv2
+          }
+          chain output {
+            type filter hook output priority filter; policy accept;
+            socket cgroupv2 level 2 @passt jump passt-egress
+          }
+          # passt does inbound-only forwarding: allow its replies, drop the rest.
+          chain passt-egress {
+            ct state established,related accept
+            counter drop
+          }
+        '';
+      };
 
       microvm.vms.tunnel.config =
         { modulesPath, pkgs, ... }:
@@ -36,17 +106,13 @@
           system.stateVersion = "26.05";
 
           microvm = {
-            interfaces = [
-              {
-                type = "user";
-                id = "eth0";
-                mac = "02:00:00:00:42:02";
-              }
+            # Networking is wired to passt over the unix socket.
+            qemu.extraArgs = [
+              "-netdev"
+              "stream,id=net0,addr.type=unix,addr.path=${passtSocket},reconnect-ms=1000"
+              "-device"
+              "virtio-net-device,netdev=net0"
             ];
-            forwardPorts = map (f: {
-              host.port = f.host;
-              guest.port = f.guest;
-            }) ports;
             volumes = [
               {
                 image = "persist.img";
@@ -56,16 +122,6 @@
             ];
           };
 
-          # QEMU SLIRP guest address; no gateway needed (no egress).
-          networking.useDHCP = false;
-          networking.usePredictableInterfaceNames = false;
-          networking.interfaces.eth0.ipv4.addresses = [
-            {
-              address = "10.0.2.15";
-              prefixLength = 24;
-            }
-          ];
-
           networking.nftables.enable = true;
           networking.firewall.allowedTCPPorts = map (f: f.guest) ports;
           # Egress lockdown: the VM may never initiate a connection.
@@ -73,7 +129,7 @@
             family = "inet";
             content = ''
               chain output {
-                type filter hook output priority 0; policy drop;
+                type filter hook output priority filter; policy drop;
                 ct state established,related accept
                 oifname "lo" accept
               }
