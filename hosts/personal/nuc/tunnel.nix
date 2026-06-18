@@ -147,7 +147,6 @@
             settings = {
               PasswordAuthentication = false;
               KbdInteractiveAuthentication = false;
-              UsePAM = false;
               PermitRootLogin = "no";
               AllowUsers = [ userName ];
               AllowTcpForwarding = "remote";
