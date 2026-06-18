@@ -11,7 +11,6 @@
     let
       userName = "tunnel";
 
-      # SSH keys allowed to open the tunnel.
       tunnelKeys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDuNXgUoOwCVdvkegE+FGP77qdyWEQFqcRgIY0d6lKeh" # 1Password
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGGfAr2tMhcrbtdxi2RjGCaXCTQGWB3dBlTEXN6/DUxE" # dev
@@ -42,19 +41,15 @@
 
       my.persistence.directories = [ config.microvm.stateDir ];
 
-      # passt gives the VM user-mode networking over a unix socket.
       systemd.services.passt-tunnel = {
         description = "passt networking for the tunnel microVM";
         before = [ "microvm@tunnel.service" ];
         requiredBy = [ "microvm@tunnel.service" ];
-        # After nftables so the egress-guard set exists when systemd registers
-        # this unit's cgroup into the NFTSet below.
-        after = [ "nftables.service" ];
+        after = [ "nftables.service" ]; # egress-guard set must exist before NFTSet
         serviceConfig = {
           User = "microvm";
           RuntimeDirectory = "passt-tunnel";
-          # Register this unit's cgroup into the egress-guard set.
-          NFTSet = "cgroup:inet:tunnel_egress:passt";
+          NFTSet = "cgroup:inet:tunnel_egress:passt"; # adds passt's cgroup to the egress-guard set
           ExecStart = lib.concatStringsSep " " [
             "${pkgs.passt}/bin/passt"
             "--foreground"
@@ -64,8 +59,7 @@
             "--netmask ${toString guestPrefix}"
             "--gateway ${guestGateway}"
             "--tcp-ports ${passtPorts}"
-            # Forward only the ports above; don't route to the host.
-            "--no-map-gw"
+            "--no-map-gw" # no route to the host
             "--no-dhcp-dns"
             "--no-udp"
             "--no-icmp" # implies --no-ndp
@@ -76,7 +70,6 @@
         };
       };
 
-      # Host-side egress guard
       networking.nftables.enable = true;
       # The build-time check sandbox kernel lacks `socket cgroupv2` support.
       networking.nftables.checkRuleset = false;
@@ -90,7 +83,7 @@
             type filter hook output priority filter; policy accept;
             socket cgroupv2 level 2 @passt jump passt-egress
           }
-          # passt does inbound-only forwarding: allow its replies, drop the rest.
+          # inbound-only: allow replies, drop anything passt initiates
           chain passt-egress {
             ct state established,related accept
             counter drop
@@ -106,9 +99,9 @@
           system.stateVersion = "26.05";
 
           microvm = {
-            # Networking is wired to passt over the unix socket.
             qemu.extraArgs = [
               "-netdev"
+              # reconnect-ms: tolerate passt (re)starts and startup ordering
               "stream,id=net0,addr.type=unix,addr.path=${passtSocket},reconnect-ms=1000"
               "-device"
               "virtio-net-device,netdev=net0"
@@ -153,11 +146,9 @@
               GatewayPorts = "clientspecified";
               ClientAliveInterval = 30;
               ClientAliveCountMax = 3;
-              # Forwarding only, no shell/exec/subsystem sessions.
-              MaxSessions = 0;
-              # Flood resistance:
-              LoginGraceTime = 20; # the window to finish authenticating
-              MaxStartups = "3:50:10"; # caps concurrent unauthenticated connections, start:drop_rate:full
+              MaxSessions = 0; # forwarding only, no shell/exec sessions
+              LoginGraceTime = 20;
+              MaxStartups = "3:50:10"; # concurrent unauthed conns: start:drop%:full
             };
           };
 
@@ -173,6 +164,9 @@
           console.enable = false;
           powerManagement.enable = false;
           nix.enable = false;
+
+          # guest logs surface in host journalctl -u microvm@tunnel
+          services.journald.extraConfig = "ForwardToConsole=yes";
 
           security.protectKernelImage = true; # no kexec
           boot.kernel.sysctl."kernel.kptr_restrict" = 2;
