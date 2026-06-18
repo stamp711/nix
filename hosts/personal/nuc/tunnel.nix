@@ -9,7 +9,7 @@
       ...
     }:
     let
-      userName = "tunnel";
+      userName = "theseus";
 
       tunnelKeys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDuNXgUoOwCVdvkegE+FGP77qdyWEQFqcRgIY0d6lKeh" # 1Password
