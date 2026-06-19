@@ -1,4 +1,5 @@
 # Defaults + enablement for the mihomo proxy router (see my/proxy-router.nix).
+{ self, ... }:
 {
   flake.homeModules.cli-environment = {
     my.proxyRouter = {
@@ -45,17 +46,7 @@
         interval = 60;
       };
 
-      gatedDomains = [
-        "google.com"
-        "github.com"
-        "deepwiki.com"
-        "linear.app"
-        "anthropic.com"
-        "claude.ai"
-        "claude.com"
-        "cdn.usefathom.com"
-        "datadoghq.com"
-      ];
+      gatedDomains = self.lib.gatedDomains;
 
       directDomains = [ ];
 

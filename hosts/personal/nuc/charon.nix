@@ -1,5 +1,5 @@
 # charon: domain-allowlisted forward proxy (tinyproxy) behind SSH, egress via Surge.
-{ inputs, ... }:
+{ inputs, self, ... }:
 {
   flake.nixosModules.charon =
     {
@@ -30,18 +30,7 @@
       passtSocket = "/run/${passtRuntimeDir}/passt.sock";
 
       # The only domains the proxy will reach (matched as domain + subdomains).
-      allowedDomains = [
-        "google.com"
-        "github.com"
-        "deepwiki.com"
-        "linear.app"
-
-        "anthropic.com"
-        "claude.ai"
-        "claude.com"
-        "cdn.usefathom.com"
-        "datadoghq.com"
-      ];
+      allowedDomains = self.lib.gatedDomains;
 
       filterFile = pkgs.writeText "charon-allow" (
         lib.concatMapStringsSep "\n" (

@@ -3,6 +3,9 @@ let
   inherit (inputs.nixpkgs) lib;
 in
 {
+  # Domains routed via the US-residential egress path (charon allowlist == proxyRouter gate).
+  gatedDomains = import ./gated-domains.nix;
+
   # Create a nixpkgs instance with our standard configuration.
   mkPkgs =
     {
