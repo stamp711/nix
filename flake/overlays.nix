@@ -22,6 +22,15 @@
         ];
       });
 
+      # fallback proxy-group: when no member passes its health-check, use the
+      # LAST member as last resort instead of the first.
+      mihomo = prev.mihomo.overrideAttrs (old: {
+        postPatch = (old.postPatch or "") + ''
+          substituteInPlace adapter/outboundgroup/fallback.go \
+            --replace-fail 'return proxies[0]' 'return proxies[len(proxies)-1]'
+        '';
+      });
+
       # Default clang-format to --fallback-style=none so it no-ops when no
       # .clang-format is present (instead of silently reformatting to LLVM).
       clang-tools = prev.symlinkJoin {
