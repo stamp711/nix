@@ -64,7 +64,7 @@
         log-level = "warning";
         proxies = named cfg.proxies;
         proxy-groups = [
-          (mkGroup "gate")
+          (mkGroup "native")
           (mkGroup "auto")
         ];
         rules =
@@ -72,7 +72,7 @@
             c: "${if lib.hasInfix ":" c then "IP-CIDR6" else "IP-CIDR"},${c},DIRECT,no-resolve"
           ) cfg.directIPs)
           ++ (map (d: "DOMAIN-SUFFIX,${d},DIRECT") cfg.directDomains)
-          ++ (map (d: "DOMAIN-SUFFIX,${d},gate") cfg.gatedDomains)
+          ++ (map (d: "DOMAIN-SUFFIX,${d},native") cfg.nativeDomains)
           ++ [ "MATCH,auto" ];
       }
       // lib.optionalAttrs (cfg.externalController != null) {
@@ -112,12 +112,12 @@
         };
         fallbackProxyGroups = lib.mkOption {
           default = { };
-          description = "The two fallback proxy-groups: gatedDomains -> gate, everything else -> auto.";
+          description = "The two fallback proxy-groups: nativeDomains -> native, everything else -> auto.";
           type = lib.types.submodule {
             options = {
-              gate = lib.mkOption {
+              native = lib.mkOption {
                 type = groupType;
-                description = "Group for gatedDomains; every member should be a proxy (no direct).";
+                description = "Group for nativeDomains; every member should be a proxy (no direct).";
               };
               auto = lib.mkOption {
                 type = groupType;
@@ -126,10 +126,10 @@
             };
           };
         };
-        gatedDomains = lib.mkOption {
+        nativeDomains = lib.mkOption {
           type = lib.types.listOf lib.types.str;
           default = [ ];
-          description = "DOMAIN-SUFFIX domains routed via the 'gate' group.";
+          description = "DOMAIN-SUFFIX domains routed via the 'native' group.";
         };
         directDomains = lib.mkOption {
           type = lib.types.listOf lib.types.str;
@@ -164,15 +164,22 @@
                 check =
                   gname:
                   let
-                    undefined = lib.subtractLists known cfg.fallbackProxyGroups.${gname}.proxies;
+                    ps = cfg.fallbackProxyGroups.${gname}.proxies;
+                    undefined = lib.subtractLists known ps;
+                    dups = lib.filter (p: lib.count (x: x == p) ps > 1) (lib.unique ps);
                   in
                   {
-                    assertion = undefined == [ ];
-                    message = "my.proxyRouter.fallbackProxyGroups.${gname}.proxies has undefined members: ${lib.concatStringsSep ", " undefined} (each must be a key in my.proxyRouter.proxies or a built-in like DIRECT)";
+                    assertion = undefined == [ ] && dups == [ ];
+                    message =
+                      "my.proxyRouter.fallbackProxyGroups.${gname}.proxies: "
+                      +
+                        lib.optionalString (undefined != [ ])
+                          "undefined members ${lib.concatStringsSep ", " undefined} (each must be a key in my.proxyRouter.proxies or a built-in like DIRECT). "
+                      + lib.optionalString (dups != [ ]) "duplicate members ${lib.concatStringsSep ", " dups}.";
                   };
               in
               [
-                (check "gate")
+                (check "native")
                 (check "auto")
               ];
           }

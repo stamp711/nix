@@ -36,7 +36,7 @@
         interval = 60;
       };
 
-      fallbackProxyGroups.gate = {
+      fallbackProxyGroups.native = {
         proxies = [
           "surge-local"
           "charon"
@@ -46,7 +46,7 @@
         interval = 60;
       };
 
-      gatedDomains = self.lib.gatedDomains;
+      nativeDomains = self.lib.gatedDomains;
 
       directDomains = [ ];
 
