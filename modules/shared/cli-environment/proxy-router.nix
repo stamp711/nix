@@ -1,5 +1,5 @@
-# Defaults + enablement for the mihomo proxy router (see my/proxy-router.nix).
-{ self, ... }:
+# Defaults + enablement for the mihomo proxy router.
+{ self, lib, ... }:
 {
   flake.homeModules.cli-environment = {
     my.proxyRouter = {
@@ -27,10 +27,12 @@
       };
 
       fallbackProxyGroups.auto = {
-        proxies = [
-          "surge-local"
-          "surge-lan"
-          "DIRECT"
+        proxies = lib.mkMerge [
+          [
+            "surge-local"
+            "surge-lan"
+          ]
+          (lib.mkOrder 9999 [ "DIRECT" ])
         ];
         url = "http://www.qualcomm.cn/generate_204";
         interval = 60;
