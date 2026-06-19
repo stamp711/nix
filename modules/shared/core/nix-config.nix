@@ -51,7 +51,10 @@ in
     };
   };
 
-  flake.systemModules.core = {
+  flake.systemModules.core = { pkgs, ... }: {
+    environment.systemPackages = [
+      inputs.system-manager.packages.${pkgs.stdenv.hostPlatform.system}.default
+    ];
     nix.enable = true;
     nix.settings = nixConfig // {
       auto-optimise-store = true;
