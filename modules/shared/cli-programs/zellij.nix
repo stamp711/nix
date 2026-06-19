@@ -1,18 +1,9 @@
 {
-  flake.homeModules.cli-programs = {
-    programs.zellij = {
-      enable = true;
-
-      settings = {
-        default_mode = "locked";
-        session_serialization = false;
-        # Run the built-in web server, and share new sessions by default.
-        web_server = true;
-        web_sharing = "on";
-      };
-
+  flake.homeModules.cli-programs =
+    { config, ... }:
+    let
       # Copied from zellij "Unlock First" config
-      extraConfig = ''
+      unlockFirstKeybinds = ''
         keybinds clear-defaults=true {
             locked {
                 bind "Ctrl g" { SwitchToMode "normal"; }
@@ -241,6 +232,59 @@
             }
         }
       '';
+    in
+    {
+      programs.zellij = {
+        enable = true;
+
+        settings = {
+          default_mode = "locked";
+          session_serialization = false;
+          # The web server is owned by the zellij-web service unit, not started per-client.
+          web_server = false;
+          web_sharing = "on";
+        };
+
+        extraConfig = unlockFirstKeybinds;
+      };
+
+      systemd.user.services.zellij-web = {
+        Unit = {
+          Description = "Zellij web server";
+          StartLimitIntervalSec = 0; # never stop retrying
+        };
+        Service = {
+          ExecStart = "${config.programs.zellij.finalPackage}/bin/zellij web";
+          # No controlling terminal supplies these, so web-created panes would lack them.
+          Environment = [
+            "TERM=xterm-256color"
+            "COLORTERM=truecolor"
+          ];
+          WorkingDirectory = "%h";
+          Restart = "always";
+          RestartSec = 10;
+          KillMode = "process"; # else restart kills web-created sessions
+        };
+        Install.WantedBy = [ "default.target" ];
+      };
+
+      launchd.agents.zellij-web = {
+        enable = true;
+        config = {
+          ProgramArguments = [
+            "${config.programs.zellij.finalPackage}/bin/zellij"
+            "web"
+          ];
+          # No controlling terminal supplies these, so web-created panes would lack them.
+          EnvironmentVariables = {
+            TERM = "xterm-256color";
+            COLORTERM = "truecolor";
+          };
+          WorkingDirectory = config.home.homeDirectory; # launchd defaults to "/"
+          KeepAlive = true;
+          RunAtLoad = true;
+          AbandonProcessGroup = true; # else launchd kills web-created sessions on restart
+        };
+      };
     };
-  };
 }
