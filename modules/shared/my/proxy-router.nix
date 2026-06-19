@@ -81,7 +81,7 @@
 
       mihomoConfig = (pkgs.formats.yaml { }).generate "mihomo.yaml" settings;
 
-      # loopback is always direct; direct domains bypass the router too
+      # loopback is always direct; direct domains + IPs bypass the router too
       noProxy = lib.concatStringsSep "," (
         [
           "localhost"
@@ -89,6 +89,7 @@
           "::1"
         ]
         ++ cfg.directDomains
+        ++ cfg.directIPs
       );
 
     in
@@ -139,7 +140,7 @@
         directIPs = lib.mkOption {
           type = lib.types.listOf lib.types.str;
           default = [ ];
-          description = "IP-CIDR ranges forced DIRECT (no-resolve); e.g. LAN/loopback/tailnet. Not added to no_proxy (CIDR there is unreliable).";
+          description = "IP-CIDR ranges forced DIRECT (no-resolve) and added to no_proxy; e.g. LAN/loopback/tailnet.";
         };
         enableZshIntegration = lib.mkOption {
           type = lib.types.bool;
