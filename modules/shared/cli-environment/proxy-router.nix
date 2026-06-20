@@ -41,8 +41,8 @@
       fallbackProxyGroups.native = {
         proxies = [
           "surge-local"
-          "charon"
           "surge-lan"
+          "charon"
         ];
         url = "http://www.google.com/generate_204";
         interval = 60;
