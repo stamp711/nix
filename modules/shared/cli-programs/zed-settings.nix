@@ -168,6 +168,10 @@
                 arguments = [ "-" ];
               };
 
+              # Prefer LSP document symbols over tree-sitter
+              C.document_symbols = "on";
+              "C++".document_symbols = "on";
+
               Python.formatter.language_server.name = "ruff";
               JSON.formatter = prettierFormatter;
               YAML.formatter = prettierFormatter;
@@ -192,7 +196,7 @@
           };
 
           code_lens = "menu";
-          document_symbols = "on";
+          document_symbols = "off";
           diagnostics.inline.enabled = true;
           inlay_hints.toggle_on_modifiers_press.control = true;
           inlay_hints.show_background = true;
