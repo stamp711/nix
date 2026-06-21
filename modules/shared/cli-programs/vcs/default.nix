@@ -1,5 +1,5 @@
 # Git configuration with signing, delta, and GitHub CLI & other VCS tools
-{ self, ... }:
+{ self, inputs, ... }:
 {
   flake.homeModules.cli-programs =
     {
@@ -30,6 +30,8 @@
       ];
 
       jjIdentity = mkAgeSecret ./jj.personal-identity.toml.age;
+
+      oyui = inputs.oyui.packages.${pkgs.stdenv.hostPlatform.system}.default;
     in
     {
       programs.git.enable = true;
@@ -58,6 +60,7 @@
       programs.delta.enableGitIntegration = true;
       programs.delta.enableJujutsuIntegration = true;
       programs.delta.options.side-by-side = true;
+      programs.delta.options.navigate = true;
 
       programs.mergiraf.enable = true;
       programs.mergiraf.enableGitIntegration = true;
@@ -105,6 +108,19 @@
 
       programs.jujutsu.enable = true;
       programs.jujutsu.settings.ui.default-command = [ "log" ];
+
+      # oyui interactive diff editor
+      programs.jujutsu.settings.ui.diff-editor = "oyui";
+      programs.jujutsu.settings.ui.diff-instructions = false;
+      programs.jujutsu.settings.merge-tools.oyui = {
+        program = lib.getExe' oyui "oyui";
+        edit-args = [
+          "diff"
+          "$left"
+          "$right"
+        ];
+      };
+
       programs.jujutsu.settings."--scope" = [
         {
           "--when".repositories = [ "${ghqRoot}/github.com" ];
@@ -118,9 +134,18 @@
 
       programs.jjui.enable = true;
 
+      # jj/gg diff with diffnav
+      programs.zsh.initContent = lib.mkAfter ''
+        ggr() { git diff "$@" | diffnav; }
+        jjr() { jj diff --git "$@" | diffnav; }
+      '';
+
       home.packages = with pkgs; [
+        diffnav
         ghq
         git-filter-repo
+        lazyjj
+        oyui
       ];
 
       # Conditional identity (age-encrypted)

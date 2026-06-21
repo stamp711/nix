@@ -77,6 +77,12 @@
       url = "github:dmmulroy/jj-starship";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    oyui = {
+      url = "github:emilien-jegou/oyui";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.inputs.systems.follows = "systems";
+    };
     monaco = {
       url = "github:thep0y/monaco-nerd-font";
       flake = false;
