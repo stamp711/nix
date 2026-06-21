@@ -70,7 +70,7 @@
           vertical_scroll_margin = 12;
 
           # Layout
-          outline_panel.dock = "right";
+          outline_panel.dock = "left";
           collaboration_panel.dock = "left";
           git_panel.dock = "left";
           project_panel.dock = "left";
