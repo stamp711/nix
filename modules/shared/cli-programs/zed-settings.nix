@@ -22,7 +22,7 @@
         mutableUserKeymaps = false;
         userKeymaps = [
           {
-            bindings."ctrl-\\" = "workspace::NewCenterTerminal";
+            bindings."ctrl-\\" = "assistant::InlineAssist";
             bindings."alt-o" = "editor::SwitchSourceHeader";
             bindings."cmd-[" = "workspace::ActivatePreviousPane";
             bindings."cmd-]" = "workspace::ActivateNextPane";
