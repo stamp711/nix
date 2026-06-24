@@ -34,6 +34,8 @@
       oyui = inputs.oyui.packages.${pkgs.stdenv.hostPlatform.system}.default;
     in
     {
+      imports = [ inputs.hunk.homeManagerModules.default ];
+
       programs.git.enable = true;
 
       # Some basic settings
@@ -133,6 +135,13 @@
       ];
 
       programs.jjui.enable = true;
+
+      # hunk review-first diff viewer
+      programs.hunk.enable = true;
+      programs.hunk.settings = {
+        theme = "auto";
+        agent_notes = true;
+      };
 
       # jj/gg diff with diffnav
       programs.zsh.initContent = lib.mkAfter ''

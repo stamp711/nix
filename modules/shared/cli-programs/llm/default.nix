@@ -23,8 +23,9 @@ in
 
       localSkills = importSkills ./skills;
       cavemanSkills = importSkills (inputs.caveman + "/skills");
+      hunkSkills = importSkills (inputs.hunk + "/skills");
 
-      skills = cavemanSkills // localSkills;
+      skills = cavemanSkills // hunkSkills // localSkills;
     in
     {
       programs.claude-code = {
