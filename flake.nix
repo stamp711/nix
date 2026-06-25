@@ -44,6 +44,7 @@
     deploy-rs = {
       url = "github:serokell/deploy-rs";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.utils.inputs.systems.follows = "systems";
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware";
     microvm = {
@@ -66,10 +67,13 @@
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
+      inputs.systems.follows = "systems";
     };
     agenix-rekey = {
       url = "github:stamp711/agenix-rekey";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
+      inputs.treefmt-nix.follows = "treefmt-nix";
     };
     disko = {
       url = "github:nix-community/disko";
@@ -83,6 +87,7 @@
     jj-starship = {
       url = "github:dmmulroy/jj-starship";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.inputs.systems.follows = "systems";
     };
     oyui = {
       url = "github:emilien-jegou/oyui";
@@ -93,6 +98,9 @@
     hunk = {
       url = "github:modem-dev/hunk";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.bun2nix.inputs.systems.follows = "systems";
+      inputs.bun2nix.inputs.flake-parts.follows = "flake-parts";
+      inputs.bun2nix.inputs.treefmt-nix.follows = "treefmt-nix";
     };
     monaco = {
       url = "github:thep0y/monaco-nerd-font";
@@ -109,6 +117,7 @@
     solaar = {
       url = "https://flakehub.com/f/Svenum/Solaar-Flake/*.tar.gz";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.utils.inputs.flake-utils.inputs.systems.follows = "systems";
     };
     caelestia-shell = {
       url = "github:caelestia-dots/shell";
@@ -146,6 +155,8 @@
     system-manager = {
       url = "github:numtide/system-manager";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.userborn.inputs.systems.follows = "systems";
+      inputs.userborn.inputs.flake-parts.follows = "flake-parts";
     };
     zsh-bench = {
       url = "github:romkatv/zsh-bench";
@@ -154,6 +165,7 @@
     zig2nix = {
       url = "github:Cloudef/zig2nix";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.inputs.systems.follows = "systems";
     };
     zig-flake = {
       url = "github:silversquirl/zig-flake";
