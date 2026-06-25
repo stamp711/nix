@@ -1,4 +1,4 @@
-# Direnv with nix-direnv integration & mise
+# Direnv with nix-direnv integration
 {
   flake.homeModules.cli-environment =
     {
@@ -13,7 +13,6 @@
         enable = true;
         enableZshIntegration = false; # deferred
         nix-direnv.enable = true;
-        mise.enable = true;
       };
 
       # Devenv
@@ -35,24 +34,18 @@
         ".pre-commit-config.yaml"
       ];
 
-      programs.mise = {
-        enable = true;
-        enableZshIntegration = false; # deferred
-      };
-
       # Deferred zsh init for direnv and mise (pre-built, no forks at runtime)
       my.zsh-defer.initContent =
         let
           direnvInit = pkgs.runCommand "direnv-hook.zsh" { } ''
             ${lib.getExe config.programs.direnv.package} hook zsh > $out
           '';
-          miseInit = pkgs.runCommand "mise-activate.zsh" { } ''
-            ${lib.getExe config.programs.mise.package} activate zsh > $out
-          '';
+          # miseInit = pkgs.runCommand "mise-activate.zsh" { } ''
+          #   ${lib.getExe config.programs.mise.package} activate zsh > $out
+          # '';
         in
         [
           { content = "source ${direnvInit}"; }
-          { content = "source ${miseInit}"; }
         ];
     };
 }
