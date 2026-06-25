@@ -1,4 +1,4 @@
-# Neovim: the nvf build (packages/nvim) as `nvim`, plus lazyvim-nix as `lvim`
+# Neovim: the nixvim build (packages/nvim) as `nvim`, plus lazyvim-nix as `lvim`
 #  LazyVim lives in ~/.config/lazyvim via NVIM_APPNAME.
 { self, inputs, ... }: {
   flake.homeModules.cli-programs =
@@ -12,7 +12,7 @@
       imports = [ inputs.lazyvim.homeManagerModules.default ];
 
       home.packages = [
-        # hiPrio so nvf wins the `nvim` name over lazyvim's programs.neovim install
+        # hiPrio so nixvim wins the `nvim` name over lazyvim's programs.neovim install
         (lib.hiPrio self.packages.${pkgs.stdenv.hostPlatform.system}.nvim)
         (pkgs.runCommand "lvim" { nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
           makeWrapper ${config.programs.neovim.finalPackage}/bin/nvim $out/bin/lvim \

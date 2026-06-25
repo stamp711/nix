@@ -1,4 +1,4 @@
-# Neovide GUI wrappers: `nvide` drives the nvf nvim, `lvide` drives the
+# Neovide GUI wrappers: `nvide` drives the nixvim nvim, `lvide` drives the
 # lazyvim-nix neovim (NVIM_APPNAME=lazyvim, config in ~/.config/lazyvim).
 { self, ... }:
 {

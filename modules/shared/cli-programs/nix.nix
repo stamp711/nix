@@ -70,9 +70,9 @@
               }}";
           in
           {
-            nvf = "${
-              inputs.nvf.packages.${pkgs.stdenv.hostPlatform.system}.docs-json
-            }/share/doc/nvf/options.json";
+            nixvim = "${
+              inputs.nixvim.packages.${pkgs.stdenv.hostPlatform.system}.options-json
+            }/share/doc/nixos/options.json";
             agenix = mkOpts inputs.agenix inputs.agenix.nixosModules.default;
             impermanence = mkOpts inputs.impermanence inputs.impermanence.nixosModules.impermanence;
             microvm = mkOpts inputs.microvm inputs.microvm.nixosModules.microvm;
