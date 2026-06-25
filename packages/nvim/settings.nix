@@ -1,6 +1,4 @@
-# nvf vim settings (single source of truth for the nvim package).
-# Lua-heavy bits (plugin setup, keymaps) can move to sibling *.lua files and be
-# pulled in with builtins.readFile, keeping them stylua-formatted.
+{ lib, ... }:
 {
   vim = {
     theme = {
@@ -16,7 +14,47 @@
       tabstop = 2;
       expandtab = true;
       signcolumn = "yes";
+      scrolloff = 8;
+      cursorline = true;
+      splitright = true;
+      splitbelow = true;
     };
+
+    keymaps = [
+      {
+        key = "<Esc>";
+        mode = "n";
+        action = "<cmd>noh<CR>";
+        desc = "Clear search highlight";
+      }
+      {
+        key = "<leader>y";
+        mode = [
+          "n"
+          "x"
+        ];
+        action = "\"+y";
+        desc = "Yank to system clipboard";
+      }
+    ];
+
+    autocmds = [
+      {
+        event = [
+          "FocusGained"
+          "TermClose"
+          "TermLeave"
+        ];
+        desc = "Reload buffer if the file changed externally";
+        callback = lib.generators.mkLuaInline ''
+          function()
+            if vim.o.buftype ~= "nofile" then
+              vim.cmd("checktime")
+            end
+          end
+        '';
+      }
+    ];
 
     statusline.lualine.enable = true;
     telescope.enable = true;
@@ -25,10 +63,15 @@
     autocomplete.blink-cmp.enable = true;
     git.gitsigns.enable = true;
     utility.motion.flash-nvim.enable = true;
+    utility.surround.enable = true;
+    utility.oil-nvim.enable = true;
+    autopairs.nvim-autopairs.enable = true;
 
     lsp = {
       enable = true;
       formatOnSave = true;
+      inlayHints.enable = true;
+      trouble.enable = true;
     };
 
     languages = {
