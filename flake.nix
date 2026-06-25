@@ -119,10 +119,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.utils.inputs.flake-utils.inputs.systems.follows = "systems";
     };
-    caelestia-shell = {
-      url = "github:caelestia-dots/shell";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     brew-nix = {
       url = "github:BatteredBunny/brew-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -131,10 +127,6 @@
     };
     brew-api = {
       url = "github:BatteredBunny/brew-api";
-      flake = false;
-    };
-    caveman = {
-      url = "github:JuliusBrussee/caveman";
       flake = false;
     };
     # no nixpkgs follows so cache.numtide.com hits
