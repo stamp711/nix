@@ -1,5 +1,4 @@
-{ lib, ... }:
-{
+{ lib, ... }: {
   vim = {
     theme = {
       enable = true;
@@ -20,23 +19,7 @@
       splitbelow = true;
     };
 
-    keymaps = [
-      {
-        key = "<Esc>";
-        mode = "n";
-        action = "<cmd>noh<CR>";
-        desc = "Clear search highlight";
-      }
-      {
-        key = "<leader>y";
-        mode = [
-          "n"
-          "x"
-        ];
-        action = "\"+y";
-        desc = "Yank to system clipboard";
-      }
-    ];
+    keymaps = import ./keymaps.nix;
 
     autocmds = [
       {
@@ -66,6 +49,28 @@
     utility.surround.enable = true;
     utility.oil-nvim.enable = true;
     autopairs.nvim-autopairs.enable = true;
+
+    tabline.nvimBufferline = {
+      enable = true;
+      mappings = {
+        cyclePrevious = "H";
+        cycleNext = "L";
+      };
+      setupOpts.options.always_show_bufferline = false;
+    };
+    filetree.neo-tree.enable = true;
+    utility.outline.aerial-nvim.enable = true;
+    ui.noice.enable = true;
+
+    navigation.harpoon = {
+      enable = true;
+      mappings = {
+        file1 = "<leader>1";
+        file2 = "<leader>2";
+        file3 = "<leader>3";
+        file4 = "<leader>4";
+      };
+    };
 
     lsp = {
       enable = true;
