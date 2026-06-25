@@ -19,8 +19,6 @@
       splitbelow = true;
     };
 
-    keymaps = import ./keymaps.nix;
-
     autocmds = [
       {
         event = [
