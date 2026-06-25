@@ -1,6 +1,5 @@
 # Nix development and workflow tools
-{ inputs, ... }:
-{
+{ inputs, ... }: {
   flake.homeModules.cli-programs =
     {
       config,
@@ -79,6 +78,10 @@
             microvm = mkOpts inputs.microvm inputs.microvm.nixosModules.microvm;
             nixvirt = mkOpts inputs.NixVirt inputs.NixVirt.nixosModules.default;
             solaar = mkOpts inputs.solaar inputs.solaar.nixosModules.solaar;
+
+            my-home = mkOpts inputs.self inputs.self.homeModules.my;
+            my-nixos = mkOpts inputs.self inputs.self.nixosModules.my;
+            my-darwin = mkOpts inputs.self inputs.self.darwinModules.my;
           };
       };
     };
