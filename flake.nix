@@ -8,6 +8,7 @@
       imports =
         (import-dir ./flake { collect = true; })._all
         ++ (import-dir ./modules { collect = true; })._all
+        ++ (import-dir ./packages { collect = true; })._all
         ++ (import-dir ./profiles { collect = true; })._all
         ++ (import-dir ./hosts { collect = true; })._all
         ++ (import-dir ./shells { collect = true; })._all;
@@ -17,6 +18,12 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
     systems.url = "github:nix-systems/default";
+    nvf = {
+      url = "github:notashelf/nvf";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
+      inputs.systems.follows = "systems";
+    };
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
