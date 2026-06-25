@@ -15,44 +15,44 @@
 #   3. if upstream libfprint then covers 0752, just set `services.fprintd.enable = true;`
 # While 0752 is not yet upstream, keep the id_table patch below even after the
 # branch merges (it adds our specific PID).
-{ inputs, ... }:
+# { inputs, ... }:
 {
   flake.nixosModules.gpd-fingerprint =
     { pkgs, ... }:
-    let
-      libfprint-focaltech = pkgs.libfprint.overrideAttrs (old: {
-        version = "1.94.10-focaltech-moh";
-        src = inputs.libfprint-focaltech;
+    # let
+    #   libfprint-focaltech = pkgs.libfprint.overrideAttrs (old: {
+    #     version = "1.94.10-focaltech-moh";
+    #     src = inputs.libfprint-focaltech;
 
-        # The branch ships the FT9362 driver registered for c652 only; add 0752.
-        # --replace-fail so we notice if upstream changes the id_table layout.
-        postPatch = (old.postPatch or "") + ''
-          substituteInPlace libfprint/drivers/focaltech.c \
-            --replace-fail \
-              '{ .vid = 0x2808, .pid = 0xc652 },' \
-              '{ .vid = 0x2808, .pid = 0xc652 },
-            { .vid = 0x2808, .pid = 0x0752 },'
+    #     # The branch ships the FT9362 driver registered for c652 only; add 0752.
+    #     # --replace-fail so we notice if upstream changes the id_table layout.
+    #     postPatch = (old.postPatch or "") + ''
+    #       substituteInPlace libfprint/drivers/focaltech.c \
+    #         --replace-fail \
+    #           '{ .vid = 0x2808, .pid = 0xc652 },' \
+    #           '{ .vid = 0x2808, .pid = 0xc652 },
+    #         { .vid = 0x2808, .pid = 0x0752 },'
 
-          # The branch execs a test script at meson configure time, but the
-          # sandbox has no /usr/bin/env and upstream's bare `patchShebangs` runs
-          # in --host mode (skipping the python3 build tool), leaving those scripts
-          # with `#!/usr/bin/env python3`. Point them at the build python3 directly.
-          for f in tests/*.py examples/*.py; do
-            substituteInPlace "$f" --replace-quiet '/usr/bin/env python3' '${pkgs.python3.interpreter}'
-          done
-        '';
+    #       # The branch execs a test script at meson configure time, but the
+    #       # sandbox has no /usr/bin/env and upstream's bare `patchShebangs` runs
+    #       # in --host mode (skipping the python3 build tool), leaving those scripts
+    #       # with `#!/usr/bin/env python3`. Point them at the build python3 directly.
+    #       for f in tests/*.py examples/*.py; do
+    #         substituteInPlace "$f" --replace-quiet '/usr/bin/env python3' '${pkgs.python3.interpreter}'
+    #       done
+    #     '';
 
-        # WIP branch carries device-dependent capture tests; don't gate the build on them.
-        doCheck = false;
-        doInstallCheck = false;
-      });
+    #     # WIP branch carries device-dependent capture tests; don't gate the build on them.
+    #     doCheck = false;
+    #     doInstallCheck = false;
+    #   });
 
-      fprintd = pkgs.fprintd.override { libfprint = libfprint-focaltech; };
-    in
+    #   fprintd = pkgs.fprintd.override { libfprint = libfprint-focaltech; };
+    # in
     {
       services.fprintd = {
         enable = true;
-        package = fprintd;
+        package = pkgs.fprintd;
       };
 
       # Match-on-host driver enrolled templates
