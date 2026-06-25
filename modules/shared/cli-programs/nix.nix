@@ -58,6 +58,28 @@
           "darwin"
           "nur"
         ];
+        # Third-party module options not covered by the builtin indexes.
+        # unf evaluates a module standalone into an options.json; disko,
+        # system-manager, agenix-rekey, and nixos-wsl don't evaluate in isolation.
+        experimental.options_file =
+          let
+            mkOpts =
+              self: module:
+              "${inputs.unf.lib.json {
+                inherit self pkgs;
+                modules = [ module ];
+              }}";
+          in
+          {
+            nvf = "${
+              inputs.nvf.packages.${pkgs.stdenv.hostPlatform.system}.docs-json
+            }/share/doc/nvf/options.json";
+            agenix = mkOpts inputs.agenix inputs.agenix.nixosModules.default;
+            impermanence = mkOpts inputs.impermanence inputs.impermanence.nixosModules.impermanence;
+            microvm = mkOpts inputs.microvm inputs.microvm.nixosModules.microvm;
+            nixvirt = mkOpts inputs.NixVirt inputs.NixVirt.nixosModules.default;
+            solaar = mkOpts inputs.solaar inputs.solaar.nixosModules.solaar;
+          };
       };
     };
 }

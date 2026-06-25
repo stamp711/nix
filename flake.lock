@@ -1100,6 +1100,7 @@
         "system-manager": "system-manager",
         "systems": "systems_2",
         "treefmt-nix": "treefmt-nix_2",
+        "unf": "unf",
         "zig-flake": "zig-flake",
         "zig2nix": "zig2nix",
         "zls": "zls",
@@ -1253,6 +1254,26 @@
         "owner": "numtide",
         "repo": "treefmt-nix",
         "type": "github"
+      }
+    },
+    "unf": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1779596435,
+        "narHash": "sha256-ztzeJVOQDhQtE0z9DwtSWL+OyoWKZrAD4gzRRvUP9ug=",
+        "ref": "refs/heads/main",
+        "rev": "4f5ab30ee524f09126b09f42f249c0aba756459d",
+        "revCount": 6,
+        "type": "git",
+        "url": "https://git.atagen.co/atagen/unf"
+      },
+      "original": {
+        "type": "git",
+        "url": "https://git.atagen.co/atagen/unf"
       }
     },
     "userborn": {
