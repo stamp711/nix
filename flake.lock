@@ -1002,6 +1002,22 @@
         "type": "github"
       }
     },
+    "nvim-99": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1781229584,
+        "narHash": "sha256-iilpiG81kHIv7Y0qvPzZOanNA0lsPotlB18cvtmTy0o=",
+        "owner": "ThePrimeagen",
+        "repo": "99",
+        "rev": "c17422457027c913c76c75a921fca1e623d2678e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ThePrimeagen",
+        "repo": "99",
+        "type": "github"
+      }
+    },
     "oyui": {
       "inputs": {
         "flake-utils": "flake-utils_3",
@@ -1104,6 +1120,7 @@
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs_3",
         "nixvim": "nixvim",
+        "nvim-99": "nvim-99",
         "oyui": "oyui",
         "solaar": "solaar",
         "system-manager": "system-manager",

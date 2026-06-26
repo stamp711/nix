@@ -10,7 +10,10 @@
     # };
 
     # Custom modifications to packages
-    modifications = _: prev: {
+    modifications = final: prev: {
+      # newer claude-code for everything, incl. nixvim's baked claudecode dependency
+      claude-code = final.llm-agents.claude-code;
+
       # TODO: Remove once NixOS/nixpkgs#515956 lands in nixos-unstable
       openldap = prev.openldap.overrideAttrs (_: {
         doCheck = false;
