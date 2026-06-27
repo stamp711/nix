@@ -1,4 +1,4 @@
-# Neovim: the nixvim build (packages/nvim) as `nvim`, plus lazyvim-nix as `lvim`
+# Neovim: the nixvim config (nixvim/) as `nvim`, plus lazyvim-nix as `lvim`
 #  LazyVim lives in ~/.config/lazyvim via NVIM_APPNAME.
 { self, inputs, ... }: {
   flake.homeModules.cli-programs =
@@ -9,11 +9,21 @@
       ...
     }:
     {
-      imports = [ inputs.lazyvim.homeManagerModules.default ];
+      imports = [
+        inputs.nixvim.homeModules.nixvim
+        inputs.lazyvim.homeManagerModules.default
+      ];
+
+      # programs.nixvim (not the bare package) so per-host `programs.nixvim.*` overrides merge.
+      # enable stays off: it asserts against programs.neovim, which lvim enables.
+      programs.nixvim = {
+        nixpkgs.pkgs = pkgs;
+        imports = [ self.nixvimModules.default ];
+      };
 
       home.packages = [
         # hiPrio so nixvim wins the `nvim` name over lazyvim's programs.neovim install
-        (lib.hiPrio self.packages.${pkgs.stdenv.hostPlatform.system}.nvim)
+        (lib.hiPrio config.programs.nixvim.build.package)
         (pkgs.runCommand "lvim" { nativeBuildInputs = [ pkgs.makeWrapper ]; } ''
           makeWrapper ${config.programs.neovim.finalPackage}/bin/nvim $out/bin/lvim \
             --set NVIM_APPNAME lazyvim

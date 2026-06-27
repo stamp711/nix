@@ -7,10 +7,11 @@
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
       imports =
         (import-dir ./flake { collect = true; })._all
+        ++ (import-dir ./hosts { collect = true; })._all
         ++ (import-dir ./modules { collect = true; })._all
+        ++ (import-dir ./nixvim { collect = true; })._all
         ++ (import-dir ./packages { collect = true; })._all
         ++ (import-dir ./profiles { collect = true; })._all
-        ++ (import-dir ./hosts { collect = true; })._all
         ++ (import-dir ./shells { collect = true; })._all;
     };
 
