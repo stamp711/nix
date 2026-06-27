@@ -1,6 +1,6 @@
 # Neovide GUI wrappers: `nvide` drives the nixvim nvim, `lvide` drives the
 # lazyvim-nix neovim (NVIM_APPNAME=lazyvim, config in ~/.config/lazyvim).
-{ ... }:
+{ self, ... }:
 {
   flake.homeModules.desktop-programs = { config, pkgs, ... }: {
     home.packages = [
@@ -16,8 +16,7 @@
         name = "lvide";
         runtimeInputs = [ pkgs.neovide ];
         text = ''
-          export NVIM_APPNAME=lazyvim
-          exec neovide --neovim-bin ${config.programs.neovim.finalPackage}/bin/nvim "$@"
+          exec neovide --neovim-bin ${self.packages.${pkgs.stdenv.hostPlatform.system}.lvim}/bin/lvim "$@"
         '';
       })
     ];
