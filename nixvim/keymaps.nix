@@ -41,25 +41,37 @@
         }
         {
           key = "<C-h>";
-          mode = "n";
+          mode = [
+            "n"
+            "t" # also in terminal mode
+          ];
           action = "<C-w>h";
           options.desc = "Go to Left Window";
         }
         {
           key = "<C-j>";
-          mode = "n";
+          mode = [
+            "n"
+            "t"
+          ];
           action = "<C-w>j";
           options.desc = "Go to Lower Window";
         }
         {
           key = "<C-k>";
-          mode = "n";
+          mode = [
+            "n"
+            "t"
+          ];
           action = "<C-w>k";
           options.desc = "Go to Upper Window";
         }
         {
           key = "<C-l>";
-          mode = "n";
+          mode = [
+            "n"
+            "t"
+          ];
           action = "<C-w>l";
           options.desc = "Go to Right Window";
         }

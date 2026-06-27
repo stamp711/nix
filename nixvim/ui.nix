@@ -1,4 +1,3 @@
-{ ... }:
 {
   flake.nixvimModules.default =
     # Appearance, panels, and UI toggles.

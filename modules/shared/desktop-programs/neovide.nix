@@ -1,5 +1,4 @@
 # Neovide GUI wrapper: `nvide` drives the nixvim nvim.
-{ ... }:
 {
   flake.homeModules.desktop-programs = { config, pkgs, ... }: {
     home.packages = [
