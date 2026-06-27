@@ -3,7 +3,7 @@
   flake.nixvimModules.default =
     # Appearance, panels, and UI toggles.
     {
-      # which-key groups, and snacks toggles via :map (so which-key shows their live on/off state).
+      # which-key groups
       extraConfigLua = ''
         require("which-key").add({
           { "<leader>u", group = "ui" },
@@ -11,7 +11,10 @@
           { "<leader>b", group = "buffer", expand = function() return require("which-key.extras").expand.buf() end },
           { "<leader>sn", group = "noice" },
         })
+      '';
 
+      # snacks toggles via :map, in Post so the Snacks global (set by snacks's own setup) already exists
+      extraConfigLuaPost = ''
         Snacks.toggle.option("spell", { name = "Spelling" }):map("<leader>us")
         Snacks.toggle.option("wrap", { name = "Wrap" }):map("<leader>uw")
         Snacks.toggle.option("relativenumber", { name = "Relative Number" }):map("<leader>uL")
@@ -113,7 +116,18 @@
           bigfile.enabled = true; # disable expensive features on very large files
           quickfile.enabled = true; # render the file before plugins finish loading
           explorer.enabled = true;
-          dashboard.enabled = true;
+          dashboard = {
+            enabled = true;
+            # snacks' default "startup" section calls require("lazy.stats"); no lazy.nvim here, so drop it
+            sections = [
+              { section = "header"; }
+              {
+                section = "keys";
+                gap = 1;
+                padding = 1;
+              }
+            ];
+          };
           indent.enabled = true;
           scope.enabled = true;
           words.enabled = true;
@@ -141,9 +155,9 @@
           };
         in
         [
-          (lua "<leader>e" "Explorer Snacks (root dir)" "Snacks.explorer()")
+          (lua "<leader>e" "Explorer Snacks (root dir)" "Snacks.explorer({ cwd = Root() })")
           (lua "<leader>E" "Explorer Snacks (cwd)" "Snacks.explorer({ cwd = vim.fn.getcwd() })")
-          (lua "<leader>fe" "Explorer Snacks (root dir)" "Snacks.explorer()")
+          (lua "<leader>fe" "Explorer Snacks (root dir)" "Snacks.explorer({ cwd = Root() })")
           (lua "<leader>fE" "Explorer Snacks (cwd)" "Snacks.explorer({ cwd = vim.fn.getcwd() })")
           (lua "<leader>n" "Notification History" "Snacks.picker.notifications()")
 

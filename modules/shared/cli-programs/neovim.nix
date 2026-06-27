@@ -1,4 +1,4 @@
-# Neovim: nixvim as `nvim`, lazyvim-nix as `lvim`.
+# Neovim: hand-rolled nixvim, baked and enabled as `nvim`.
 { self, inputs, ... }:
 {
   flake.homeModules.cli-programs =
@@ -12,7 +12,5 @@
         nixpkgs.pkgs = pkgs; # our overlaid, allowUnfree pkgs
         imports = [ self.nixvimModules.default ];
       };
-
-      home.packages = [ self.packages.${pkgs.stdenv.hostPlatform.system}.lvim ];
     };
 }

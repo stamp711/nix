@@ -30,18 +30,21 @@
           md_files = { "CLAUDE.md", "AGENTS.md", "AGENT.md" },
         })
 
-        Snacks.toggle({
-          name = "Sidekick NES",
-          get = function() return require("sidekick.nes").enabled end,
-          set = function(state) require("sidekick.nes").enable(state) end,
-        }):map("<leader>uN")
-
         require("which-key").add({
           { "<leader>a", group = "ai", mode = { "n", "v" } },
           { "<leader>a9", group = "99", mode = { "n", "x" } },
           { "<leader>ac", group = "claudecode", mode = { "n", "x" } },
           { "<leader>as", group = "sidekick", mode = { "n", "x" } },
         })
+      '';
+
+      # Snacks.toggle in Post so the Snacks global (from snacks's setup) exists
+      extraConfigLuaPost = ''
+        Snacks.toggle({
+          name = "Sidekick NES",
+          get = function() return require("sidekick.nes").enabled end,
+          set = function(state) require("sidekick.nes").enable(state) end,
+        }):map("<leader>uN")
       '';
 
       keymaps = [

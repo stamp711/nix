@@ -35,14 +35,6 @@
 
       keymaps =
         let
-          # LazyVim's root spec { "lsp", { ".git", "lua" }, "cwd" }: lsp root, else marker, else cwd.
-          root = ''
-            (function()
-              for _, c in pairs(vim.lsp.get_clients({ bufnr = 0 })) do
-                if c.root_dir then return c.root_dir end
-              end
-              return vim.fs.root(0, { ".git", "lua" }) or vim.fn.getcwd()
-            end)()'';
           # snacks calls live-grep `grep`.
           pick = key: desc: src: {
             inherit key;
@@ -53,7 +45,7 @@
           pickRoot = key: desc: src: {
             inherit key;
             mode = "n";
-            action.__raw = "function() Snacks.picker.${src}({ cwd = ${root} }) end";
+            action.__raw = "function() Snacks.picker.${src}({ cwd = Root() }) end";
             options.desc = desc;
           };
           pickCwd = key: desc: src: {
@@ -128,7 +120,7 @@
           {
             key = "<leader>ft";
             mode = "n";
-            action.__raw = "function() Snacks.terminal(nil, { cwd = ${root} }) end";
+            action.__raw = "function() Snacks.terminal(nil, { cwd = Root() }) end";
             options.desc = "Terminal (Root Dir)";
           }
           {

@@ -484,26 +484,6 @@
         ]
       },
       "locked": {
-        "lastModified": 1731533236,
-        "narHash": "sha256-l0KFg5HjrsfsO/JpG+r7fRrqm12kzFHyUHqHCVpMMbI=",
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "rev": "11707dc2f618dd54ca8739b309ec4fc024de578b",
-        "type": "github"
-      },
-      "original": {
-        "owner": "numtide",
-        "repo": "flake-utils",
-        "type": "github"
-      }
-    },
-    "flake-utils_4": {
-      "inputs": {
-        "systems": [
-          "systems"
-        ]
-      },
-      "locked": {
         "lastModified": 1694529238,
         "narHash": "sha256-zsNZZGTGnMOf9YpHKJqMSsa0dXbfmxeoJ7xHlrt+xmY=",
         "owner": "numtide",
@@ -517,7 +497,7 @@
         "type": "github"
       }
     },
-    "flake-utils_5": {
+    "flake-utils_4": {
       "inputs": {
         "systems": [
           "systems"
@@ -711,27 +691,6 @@
       "original": {
         "owner": "dmmulroy",
         "repo": "jj-starship",
-        "type": "github"
-      }
-    },
-    "lazyvim": {
-      "inputs": {
-        "flake-utils": "flake-utils_2",
-        "nixpkgs": [
-          "nixpkgs"
-        ]
-      },
-      "locked": {
-        "lastModified": 1781223826,
-        "narHash": "sha256-ezB1SLk4wyBkJZC9NHKn21FsheyVdmFha+FO/6tflO4=",
-        "owner": "pfassina",
-        "repo": "lazyvim-nix",
-        "rev": "d1f9bd2bfff35708dfaf75351bce06580a862f61",
-        "type": "github"
-      },
-      "original": {
-        "owner": "pfassina",
-        "repo": "lazyvim-nix",
         "type": "github"
       }
     },
@@ -1020,7 +979,7 @@
     },
     "oyui": {
       "inputs": {
-        "flake-utils": "flake-utils_3",
+        "flake-utils": "flake-utils_2",
         "nixpkgs": [
           "nixpkgs"
         ],
@@ -1108,7 +1067,6 @@
         "hunk": "hunk",
         "impermanence": "impermanence",
         "jj-starship": "jj-starship",
-        "lazyvim": "lazyvim",
         "llm-agents": "llm-agents",
         "microvm": "microvm",
         "monaco": "monaco",
@@ -1357,7 +1315,7 @@
     },
     "utils_2": {
       "inputs": {
-        "flake-utils": "flake-utils_4"
+        "flake-utils": "flake-utils_3"
       },
       "locked": {
         "lastModified": 1738591040,
@@ -1396,7 +1354,7 @@
     },
     "zig2nix": {
       "inputs": {
-        "flake-utils": "flake-utils_5",
+        "flake-utils": "flake-utils_4",
         "nixpkgs": [
           "nixpkgs"
         ]

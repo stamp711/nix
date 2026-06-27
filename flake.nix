@@ -30,12 +30,6 @@
       inputs.flake-parts.follows = "flake-parts";
       inputs.systems.follows = "systems";
     };
-    # LazyVim distribution, kept beside nvf as the `lazyvim` command for comparison
-    lazyvim = {
-      url = "github:pfassina/lazyvim-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.inputs.systems.follows = "systems";
-    };
     nvim-99 = {
       url = "github:ThePrimeagen/99";
       flake = false;

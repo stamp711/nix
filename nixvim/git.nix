@@ -90,7 +90,7 @@
           {
             key = "<leader>gl";
             mode = "n";
-            action.__raw = ''function() Snacks.picker.git_log({ cwd = vim.fs.root(0, ".git") }) end'';
+            action.__raw = "function() Snacks.picker.git_log({ cwd = Root.git() }) end";
             options.desc = "Git Log";
           }
           (pick "<leader>gb" "Git Blame Line" "git_log_line")
@@ -119,7 +119,7 @@
           {
             key = "<leader>gg";
             mode = "n";
-            action.__raw = ''function() Snacks.lazygit({ cwd = vim.fs.root(0, ".git") }) end'';
+            action.__raw = "function() Snacks.lazygit({ cwd = Root.git() }) end";
             options.desc = "Lazygit (Root Dir)";
           }
           {
