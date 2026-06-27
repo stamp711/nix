@@ -208,13 +208,6 @@
             options.desc = desc;
           };
 
-          swap = key: desc: dir: {
-            inherit key;
-            mode = "n";
-            action.__raw = ''function() require("nvim-treesitter-textobjects.swap").swap_${dir}("@parameter.inner") end'';
-            options.desc = desc;
-          };
-
           rep = key: desc: fn: {
             inherit key;
             mode = nxo;
@@ -265,10 +258,6 @@
               end'';
             options.desc = "Treesitter Incremental Selection";
           }
-
-          # Move argument left/right (parallels <A-j>/<A-k> move-line).
-          (swap "<A-l>" "Move argument right" "next")
-          (swap "<A-h>" "Move argument left" "previous")
 
           (rep ";" "Repeat last move forward" "repeat_last_move_next")
           (rep "," "Repeat last move backward" "repeat_last_move_previous")
