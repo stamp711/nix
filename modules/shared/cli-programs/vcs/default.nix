@@ -71,6 +71,7 @@
       # Global ignores
       programs.git.ignores = [
         "__scratch__/"
+        "tmp/"
 
         # macOS
         ".DS_Store"

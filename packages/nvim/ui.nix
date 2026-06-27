@@ -49,73 +49,73 @@
     settings.style = "warm";
   };
 
-  plugins = {
-    lualine.enable = true;
-    mini-icons.enable = true;
-    noice = {
-      enable = true;
-      settings = {
-        lsp.override = {
-          "vim.lsp.util.convert_input_to_markdown_lines" = true;
-          "vim.lsp.util.stylize_markdown" = true;
-          "cmp.entry.get_documentation" = true;
-        };
-        presets = {
-          bottom_search = true;
-          command_palette = true;
-          long_message_to_split = true;
-        };
-        routes = [
-          {
-            # route write/undo/redo notifications to the corner mini view
-            filter = {
-              event = "msg_show";
-              any = [
-                { find = "%d+L, %d+B"; }
-                { find = "; after #%d+"; }
-                { find = "; before #%d+"; }
-              ];
-            };
-            view = "mini";
-          }
-        ];
-      };
-    };
+  plugins.lualine.enable = true;
 
-    bufferline = {
-      enable = true;
-      settings.options = {
-        always_show_bufferline = false;
-        diagnostics = "nvim_lsp";
-        close_command.__raw = "function(n) Snacks.bufdelete(n) end";
-        right_mouse_command.__raw = "function(n) Snacks.bufdelete(n) end";
-        diagnostics_indicator.__raw = ''
-          function(_, _, diag)
-            local icons = { Error = " ", Warn = " " }
-            local ret = (diag.error and icons.Error .. diag.error .. " " or "")
-              .. (diag.warning and icons.Warn .. diag.warning or "")
-            return vim.trim(ret)
-          end'';
-        # reserve a column for the snacks explorer/picker sidebar so tabs don't span it
-        offsets = [
-          { filetype = "snacks_layout_box"; }
-        ];
-      };
-    };
+  plugins.mini-icons.enable = true;
 
-    snacks = {
-      enable = true;
-      settings = {
-        bigfile.enabled = true; # disable expensive features on very large files
-        quickfile.enabled = true; # render the file before plugins finish loading
-        explorer.enabled = true;
-        dashboard.enabled = true;
-        indent.enabled = true;
-        scope.enabled = true;
-        words.enabled = true;
-        notifier.enabled = true;
-        input.enabled = true;
+  plugins.noice = {
+    enable = true;
+    settings = {
+      lsp.override = {
+        "vim.lsp.util.convert_input_to_markdown_lines" = true;
+        "vim.lsp.util.stylize_markdown" = true;
+        "cmp.entry.get_documentation" = true;
       };
+      presets = {
+        bottom_search = true;
+        command_palette = true;
+        long_message_to_split = true;
+      };
+      routes = [
+        {
+          # route write/undo/redo notifications to the corner mini view
+          filter = {
+            event = "msg_show";
+            any = [
+              { find = "%d+L, %d+B"; }
+              { find = "; after #%d+"; }
+              { find = "; before #%d+"; }
+            ];
+          };
+          view = "mini";
+        }
+      ];
+    };
+  };
+
+  plugins.bufferline = {
+    enable = true;
+    settings.options = {
+      always_show_bufferline = false;
+      diagnostics = "nvim_lsp";
+      close_command.__raw = "function(n) Snacks.bufdelete(n) end";
+      right_mouse_command.__raw = "function(n) Snacks.bufdelete(n) end";
+      diagnostics_indicator.__raw = ''
+        function(_, _, diag)
+          local icons = { Error = " ", Warn = " " }
+          local ret = (diag.error and icons.Error .. diag.error .. " " or "")
+            .. (diag.warning and icons.Warn .. diag.warning or "")
+          return vim.trim(ret)
+        end'';
+      # reserve a column for the snacks explorer/picker sidebar so tabs don't span it
+      offsets = [
+        { filetype = "snacks_layout_box"; }
+      ];
+    };
+  };
+
+  plugins.snacks = {
+    enable = true;
+    settings = {
+      bigfile.enabled = true; # disable expensive features on very large files
+      quickfile.enabled = true; # render the file before plugins finish loading
+      explorer.enabled = true;
+      dashboard.enabled = true;
+      indent.enabled = true;
+      scope.enabled = true;
+      words.enabled = true;
+      notifier.enabled = true;
+      input.enabled = true;
     };
   };
 
