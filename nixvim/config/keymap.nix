@@ -45,7 +45,7 @@
             "n"
             "t" # also in terminal mode
           ];
-          action = "<C-w>h";
+          action = "<Cmd>wincmd h<CR>";
           options.desc = "Go to Left Window";
         }
         {
@@ -54,7 +54,7 @@
             "n"
             "t"
           ];
-          action = "<C-w>j";
+          action = "<Cmd>wincmd j<CR>";
           options.desc = "Go to Lower Window";
         }
         {
@@ -63,7 +63,7 @@
             "n"
             "t"
           ];
-          action = "<C-w>k";
+          action = "<Cmd>wincmd k<CR>";
           options.desc = "Go to Upper Window";
         }
         {
@@ -72,7 +72,7 @@
             "n"
             "t"
           ];
-          action = "<C-w>l";
+          action = "<Cmd>wincmd l<CR>";
           options.desc = "Go to Right Window";
         }
 

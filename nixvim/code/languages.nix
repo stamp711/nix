@@ -23,6 +23,8 @@
         cpp
         diff
         json
+        kdl # for zellij config
+        lua
         markdown
         markdown_inline
         nix
@@ -38,6 +40,7 @@
         c = [ "clang_format" ];
         cpp = [ "clang_format" ];
         json = [ "prettierd" ];
+        lua = [ "stylua" ];
         markdown = [ "prettierd" ];
         nix = [ "nixfmt" ];
         python = [ "ruff_format" ];

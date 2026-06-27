@@ -8,6 +8,7 @@
           -- Root(): lsp (workspace/root_dir) -> { .git, lua } pattern -> cwd.  Root.git(): git root.
           -- :Root lists the detected roots for the current buffer.
           local function is_win() return vim.fn.has("win32") == 1 end
+
           local function norm(path)
             if path:sub(1, 1) == "~" then
               local home = vim.uv.os_homedir()
@@ -28,24 +29,22 @@
             path = not is_win() and vim.uv.fs_realpath(path) or path
             return norm(path)
           end
-          function M.bufpath(buf)
-            return M.realpath(vim.api.nvim_buf_get_name(assert(buf)))
-          end
-          function M.cwd()
-            return M.realpath(vim.uv.cwd()) or ""
-          end
 
-          function M.detectors.cwd()
-            return { vim.uv.cwd() }
-          end
+          function M.bufpath(buf) return M.realpath(vim.api.nvim_buf_get_name(assert(buf))) end
+
+          function M.cwd() return M.realpath(vim.uv.cwd()) or "" end
+
+          function M.detectors.cwd() return { vim.uv.cwd() } end
+
           function M.detectors.lsp(buf)
             local bufpath = M.bufpath(buf)
             if not bufpath then return {} end
             local roots = {}
             local clients = vim.lsp.get_clients({ bufnr = buf })
-            clients = vim.tbl_filter(function(client)
-              return not vim.tbl_contains(vim.g.root_lsp_ignore or {}, client.name)
-            end, clients)
+            clients = vim.tbl_filter(
+              function(client) return not vim.tbl_contains(vim.g.root_lsp_ignore or {}, client.name) end,
+              clients
+            )
             for _, client in pairs(clients) do
               for _, ws in pairs(client.config.workspace_folders or {}) do
                 roots[#roots + 1] = vim.uri_to_fname(ws.uri)
@@ -57,6 +56,7 @@
               return path and bufpath:find(path, 1, true) == 1
             end, roots)
           end
+
           function M.detectors.pattern(buf, patterns)
             patterns = type(patterns) == "string" and { patterns } or patterns
             local path = M.bufpath(buf) or vim.uv.cwd()
@@ -75,6 +75,7 @@
             if type(spec) == "function" then return spec end
             return function(buf) return M.detectors.pattern(buf, spec) end
           end
+
           function M.detect(opts)
             opts = opts or {}
             opts.spec = opts.spec or (type(vim.g.root_spec) == "table" and vim.g.root_spec) or M.spec
@@ -139,15 +140,14 @@
             if opts.normalize then return ret end
             return is_win() and ret:gsub("/", "\\") or ret
           end
+
           function M.git()
             local root = M.get()
             local git_root = vim.fs.find(".git", { path = root, upward = true })[1]
             return git_root and vim.fn.fnamemodify(git_root, ":h") or root
           end
 
-          function M.pretty_path(opts)
-            return ""
-          end
+          function M.pretty_path(opts) return "" end
 
           M.setup()
           _G.Root = M

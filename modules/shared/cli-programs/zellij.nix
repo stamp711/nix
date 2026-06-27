@@ -3,7 +3,7 @@
     { config, ... }:
     let
       # Copied from zellij "Unlock First" config
-      unlockFirstKeybinds = ''
+      unlockFirstKeybinds = /* kdl */ ''
         keybinds clear-defaults=true {
             locked {
                 bind "Ctrl g" { SwitchToMode "normal"; }

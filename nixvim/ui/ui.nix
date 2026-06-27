@@ -21,7 +21,6 @@
         Snacks.toggle.option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2, name = "Conceal Level" }):map("<leader>uc")
         Snacks.toggle.diagnostics():map("<leader>ud")
         Snacks.toggle.treesitter():map("<leader>uT")
-        Snacks.toggle.option("background", { off = "light", on = "dark", name = "Dark Background" }):map("<leader>ub")
         Snacks.toggle.inlay_hints():map("<leader>uh")
         Snacks.toggle.indent():map("<leader>ug")
         Snacks.toggle.zen():map("<leader>uz")
@@ -48,11 +47,6 @@
         Snacks.toggle.option("showtabline", { off = 0, on = vim.o.showtabline > 0 and vim.o.showtabline or 2, name = "Tabline" }):map("<leader>uA")
         Snacks.toggle.zoom():map("<leader>wm"):map("<leader>uZ")
       '';
-
-      colorschemes.onedark = {
-        enable = true;
-        settings.style = "warm";
-      };
 
       plugins.lualine.enable = true;
 
@@ -179,7 +173,6 @@
           (cmd "<leader>bj" "Pick Buffer" "<cmd>BufferLinePick<cr>")
 
           (lua "<leader>un" "Dismiss All Notifications" "Snacks.notifier.hide()")
-          (lua "<leader>uC" "Colorschemes" "Snacks.picker.colorschemes()")
           (lua "<leader>ui" "Inspect Pos" "vim.show_pos()")
           (lua "<leader>uI" "Inspect Tree" "vim.treesitter.inspect_tree()")
           (cmd "<leader>ur" "Redraw / Clear hlsearch / Diff Update"
