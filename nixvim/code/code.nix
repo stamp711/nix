@@ -192,14 +192,18 @@
       };
 
       # Linting layer (diagnostics from external tools); linters wired per-ft in code-languages.nix.
+      autoGroups.lint.clear = true;
       plugins.lint = {
         enable = true;
         autoInstall.enable = true; # bake shellcheck (and any lintersByFt linter) into the wrapper
-        autoCmd.event = [
-          "BufWritePost"
-          "BufReadPost"
-          "InsertLeave"
-        ];
+        autoCmd = {
+          group = "lint";
+          event = [
+            "BufWritePost"
+            "BufReadPost"
+            "InsertLeave"
+          ];
+        };
       };
 
       # Route format through conform (code-languages.nix) so nix/python (whose LSPs don't format) are covered too.

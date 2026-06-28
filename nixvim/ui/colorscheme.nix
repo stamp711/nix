@@ -15,27 +15,51 @@
       };
     };
 
-    colorschemes.catppuccin = {
+    colorschemes.modus = {
       enable = true;
-      settings.flavour = "latte";
+      settings = {
+        variants.modus_operandi = "tinted";
+        styles = {
+          comments.italic = false;
+          keywords.italic = false;
+        };
+        # Match Zed "Modus Operandi Tinted" overrides (warm-neutral tuning).
+        on_colors.__raw = ''
+          function(c)
+            c.comment = "#8a8178" -- comment + code-lens + inlay hint (Zed: comment, hint)
+          end
+        '';
+        on_highlights.__raw = ''
+          function(hl, c)
+            hl.CursorLine.bg = "#efeae3" -- Zed: editor.active_line.background (text area only)
+            -- keep the gutter coherent: current-line bg matches the rest of the gutter
+            hl.CursorLineNr.bg = hl.LineNr.bg
+            hl.LspInlayHint.italic = false
+            hl.Cursor.bg = "#5a544c" -- Zed: players.cursor
+            hl.Visual = { bg = "#c2bcb5" } -- Zed: players[0].background; bg-only so syntax colors show through the selection
+          end
+        '';
+      };
     };
 
     extraPlugins = [ pkgs.vimPlugins.auto-dark-mode-nvim ];
 
     extraConfigLua = ''
       require("auto-dark-mode").setup() -- defaults to set `background` to dark/light from the OS
-      vim.cmd.colorscheme(vim.o.background == "light" and "catppuccin" or "gruvbox")
+      vim.cmd.colorscheme(vim.o.background == "light" and "modus_operandi" or "gruvbox")
     '';
 
     # When background is changed, apply the theme.
+    autoGroups.theme.clear = true;
     autoCmd = [
       {
         event = "OptionSet";
         pattern = "background";
+        group = "theme";
         callback.__raw = ''
           function()
             if vim.v.option_old ~= vim.v.option_new then
-              vim.cmd.colorscheme(vim.o.background == "light" and "catppuccin" or "gruvbox")
+              vim.cmd.colorscheme(vim.o.background == "light" and "modus_operandi" or "gruvbox")
             end
           end
         '';

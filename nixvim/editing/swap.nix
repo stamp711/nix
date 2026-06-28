@@ -10,9 +10,13 @@
         if visual then
           -- largest node inside the selection
           local s, e = vim.fn.getpos("v"), vim.fn.getpos(".")
-          if s[2] > e[2] or (s[2] == e[2] and s[3] > e[3]) then s, e = e, s end
+          if s[2] > e[2] or (s[2] == e[2] and s[3] > e[3]) then
+            s, e = e, s
+          end
           local sr, sc, er, ec = s[2] - 1, s[3] - 1, e[2] - 1, e[3]
-          if mode == "V" then sc, ec = 0, math.huge end
+          if mode == "V" then
+            sc, ec = 0, math.huge
+          end
           node = vim.treesitter.get_node({ pos = { sr, sc } })
           while node do
             local p = node:parent()
@@ -42,7 +46,9 @@
 
         local a, b = { node:range() }, { sib:range() }
         local lo, hi = a, b
-        if a[1] > b[1] or (a[1] == b[1] and a[2] > b[2]) then lo, hi = b, a end
+        if a[1] > b[1] or (a[1] == b[1] and a[2] > b[2]) then
+          lo, hi = b, a
+        end
         local lt = vim.api.nvim_buf_get_text(0, lo[1], lo[2], lo[3], lo[4], {})
         local ht = vim.api.nvim_buf_get_text(0, hi[1], hi[2], hi[3], hi[4], {})
         vim.api.nvim_buf_set_text(0, hi[1], hi[2], hi[3], hi[4], lt)

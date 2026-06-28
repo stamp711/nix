@@ -1,0 +1,4 @@
+{
+  flake.nixvimModules.default = {
+  };
+}

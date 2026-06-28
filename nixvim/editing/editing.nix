@@ -15,16 +15,26 @@
             mode = { "o", "x" },
             { "a", group = "around" },
             { "i", group = "inside" },
-            { "af", desc = "function" }, { "if", desc = "function" },
-            { "ac", desc = "class" }, { "ic", desc = "class" },
-            { "ao", desc = "block/loop/cond" }, { "io", desc = "block/loop/cond" },
-            { "aa", desc = "argument" }, { "ia", desc = "argument" },
-            { "at", desc = "tag" }, { "it", desc = "tag" },
-            { "ad", desc = "digit" }, { "id", desc = "digit" },
-            { "ae", desc = "word" }, { "ie", desc = "word" },
-            { "ag", desc = "buffer" }, { "ig", desc = "buffer" },
-            { "au", desc = "call" }, { "iu", desc = "call" },
-            { "aU", desc = "call" }, { "iU", desc = "call" },
+            { "af", desc = "function" },
+            { "if", desc = "function" },
+            { "ac", desc = "class" },
+            { "ic", desc = "class" },
+            { "ao", desc = "block/loop/cond" },
+            { "io", desc = "block/loop/cond" },
+            { "aa", desc = "argument" },
+            { "ia", desc = "argument" },
+            { "at", desc = "tag" },
+            { "it", desc = "tag" },
+            { "ad", desc = "digit" },
+            { "id", desc = "digit" },
+            { "ae", desc = "word" },
+            { "ie", desc = "word" },
+            { "ag", desc = "buffer" },
+            { "ig", desc = "buffer" },
+            { "au", desc = "call" },
+            { "iu", desc = "call" },
+            { "aU", desc = "call" },
+            { "iU", desc = "call" },
           },
         })
 
@@ -39,9 +49,7 @@
           local pairs = require("mini.pairs")
           local open = pairs.open
           pairs.open = function(pair, neigh_pattern)
-            if vim.fn.getcmdline() ~= "" then
-              return open(pair, neigh_pattern)
-            end
+            if vim.fn.getcmdline() ~= "" then return open(pair, neigh_pattern) end
             local o, c = pair:sub(1, 1), pair:sub(2, 2)
             local line = vim.api.nvim_get_current_line()
             local cursor = vim.api.nvim_win_get_cursor(0)
@@ -52,25 +60,19 @@
               return "`\n```" .. vim.api.nvim_replace_termcodes("<up>", true, true, true)
             end
             -- about to type in front of a word/quote/etc: insert only the opening char
-            if skip_next and next ~= "" and next:match(skip_next) then
-              return o
-            end
+            if skip_next and next ~= "" and next:match(skip_next) then return o end
             -- cursor sits inside a string (or other listed) treesitter node: don't close
             if skip_ts and #skip_ts > 0 then
               local ok, captures = pcall(vim.treesitter.get_captures_at_pos, 0, cursor[1] - 1, math.max(cursor[2] - 1, 0))
               for _, capture in ipairs(ok and captures or {}) do
-                if vim.tbl_contains(skip_ts, capture.capture) then
-                  return o
-                end
+                if vim.tbl_contains(skip_ts, capture.capture) then return o end
               end
             end
             -- line already has more closers than openers: don't add another
             if skip_unbalanced and next == c and c ~= o then
               local _, count_open = line:gsub(vim.pesc(pair:sub(1, 1)), "")
               local _, count_close = line:gsub(vim.pesc(pair:sub(2, 2)), "")
-              if count_close > count_open then
-                return o
-              end
+              if count_close > count_open then return o end
             end
             return open(pair, neigh_pattern)
           end
@@ -89,9 +91,7 @@
             return lang ~= nil and vim.treesitter.query.get(lang, "textobjects") ~= nil
           end
           local function attach(buf)
-            if not have(vim.bo[buf].filetype) then
-              return
-            end
+            if not have(vim.bo[buf].filetype) then return end
             for method, keys in pairs(moves) do
               for key, query in pairs(keys) do
                 local part = query:gsub("@", ""):gsub("%..*", "")
@@ -99,9 +99,7 @@
                 local desc = (key:sub(1, 1) == "[" and "Prev " or "Next ") .. part
                 desc = desc .. (key:sub(2, 2) == key:sub(2, 2):upper() and " End" or " Start")
                 vim.keymap.set({ "n", "x", "o" }, key, function()
-                  if vim.wo.diff and key:find("[cC]") then
-                    return vim.cmd("normal! " .. key)
-                  end
+                  if vim.wo.diff and key:find("[cC]") then return vim.cmd("normal! " .. key) end
                   require("nvim-treesitter-textobjects.move")[method](query, "textobjects")
                 end, { buffer = buf, desc = desc, silent = true })
               end
@@ -109,9 +107,7 @@
           end
           vim.api.nvim_create_autocmd("FileType", {
             group = vim.api.nvim_create_augroup("nvim_ts_moves", { clear = true }),
-            callback = function(ev)
-              attach(ev.buf)
-            end,
+            callback = function(ev) attach(ev.buf) end,
           })
           vim.tbl_map(attach, vim.api.nvim_list_bufs())
         end
