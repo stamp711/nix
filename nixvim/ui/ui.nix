@@ -46,6 +46,13 @@
         }):map("<leader>up")
         Snacks.toggle.option("showtabline", { off = 0, on = vim.o.showtabline > 0 and vim.o.showtabline or 2, name = "Tabline" }):map("<leader>uA")
         Snacks.toggle.zoom():map("<leader>wm"):map("<leader>uZ")
+
+        -- re-sort bufferline after a session restore adds buffers en masse
+        vim.api.nvim_create_autocmd({ "BufAdd", "BufDelete" }, {
+          callback = function()
+            vim.schedule(function() pcall(nvim_bufferline) end)
+          end,
+        })
       '';
 
       plugins.lualine.enable = true;
