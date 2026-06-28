@@ -5,6 +5,7 @@
 
     globals = {
       neovide_cursor_animation_length = 0;
+      neovide_scroll_animation_length = 0.1;
       neovide_position_animation_length = 0.1;
       neovide_hide_mouse_when_typing = true;
       # macOS: Option sends Alt so <A-..> mappings fire
