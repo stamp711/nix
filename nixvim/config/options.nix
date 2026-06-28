@@ -22,10 +22,6 @@
         splitright = true;
         splitbelow = true;
 
-        # Folds: foldmethod/foldexpr set in editing.nix (treesitter + LSP); start everything unfolded.
-        foldlevel = 99;
-        foldtext = "";
-
         autowrite = true;
         confirm = true;
         undofile = true;
@@ -83,10 +79,6 @@
         ];
 
         fillchars = {
-          foldopen = "";
-          foldclose = "";
-          fold = " ";
-          foldsep = " ";
           diff = "╱";
           eob = " ";
         };

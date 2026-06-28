@@ -1,0 +1,63 @@
+diff --git a/lua/origami/config.lua b/lua/origami/config.lua
+index 15798f8..41ae524 100644
+--- a/lua/origami/config.lua
++++ b/lua/origami/config.lua
+@@ -23,6 +23,10 @@ local defaultConfig = {
+ 		diagnosticsCount = true, -- uses hlgroups and icons from `vim.diagnostic.config().signs`
+ 		gitsignsCount = true, -- requires `gitsigns.nvim`
+ 		disableOnFt = { "snacks_picker_input" }, ---@type string[]
++		closingLine = {
++			enabled = false, -- append the fold's last line when it closes the fold
++			hlgroup = "Folded",
++		},
+ 	},
+ 	autoFold = {
+ 		enabled = true,
+diff --git a/lua/origami/features/foldtext.lua b/lua/origami/features/foldtext.lua
+index 04c87cd..43b44f0 100644
+--- a/lua/origami/features/foldtext.lua
++++ b/lua/origami/features/foldtext.lua
+@@ -110,6 +110,28 @@ end
+ ---@param buf number
+ ---@param foldstart number
+ ---@return number foldend
++--- Whether the fold's last line leads with a closer rather than a body statement.
++---@param buf number
++---@param foldstart number
++---@param foldend number
++---@return boolean
++local function isClosingLine(buf, foldstart, foldend)
++	local last = vim.api.nvim_buf_get_lines(buf, foldend - 1, foldend, false)[1] or ""
++	local col = last:find("%S")
++	if not col then return false end
++	local ok, node = pcall(vim.treesitter.get_node, { bufnr = buf, pos = { foldend - 1, col - 1 } })
++	if ok and node then
++		while node and not node:named() do
++			node = node:parent()
++		end
++		-- leading node starts earlier = closes an outer block (closer); starts here = a body statement
++		if node then return (node:range()) < (foldend - 1) end
++	end
++	-- no parser: fall back to indentation, a closer aligns with the header
++	local first = vim.api.nvim_buf_get_lines(buf, foldstart - 1, foldstart, false)[1] or ""
++	return #(last:match("^%s*")) <= #(first:match("^%s*"))
++end
++
+ local function renderFoldedSegments(win, buf, foldstart)
+ 	local config = require("origami.config").config
+ 	local foldend = vim.fn.foldclosedend(foldstart)
+@@ -141,6 +163,14 @@ local function renderFoldedSegments(win, buf, foldstart)
+ 		(config.foldtext.padding.character):rep(padding),
+ 		config.foldtext.padding.hlgroup,
+ 	})
++	-- append the last line when it closes the fold, reusing `padding`
++	if config.foldtext.closingLine.enabled and foldend > foldstart then
++		local closing = (vim.api.nvim_buf_get_lines(buf, foldend - 1, foldend, false)[1] or ""):gsub("^%s+", "")
++		if closing ~= "" and isClosingLine(buf, foldstart, foldend) then
++			table.insert(virtText, { (config.foldtext.padding.character):rep(padding), config.foldtext.padding.hlgroup })
++			table.insert(virtText, { closing, { config.foldtext.closingLine.hlgroup } })
++		end
++	end
+ 
+ 	-- add text as extmark
+ 	local line = vim.api.nvim_buf_get_lines(buf, foldstart - 1, foldstart, false)[1]

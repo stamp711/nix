@@ -16,7 +16,6 @@
           { "<leader><tab>", group = "tabs" },
           { "]", group = "next" },
           { "[", group = "prev" },
-          { "z", group = "fold" },
         })
       '';
 
