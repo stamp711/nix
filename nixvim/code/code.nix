@@ -63,15 +63,15 @@
 
         map("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Line Diagnostics" })
 
-        local next_diag, prev_diag = _G.MkRepeatMove(function(forward) vim.diagnostic.jump({ count = forward and 1 or -1, float = true }) end)
+        local next_diag, prev_diag = _G.MkRepeatMove(function(forward) vim.diagnostic.jump({ count = (forward and 1 or -1) * vim.v.count1, float = true }) end)
         map("n", "]d", next_diag, { desc = "Next Diagnostic" })
         map("n", "[d", prev_diag, { desc = "Prev Diagnostic" })
 
-        local next_err, prev_err = _G.MkRepeatMove(function(forward) vim.diagnostic.jump({ count = forward and 1 or -1, severity = vim.diagnostic.severity.ERROR, float = true }) end)
+        local next_err, prev_err = _G.MkRepeatMove(function(forward) vim.diagnostic.jump({ count = (forward and 1 or -1) * vim.v.count1, severity = vim.diagnostic.severity.ERROR, float = true }) end)
         map("n", "]e", next_err, { desc = "Next Error" })
         map("n", "[e", prev_err, { desc = "Prev Error" })
 
-        local next_warn, prev_warn = _G.MkRepeatMove(function(forward) vim.diagnostic.jump({ count = forward and 1 or -1, severity = vim.diagnostic.severity.WARN, float = true }) end)
+        local next_warn, prev_warn = _G.MkRepeatMove(function(forward) vim.diagnostic.jump({ count = (forward and 1 or -1) * vim.v.count1, severity = vim.diagnostic.severity.WARN, float = true }) end)
         map("n", "]w", next_warn, { desc = "Next Warning" })
         map("n", "[w", prev_warn, { desc = "Prev Warning" })
 
@@ -85,6 +85,58 @@
         map("n", "<leader>sT", function() Snacks.picker.todo_comments({ keywords = { "TODO", "FIX", "FIXME" } }) end, { desc = "Todo/Fix/Fixme" })
       '';
 
+      # Post: plugin setup() shares the extraConfigLua bucket, so run Snacks-dependent code here to guarantee Snacks is ready.
+      extraConfigLuaPost = ''
+        -- LSP keymaps: capability-gated + buffer-local via Snacks.keymap.set (lsp filter), mirroring LazyVim.
+        -- lsp = {} means "any LSP buffer"; lsp = { method } gates on that capability (static + dynamic).
+        local sk = Snacks.keymap.set
+        local function code_action_kinds(buf)
+          local ret = {}
+          for _, c in ipairs(vim.lsp.get_clients({ bufnr = buf })) do
+            vim.list_extend(ret, vim.tbl_get(c, "server_capabilities", "codeActionProvider", "codeActionKinds") or {})
+            for _, reg in ipairs(c.dynamic_capabilities:get("textDocument/codeAction", { bufnr = buf }) or {}) do
+              vim.list_extend(ret, vim.tbl_get(reg, "registerOptions", "codeActionKinds") or {})
+            end
+          end
+          return ret
+        end
+
+        sk("n", "<leader>cl", function() Snacks.picker.lsp_config() end, { desc = "Lsp Info", lsp = {} })
+        sk("n", "gd", function() Snacks.picker.lsp_definitions() end, { desc = "Goto Definition", lsp = { method = "textDocument/definition" } })
+        sk("n", "gr", function() Snacks.picker.lsp_references() end, { desc = "References", nowait = true, lsp = {} })
+        sk("n", "gI", function() Snacks.picker.lsp_implementations() end, { desc = "Goto Implementation", lsp = {} })
+        sk("n", "gy", function() Snacks.picker.lsp_type_definitions() end, { desc = "Goto T[y]pe Definition", lsp = {} })
+        sk("n", "gD", vim.lsp.buf.declaration, { desc = "Goto Declaration", lsp = {} })
+        sk("n", "K", function() return vim.lsp.buf.hover() end, { desc = "Hover", lsp = {} })
+        sk("n", "gK", function() return vim.lsp.buf.signature_help() end, { desc = "Signature Help", lsp = { method = "textDocument/signatureHelp" } })
+        sk("i", "<c-k>", function() return vim.lsp.buf.signature_help() end, { desc = "Signature Help", lsp = { method = "textDocument/signatureHelp" } })
+        sk({ "n", "x" }, "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Action", lsp = { method = "textDocument/codeAction" } })
+        sk({ "n", "x" }, "<leader>cc", vim.lsp.codelens.run, { desc = "Run Codelens", lsp = { method = "textDocument/codeLens" } })
+        sk("n", "<leader>cC", vim.lsp.codelens.refresh, { desc = "Refresh & Display Codelens", lsp = { method = "textDocument/codeLens" } })
+        sk("n", "<leader>cR", function() Snacks.rename.rename_file() end, { desc = "Rename File", lsp = { method = "workspace/didRenameFiles" } })
+        sk("n", "<leader>cR", function() Snacks.rename.rename_file() end, { desc = "Rename File", lsp = { method = "workspace/willRenameFiles" } })
+        sk("n", "<leader>cr", vim.lsp.buf.rename, { desc = "Rename", lsp = { method = "textDocument/rename" } })
+        sk("n", "<leader>cA", function() vim.lsp.buf.code_action({ apply = true, context = { only = { "source" }, diagnostics = {} } }) end, { desc = "Source Action", lsp = { method = "textDocument/codeAction" } })
+        sk("n", "]]", function() Snacks.words.jump(vim.v.count1) end, { desc = "Next Reference", lsp = { method = "textDocument/documentHighlight" }, enabled = function() return Snacks.words.is_enabled() end })
+        sk("n", "[[", function() Snacks.words.jump(-vim.v.count1) end, { desc = "Prev Reference", lsp = { method = "textDocument/documentHighlight" }, enabled = function() return Snacks.words.is_enabled() end })
+        sk("n", "<a-n>", function() Snacks.words.jump(vim.v.count1, true) end, { desc = "Next Reference", lsp = { method = "textDocument/documentHighlight" }, enabled = function() return Snacks.words.is_enabled() end })
+        sk("n", "<a-p>", function() Snacks.words.jump(-vim.v.count1, true) end, { desc = "Prev Reference", lsp = { method = "textDocument/documentHighlight" }, enabled = function() return Snacks.words.is_enabled() end })
+        sk("n", "<leader>co", function() vim.lsp.buf.code_action({ apply = true, context = { only = { "source.organizeImports" }, diagnostics = {} } }) end, {
+          desc = "Organize Imports",
+          lsp = { method = "textDocument/codeAction" },
+          enabled = function(buf)
+            for _, k in ipairs(code_action_kinds(buf)) do
+              if k == "source.organizeImports" or k == "source.organizeImports." then
+                return true
+              end
+            end
+            return false
+          end,
+        })
+        sk("n", "gai", function() Snacks.picker.lsp_incoming_calls() end, { desc = "C[a]lls Incoming", lsp = { method = "callHierarchy/incomingCalls" } })
+        sk("n", "gao", function() Snacks.picker.lsp_outgoing_calls() end, { desc = "C[a]lls Outgoing", lsp = { method = "callHierarchy/outgoingCalls" } })
+      '';
+
       plugins.lsp = {
         enable = true;
         inlayHints = true;
@@ -95,47 +147,6 @@
           capabilities.workspace.fileOperations = { didRename = true, willRename = true }
         '';
 
-        # LSP keymaps: buffer-local on attach, capability-gated (mirrors LazyVim).
-        onAttach = /* lua */ ''
-          local function has(method)
-            method = method:find("/") and method or ("textDocument/" .. method)
-            return client:supports_method(method)
-          end
-          local function map(mode, key, fn, desc, opts)
-            vim.keymap.set(mode, key, fn, vim.tbl_extend("force", { buffer = bufnr, desc = desc }, opts or {}))
-          end
-
-          map("n", "<leader>cl", function() Snacks.picker.lsp_config() end, "Lsp Info")
-          if has("definition") then map("n", "gd", function() Snacks.picker.lsp_definitions() end, "Goto Definition") end
-          map("n", "gr", function() Snacks.picker.lsp_references() end, "References", { nowait = true })
-          map("n", "gI", function() Snacks.picker.lsp_implementations() end, "Goto Implementation")
-          map("n", "gy", function() Snacks.picker.lsp_type_definitions() end, "Goto T[y]pe Definition")
-          map("n", "gD", vim.lsp.buf.declaration, "Goto Declaration")
-          map("n", "K", function() return vim.lsp.buf.hover() end, "Hover")
-          if has("signatureHelp") then map("n", "gK", function() return vim.lsp.buf.signature_help() end, "Signature Help") end
-          if has("signatureHelp") then map("i", "<c-k>", function() return vim.lsp.buf.signature_help() end, "Signature Help") end
-          if has("codeAction") then map({ "n", "x" }, "<leader>ca", vim.lsp.buf.code_action, "Code Action") end
-          if has("codeLens") then map({ "n", "x" }, "<leader>cc", vim.lsp.codelens.run, "Run Codelens") end
-          if has("codeLens") then map("n", "<leader>cC", vim.lsp.codelens.refresh, "Refresh & Display Codelens") end
-          if has("workspace/didRenameFiles") or has("workspace/willRenameFiles") then
-            map("n", "<leader>cR", function() Snacks.rename.rename_file() end, "Rename File")
-          end
-          if has("rename") then map("n", "<leader>cr", vim.lsp.buf.rename, "Rename") end
-          if has("codeAction") then
-            map("n", "<leader>cA", function() vim.lsp.buf.code_action({ apply = true, context = { only = { "source" }, diagnostics = {} } }) end, "Source Action")
-          end
-          if has("documentHighlight") and Snacks.words.is_enabled() then
-            map("n", "]]", function() Snacks.words.jump(vim.v.count1) end, "Next Reference")
-            map("n", "[[", function() Snacks.words.jump(-vim.v.count1) end, "Prev Reference")
-            map("n", "<a-n>", function() Snacks.words.jump(vim.v.count1, true) end, "Next Reference")
-            map("n", "<a-p>", function() Snacks.words.jump(-vim.v.count1, true) end, "Prev Reference")
-          end
-          if has("codeAction") then
-            map("n", "<leader>co", function() vim.lsp.buf.code_action({ apply = true, context = { only = { "source.organizeImports" }, diagnostics = {} } }) end, "Organize Imports")
-          end
-          if has("callHierarchy/incomingCalls") then map("n", "gai", function() Snacks.picker.lsp_incoming_calls() end, "C[a]lls Incoming") end
-          if has("callHierarchy/outgoingCalls") then map("n", "gao", function() Snacks.picker.lsp_outgoing_calls() end, "C[a]lls Outgoing") end
-        '';
       };
 
       plugins.blink-cmp = {

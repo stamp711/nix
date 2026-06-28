@@ -22,10 +22,9 @@
         splitright = true;
         splitbelow = true;
 
-        # Folds come from treesitter (editing.nix); start everything unfolded.
+        # Folds: foldmethod/foldexpr set in editing.nix (treesitter + LSP); start everything unfolded.
         foldlevel = 99;
         foldtext = "";
-        foldmethod = "indent";
 
         autowrite = true;
         confirm = true;

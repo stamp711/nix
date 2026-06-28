@@ -113,12 +113,29 @@
         end
       '';
 
+      # Post (uses Snacks.util.lsp.on): treesitter folds by default, LSP foldexpr where the server supports foldingRange.
+      extraConfigLuaPost = ''
+        local lsp_folds = {}
+        Snacks.util.lsp.on({ method = "textDocument/foldingRange" }, function(buf)
+          lsp_folds[buf] = true
+        end)
+        vim.api.nvim_create_autocmd("BufDelete", {
+          callback = function(ev)
+            lsp_folds[ev.buf] = nil
+          end,
+        })
+        function _G.FoldExpr()
+          return lsp_folds[vim.api.nvim_get_current_buf()] and vim.lsp.foldexpr() or vim.treesitter.foldexpr()
+        end
+        vim.o.foldmethod = "expr"
+        vim.o.foldexpr = "v:lua._G.FoldExpr()"
+      '';
+
       plugins = {
         treesitter = {
           enable = true;
           highlight.enable = true;
           indent.enable = true;
-          folding.enable = true;
         };
         treesitter-textobjects.enable = true;
         ts-comments.enable = true;
