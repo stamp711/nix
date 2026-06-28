@@ -1,5 +1,5 @@
 diff --git a/lua/origami/config.lua b/lua/origami/config.lua
-index 15798f8..41ae524 100644
+index 15798f8..a7d8e23 100644
 --- a/lua/origami/config.lua
 +++ b/lua/origami/config.lua
 @@ -23,6 +23,10 @@ local defaultConfig = {
@@ -8,19 +8,19 @@ index 15798f8..41ae524 100644
  		disableOnFt = { "snacks_picker_input" }, ---@type string[]
 +		closingLine = {
 +			enabled = false, -- append the fold's last line when it closes the fold
-+			hlgroup = "Folded",
++			hlgroup = "Folded", -- fallback when there is no treesitter parser
 +		},
  	},
  	autoFold = {
  		enabled = true,
 diff --git a/lua/origami/features/foldtext.lua b/lua/origami/features/foldtext.lua
-index 04c87cd..43b44f0 100644
+index 04c87cd..189aeda 100644
 --- a/lua/origami/features/foldtext.lua
 +++ b/lua/origami/features/foldtext.lua
-@@ -110,6 +110,28 @@ end
- ---@param buf number
- ---@param foldstart number
- ---@return number foldend
+@@ -106,6 +106,58 @@ end
+ 
+ --------------------------------------------------------------------------------
+ 
 +--- Whether the fold's last line leads with a closer rather than a body statement.
 +---@param buf number
 +---@param foldstart number
@@ -43,19 +43,63 @@ index 04c87cd..43b44f0 100644
 +	return #(last:match("^%s*")) <= #(first:match("^%s*"))
 +end
 +
- local function renderFoldedSegments(win, buf, foldstart)
- 	local config = require("origami.config").config
- 	local foldend = vim.fn.foldclosedend(foldstart)
-@@ -141,6 +163,14 @@ local function renderFoldedSegments(win, buf, foldstart)
++--- Syntax-highlight the closing line via treesitter, so it matches the first
++--- folded line instead of a single flat hlgroup.
++---@param buf number
++---@param row number 0-indexed line of the closing line
++---@param startCol number byte column of its first non-blank char
++---@param text string closing text, leading whitespace already removed
++---@param fallbackHl string used when there is no treesitter parser
++---@return Origami.VirtTextChunk[]
++local function highlightClosingLine(buf, row, startCol, text, fallbackHl)
++	local hasParser, parser = pcall(vim.treesitter.get_parser, buf)
++	if not hasParser or not parser then return { { text, { fallbackHl } } } end
++	parser:parse { row, row } -- the closing line is folded away, so not parsed yet
++
++	local chunks = {} ---@type Origami.VirtTextChunk[]
++	local segment, segmentHl
++	for i = 1, #text do
++		local captures = vim.treesitter.get_captures_at_pos(buf, row, startCol + i - 1)
++		local last = captures[#captures]
++		local hl = last and ("@" .. last.capture) or fallbackHl
++		if hl == segmentHl then
++			segment = segment .. text:sub(i, i)
++		else
++			if segment then table.insert(chunks, { segment, { segmentHl } }) end
++			segment, segmentHl = text:sub(i, i), hl
++		end
++	end
++	if segment then table.insert(chunks, { segment, { segmentHl } }) end
++	return chunks
++end
++
+ ---@param win number
+ ---@param buf number
+ ---@param foldstart number
+@@ -141,6 +193,28 @@ local function renderFoldedSegments(win, buf, foldstart)
  		(config.foldtext.padding.character):rep(padding),
  		config.foldtext.padding.hlgroup,
  	})
 +	-- append the last line when it closes the fold, reusing `padding`
 +	if config.foldtext.closingLine.enabled and foldend > foldstart then
-+		local closing = (vim.api.nvim_buf_get_lines(buf, foldend - 1, foldend, false)[1] or ""):gsub("^%s+", "")
++		local lastLine = vim.api.nvim_buf_get_lines(buf, foldend - 1, foldend, false)[1] or ""
++		local indent = #(lastLine:match("^%s*"))
++		local closing = lastLine:sub(indent + 1)
 +		if closing ~= "" and isClosingLine(buf, foldstart, foldend) then
-+			table.insert(virtText, { (config.foldtext.padding.character):rep(padding), config.foldtext.padding.hlgroup })
-+			table.insert(virtText, { closing, { config.foldtext.closingLine.hlgroup } })
++			table.insert(
++				virtText,
++				{ (config.foldtext.padding.character):rep(padding), config.foldtext.padding.hlgroup }
++			)
++			vim.list_extend(
++				virtText,
++				highlightClosingLine(
++					buf,
++					foldend - 1,
++					indent,
++					closing,
++					config.foldtext.closingLine.hlgroup
++				)
++			)
 +		end
 +	end
  
