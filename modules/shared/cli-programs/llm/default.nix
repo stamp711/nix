@@ -34,6 +34,7 @@ in
         inherit skills;
 
         settings = {
+          theme = "auto";
           effortLevel = "high";
           tui = "fullscreen";
           worktree.bgIsolation = "none";
