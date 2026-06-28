@@ -144,6 +144,72 @@
             },
           },
         })
+
+        local map = vim.keymap.set
+
+        -- Route format through conform (code-languages.nix) so nix/python (whose LSPs don't format) are covered too.
+        map({ "n", "x" }, "<leader>cf", function() require("conform").format({ async = true, lsp_format = "fallback" }) end, { desc = "Format" })
+        map({ "n", "x" }, "<leader>cF", function() require("conform").format({ formatters = { "injected" }, timeout_ms = 3000 }) end, { desc = "Format Injected Langs" })
+        map("n", "<leader>cs", "<cmd>Trouble symbols toggle<cr>", { desc = "Symbols (Trouble)" })
+        map("n", "<leader>cS", "<cmd>Trouble lsp toggle<cr>", { desc = "LSP references/definitions/... (Trouble)" })
+        map("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Diagnostics (Trouble)" })
+        map("n", "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", { desc = "Buffer Diagnostics (Trouble)" })
+        map("n", "<leader>xL", "<cmd>Trouble loclist toggle<cr>", { desc = "Location List (Trouble)" })
+        map("n", "<leader>xQ", "<cmd>Trouble qflist toggle<cr>", { desc = "Quickfix List (Trouble)" })
+        map("n", "<leader>xl", function()
+          local ok, err = pcall(vim.fn.getloclist(0, { winid = 0 }).winid ~= 0 and vim.cmd.lclose or vim.cmd.lopen)
+          if not ok and err then
+            vim.notify(err, vim.log.levels.ERROR)
+          end
+        end, { desc = "Location List" })
+        map("n", "<leader>xq", function()
+          local ok, err = pcall(vim.fn.getqflist({ winid = 0 }).winid ~= 0 and vim.cmd.cclose or vim.cmd.copen)
+          if not ok and err then
+            vim.notify(err, vim.log.levels.ERROR)
+          end
+        end, { desc = "Quickfix List" })
+
+        local next_qf, prev_qf = _G.MkRepeatMove(function(forward)
+          if require("trouble").is_open() then
+            require("trouble")[forward and "next" or "prev"]({ skip_groups = true, jump = true })
+          else
+            local ok, err = pcall(forward and vim.cmd.cnext or vim.cmd.cprev)
+            if not ok then
+              vim.notify(err, vim.log.levels.ERROR)
+            end
+          end
+        end)
+        map("n", "]q", next_qf, { desc = "Next Trouble/Quickfix Item" })
+        map("n", "[q", prev_qf, { desc = "Previous Trouble/Quickfix Item" })
+
+        map("n", "<leader>cR", function() Snacks.rename.rename_file() end, { desc = "Rename File" })
+
+        local next_ref, prev_ref = _G.MkRepeatMove(function(forward) Snacks.words.jump(forward and vim.v.count1 or -vim.v.count1) end)
+        map("n", "]]", next_ref, { desc = "Next Reference" })
+        map("n", "[[", prev_ref, { desc = "Prev Reference" })
+        map("n", "<a-n>", function() Snacks.words.jump(vim.v.count1, true) end, { desc = "Next Reference" })
+        map("n", "<a-p>", function() Snacks.words.jump(-vim.v.count1, true) end, { desc = "Prev Reference" })
+
+        local next_diag, prev_diag = _G.MkRepeatMove(function(forward) vim.diagnostic.jump({ count = forward and 1 or -1, float = true }) end)
+        map("n", "]d", next_diag, { desc = "Next Diagnostic" })
+        map("n", "[d", prev_diag, { desc = "Prev Diagnostic" })
+
+        local next_err, prev_err = _G.MkRepeatMove(function(forward) vim.diagnostic.jump({ count = forward and 1 or -1, severity = vim.diagnostic.severity.ERROR, float = true }) end)
+        map("n", "]e", next_err, { desc = "Next Error" })
+        map("n", "[e", prev_err, { desc = "Prev Error" })
+
+        local next_warn, prev_warn = _G.MkRepeatMove(function(forward) vim.diagnostic.jump({ count = forward and 1 or -1, severity = vim.diagnostic.severity.WARN, float = true }) end)
+        map("n", "]w", next_warn, { desc = "Next Warning" })
+        map("n", "[w", prev_warn, { desc = "Prev Warning" })
+
+        -- todo-comments
+        local next_todo, prev_todo = _G.MkRepeatMove(function(forward) require("todo-comments")[forward and "jump_next" or "jump_prev"]() end)
+        map("n", "]t", next_todo, { desc = "Next Todo Comment" })
+        map("n", "[t", prev_todo, { desc = "Previous Todo Comment" })
+        map("n", "<leader>xt", "<cmd>Trouble todo toggle<cr>", { desc = "Todo (Trouble)" })
+        map("n", "<leader>xT", "<cmd>Trouble todo toggle filter = {tag = {TODO,FIX,FIXME}}<cr>", { desc = "Todo/Fix/Fixme (Trouble)" })
+        map("n", "<leader>st", function() Snacks.picker.todo_comments() end, { desc = "Todo" })
+        map("n", "<leader>sT", function() Snacks.picker.todo_comments({ keywords = { "TODO", "FIX", "FIXME" } }) end, { desc = "Todo/Fix/Fixme" })
       '';
 
       plugins.lsp = {
@@ -206,222 +272,5 @@
         };
       };
 
-      # Route format through conform (code-languages.nix) so nix/python (whose LSPs don't format) are covered too.
-      keymaps = [
-        {
-          mode = [
-            "n"
-            "x"
-          ];
-          key = "<leader>cf";
-          action.__raw = "function() require('conform').format({ async = true, lsp_format = 'fallback' }) end";
-          options.desc = "Format";
-        }
-        {
-          mode = [
-            "n"
-            "x"
-          ];
-          key = "<leader>cF";
-          action.__raw = ''function() require("conform").format({ formatters = { "injected" }, timeout_ms = 3000 }) end'';
-          options.desc = "Format Injected Langs";
-        }
-        {
-          mode = "n";
-          key = "<leader>cs";
-          action = "<cmd>Trouble symbols toggle<cr>";
-          options.desc = "Symbols (Trouble)";
-        }
-        {
-          mode = "n";
-          key = "<leader>cS";
-          action = "<cmd>Trouble lsp toggle<cr>";
-          options.desc = "LSP references/definitions/... (Trouble)";
-        }
-        {
-          mode = "n";
-          key = "<leader>xx";
-          action = "<cmd>Trouble diagnostics toggle<cr>";
-          options.desc = "Diagnostics (Trouble)";
-        }
-        {
-          mode = "n";
-          key = "<leader>xX";
-          action = "<cmd>Trouble diagnostics toggle filter.buf=0<cr>";
-          options.desc = "Buffer Diagnostics (Trouble)";
-        }
-        {
-          mode = "n";
-          key = "<leader>xL";
-          action = "<cmd>Trouble loclist toggle<cr>";
-          options.desc = "Location List (Trouble)";
-        }
-        {
-          mode = "n";
-          key = "<leader>xQ";
-          action = "<cmd>Trouble qflist toggle<cr>";
-          options.desc = "Quickfix List (Trouble)";
-        }
-        {
-          mode = "n";
-          key = "<leader>xl";
-          action.__raw = ''
-            function()
-              local ok, err = pcall(vim.fn.getloclist(0, { winid = 0 }).winid ~= 0 and vim.cmd.lclose or vim.cmd.lopen)
-              if not ok and err then
-                vim.notify(err, vim.log.levels.ERROR)
-              end
-            end'';
-          options.desc = "Location List";
-        }
-        {
-          mode = "n";
-          key = "<leader>xq";
-          action.__raw = ''
-            function()
-              local ok, err = pcall(vim.fn.getqflist({ winid = 0 }).winid ~= 0 and vim.cmd.cclose or vim.cmd.copen)
-              if not ok and err then
-                vim.notify(err, vim.log.levels.ERROR)
-              end
-            end'';
-          options.desc = "Quickfix List";
-        }
-        {
-          mode = "n";
-          key = "]q";
-          action.__raw = ''
-            function()
-              if require("trouble").is_open() then
-                require("trouble").next({ skip_groups = true, jump = true })
-              else
-                local ok, err = pcall(vim.cmd.cnext)
-                if not ok then
-                  vim.notify(err, vim.log.levels.ERROR)
-                end
-              end
-            end'';
-          options.desc = "Next Trouble/Quickfix Item";
-        }
-        {
-          mode = "n";
-          key = "[q";
-          action.__raw = ''
-            function()
-              if require("trouble").is_open() then
-                require("trouble").prev({ skip_groups = true, jump = true })
-              else
-                local ok, err = pcall(vim.cmd.cprev)
-                if not ok then
-                  vim.notify(err, vim.log.levels.ERROR)
-                end
-              end
-            end'';
-          options.desc = "Previous Trouble/Quickfix Item";
-        }
-        {
-          mode = "n";
-          key = "<leader>cR";
-          action.__raw = "function() Snacks.rename.rename_file() end";
-          options.desc = "Rename File";
-        }
-        {
-          mode = "n";
-          key = "]]";
-          action.__raw = "function() Snacks.words.jump(vim.v.count1) end";
-          options.desc = "Next Reference";
-        }
-        {
-          mode = "n";
-          key = "[[";
-          action.__raw = "function() Snacks.words.jump(-vim.v.count1) end";
-          options.desc = "Prev Reference";
-        }
-        {
-          mode = "n";
-          key = "<a-n>";
-          action.__raw = "function() Snacks.words.jump(vim.v.count1, true) end";
-          options.desc = "Next Reference";
-        }
-        {
-          mode = "n";
-          key = "<a-p>";
-          action.__raw = "function() Snacks.words.jump(-vim.v.count1, true) end";
-          options.desc = "Prev Reference";
-        }
-        {
-          mode = "n";
-          key = "]d";
-          action.__raw = "function() vim.diagnostic.jump({ count = 1, float = true }) end";
-          options.desc = "Next Diagnostic";
-        }
-        {
-          mode = "n";
-          key = "[d";
-          action.__raw = "function() vim.diagnostic.jump({ count = -1, float = true }) end";
-          options.desc = "Prev Diagnostic";
-        }
-        {
-          mode = "n";
-          key = "]e";
-          action.__raw = "function() vim.diagnostic.jump({ count = 1, severity = vim.diagnostic.severity.ERROR, float = true }) end";
-          options.desc = "Next Error";
-        }
-        {
-          mode = "n";
-          key = "[e";
-          action.__raw = "function() vim.diagnostic.jump({ count = -1, severity = vim.diagnostic.severity.ERROR, float = true }) end";
-          options.desc = "Prev Error";
-        }
-        {
-          mode = "n";
-          key = "]w";
-          action.__raw = "function() vim.diagnostic.jump({ count = 1, severity = vim.diagnostic.severity.WARN, float = true }) end";
-          options.desc = "Next Warning";
-        }
-        {
-          mode = "n";
-          key = "[w";
-          action.__raw = "function() vim.diagnostic.jump({ count = -1, severity = vim.diagnostic.severity.WARN, float = true }) end";
-          options.desc = "Prev Warning";
-        }
-
-        # todo-comments
-        {
-          mode = "n";
-          key = "]t";
-          action.__raw = "function() require('todo-comments').jump_next() end";
-          options.desc = "Next Todo Comment";
-        }
-        {
-          mode = "n";
-          key = "[t";
-          action.__raw = "function() require('todo-comments').jump_prev() end";
-          options.desc = "Previous Todo Comment";
-        }
-        {
-          mode = "n";
-          key = "<leader>xt";
-          action = "<cmd>Trouble todo toggle<cr>";
-          options.desc = "Todo (Trouble)";
-        }
-        {
-          mode = "n";
-          key = "<leader>xT";
-          action = "<cmd>Trouble todo toggle filter = {tag = {TODO,FIX,FIXME}}<cr>";
-          options.desc = "Todo/Fix/Fixme (Trouble)";
-        }
-        {
-          mode = "n";
-          key = "<leader>st";
-          action.__raw = "function() Snacks.picker.todo_comments() end";
-          options.desc = "Todo";
-        }
-        {
-          mode = "n";
-          key = "<leader>sT";
-          action.__raw = ''function() Snacks.picker.todo_comments({ keywords = { "TODO", "FIX", "FIXME" } }) end'';
-          options.desc = "Todo/Fix/Fixme";
-        }
-      ];
     };
 }
