@@ -1,127 +1,6 @@
 {
   flake.nixvimModules.default =
     # Code intelligence: language server, completion, and diagnostics.
-    let
-      lspExtraKeymaps = [
-        {
-          mode = "n";
-          key = "gd";
-          action.__raw = "function() vim.lsp.buf.definition() end";
-          options.desc = "Goto Definition";
-        }
-        {
-          mode = "n";
-          key = "gD";
-          action.__raw = "function() vim.lsp.buf.declaration() end";
-          options.desc = "Goto Declaration";
-        }
-        {
-          mode = "n";
-          key = "gy";
-          action.__raw = "function() vim.lsp.buf.type_definition() end";
-          options.desc = "Goto T[y]pe Definition";
-        }
-        {
-          mode = "n";
-          key = "gI";
-          action.__raw = "function() vim.lsp.buf.implementation() end";
-          options.desc = "Goto Implementation";
-        }
-        {
-          mode = "n";
-          key = "gr";
-          action.__raw = "function() vim.lsp.buf.references() end";
-          options = {
-            desc = "References";
-            nowait = true;
-          };
-        }
-        {
-          mode = "n";
-          key = "K";
-          action.__raw = "function() vim.lsp.buf.hover() end";
-          options.desc = "Hover";
-        }
-        {
-          mode = "n";
-          key = "gK";
-          action.__raw = "function() vim.lsp.buf.signature_help() end";
-          options.desc = "Signature Help";
-        }
-        {
-          mode = [
-            "n"
-            "x"
-          ];
-          key = "<leader>ca";
-          action.__raw = "function() vim.lsp.buf.code_action() end";
-          options.desc = "Code Action";
-        }
-        {
-          mode = "n";
-          key = "<leader>cr";
-          action.__raw = "function() vim.lsp.buf.rename() end";
-          options.desc = "Rename";
-        }
-        {
-          mode = "n";
-          key = "<leader>cd";
-          action.__raw = "function() vim.diagnostic.open_float() end";
-          options.desc = "Line Diagnostics";
-        }
-        {
-          mode = "i";
-          key = "<c-k>";
-          action.__raw = "function() vim.lsp.buf.signature_help() end";
-          options.desc = "Signature Help";
-        }
-        {
-          mode = "n";
-          key = "<leader>cl";
-          action.__raw = "function() Snacks.picker.lsp_config() end";
-          options.desc = "Lsp Info";
-        }
-        {
-          mode = [
-            "n"
-            "x"
-          ];
-          key = "<leader>cc";
-          action.__raw = "function() vim.lsp.codelens.run() end";
-          options.desc = "Run Codelens";
-        }
-        {
-          mode = "n";
-          key = "<leader>cC";
-          action.__raw = "function() vim.lsp.codelens.refresh() end";
-          options.desc = "Refresh & Display Codelens";
-        }
-        {
-          mode = "n";
-          key = "<leader>cA";
-          action.__raw = "function() vim.lsp.buf.code_action({ context = { only = { 'source' }, diagnostics = {} } }) end";
-          options.desc = "Source Action";
-        }
-        {
-          mode = "n";
-          key = "<leader>co";
-          action.__raw = "function() vim.lsp.buf.code_action({ apply = true, context = { only = { 'source.organizeImports' }, diagnostics = {} } }) end";
-          options.desc = "Organize Imports";
-        }
-        {
-          mode = "n";
-          key = "gai";
-          action.__raw = "function() Snacks.picker.lsp_incoming_calls() end";
-          options.desc = "C[a]lls Incoming";
-        }
-        {
-          mode = "n";
-          key = "gao";
-          action.__raw = "function() Snacks.picker.lsp_outgoing_calls() end";
-          options.desc = "C[a]lls Outgoing";
-        }
-      ];
-    in
     {
       # which-key groups
       extraConfigLua = ''
@@ -182,13 +61,7 @@
         map("n", "]q", next_qf, { desc = "Next Trouble/Quickfix Item" })
         map("n", "[q", prev_qf, { desc = "Previous Trouble/Quickfix Item" })
 
-        map("n", "<leader>cR", function() Snacks.rename.rename_file() end, { desc = "Rename File" })
-
-        local next_ref, prev_ref = _G.MkRepeatMove(function(forward) Snacks.words.jump(forward and vim.v.count1 or -vim.v.count1) end)
-        map("n", "]]", next_ref, { desc = "Next Reference" })
-        map("n", "[[", prev_ref, { desc = "Prev Reference" })
-        map("n", "<a-n>", function() Snacks.words.jump(vim.v.count1, true) end, { desc = "Next Reference" })
-        map("n", "<a-p>", function() Snacks.words.jump(-vim.v.count1, true) end, { desc = "Prev Reference" })
+        map("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Line Diagnostics" })
 
         local next_diag, prev_diag = _G.MkRepeatMove(function(forward) vim.diagnostic.jump({ count = forward and 1 or -1, float = true }) end)
         map("n", "]d", next_diag, { desc = "Next Diagnostic" })
@@ -222,8 +95,47 @@
           capabilities.workspace.fileOperations = { didRename = true, willRename = true }
         '';
 
-        # All bind buffer-local on LspAttach.
-        keymaps.extra = lspExtraKeymaps;
+        # LSP keymaps: buffer-local on attach, capability-gated (mirrors LazyVim).
+        onAttach = /* lua */ ''
+          local function has(method)
+            method = method:find("/") and method or ("textDocument/" .. method)
+            return client:supports_method(method)
+          end
+          local function map(mode, key, fn, desc, opts)
+            vim.keymap.set(mode, key, fn, vim.tbl_extend("force", { buffer = bufnr, desc = desc }, opts or {}))
+          end
+
+          map("n", "<leader>cl", function() Snacks.picker.lsp_config() end, "Lsp Info")
+          if has("definition") then map("n", "gd", function() Snacks.picker.lsp_definitions() end, "Goto Definition") end
+          map("n", "gr", function() Snacks.picker.lsp_references() end, "References", { nowait = true })
+          map("n", "gI", function() Snacks.picker.lsp_implementations() end, "Goto Implementation")
+          map("n", "gy", function() Snacks.picker.lsp_type_definitions() end, "Goto T[y]pe Definition")
+          map("n", "gD", vim.lsp.buf.declaration, "Goto Declaration")
+          map("n", "K", function() return vim.lsp.buf.hover() end, "Hover")
+          if has("signatureHelp") then map("n", "gK", function() return vim.lsp.buf.signature_help() end, "Signature Help") end
+          if has("signatureHelp") then map("i", "<c-k>", function() return vim.lsp.buf.signature_help() end, "Signature Help") end
+          if has("codeAction") then map({ "n", "x" }, "<leader>ca", vim.lsp.buf.code_action, "Code Action") end
+          if has("codeLens") then map({ "n", "x" }, "<leader>cc", vim.lsp.codelens.run, "Run Codelens") end
+          if has("codeLens") then map("n", "<leader>cC", vim.lsp.codelens.refresh, "Refresh & Display Codelens") end
+          if has("workspace/didRenameFiles") or has("workspace/willRenameFiles") then
+            map("n", "<leader>cR", function() Snacks.rename.rename_file() end, "Rename File")
+          end
+          if has("rename") then map("n", "<leader>cr", vim.lsp.buf.rename, "Rename") end
+          if has("codeAction") then
+            map("n", "<leader>cA", function() vim.lsp.buf.code_action({ apply = true, context = { only = { "source" }, diagnostics = {} } }) end, "Source Action")
+          end
+          if has("documentHighlight") and Snacks.words.is_enabled() then
+            map("n", "]]", function() Snacks.words.jump(vim.v.count1) end, "Next Reference")
+            map("n", "[[", function() Snacks.words.jump(-vim.v.count1) end, "Prev Reference")
+            map("n", "<a-n>", function() Snacks.words.jump(vim.v.count1, true) end, "Next Reference")
+            map("n", "<a-p>", function() Snacks.words.jump(-vim.v.count1, true) end, "Prev Reference")
+          end
+          if has("codeAction") then
+            map("n", "<leader>co", function() vim.lsp.buf.code_action({ apply = true, context = { only = { "source.organizeImports" }, diagnostics = {} } }) end, "Organize Imports")
+          end
+          if has("callHierarchy/incomingCalls") then map("n", "gai", function() Snacks.picker.lsp_incoming_calls() end, "C[a]lls Incoming") end
+          if has("callHierarchy/outgoingCalls") then map("n", "gao", function() Snacks.picker.lsp_outgoing_calls() end, "C[a]lls Outgoing") end
+        '';
       };
 
       plugins.blink-cmp = {
@@ -240,6 +152,7 @@
         enable = true;
         settings.modes.lsp.win.position = "right";
       };
+
       plugins.todo-comments.enable = true;
 
       plugins.conform-nvim = {
