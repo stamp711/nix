@@ -34,6 +34,32 @@
         '';
       });
 
+      # modus's util.lua sets the :terminal slots from bg_main/fg_main/*_intense instead of its
+      # own spec bg_term_* keys (the extras use those); on light themes that makes highlights black.
+      vimPlugins = prev.vimPlugins // {
+        modus-themes-nvim = prev.vimPlugins.modus-themes-nvim.overrideAttrs (old: {
+          postPatch = (old.postPatch or "") + ''
+            substituteInPlace lua/modus-themes/util.lua \
+              --replace-fail 'vim.g.terminal_color_0 = colors.bg_main' 'vim.g.terminal_color_0 = colors.bg_term_black' \
+              --replace-fail 'vim.g.terminal_color_8 = colors.bg_dim' 'vim.g.terminal_color_8 = colors.bg_term_black_bright' \
+              --replace-fail 'vim.g.terminal_color_7 = colors.fg_main' 'vim.g.terminal_color_7 = colors.bg_term_white' \
+              --replace-fail 'vim.g.terminal_color_15 = colors.fg_dim' 'vim.g.terminal_color_15 = colors.bg_term_white_bright' \
+              --replace-fail 'vim.g.terminal_color_1 = colors.red' 'vim.g.terminal_color_1 = colors.bg_term_red' \
+              --replace-fail 'vim.g.terminal_color_9 = colors.red_intense' 'vim.g.terminal_color_9 = colors.bg_term_red_bright' \
+              --replace-fail 'vim.g.terminal_color_2 = colors.green' 'vim.g.terminal_color_2 = colors.bg_term_green' \
+              --replace-fail 'vim.g.terminal_color_10 = colors.green_intense' 'vim.g.terminal_color_10 = colors.bg_term_green_bright' \
+              --replace-fail 'vim.g.terminal_color_3 = colors.yellow' 'vim.g.terminal_color_3 = colors.bg_term_yellow' \
+              --replace-fail 'vim.g.terminal_color_11 = colors.yellow_intense' 'vim.g.terminal_color_11 = colors.bg_term_yellow_bright' \
+              --replace-fail 'vim.g.terminal_color_4 = colors.blue' 'vim.g.terminal_color_4 = colors.bg_term_blue' \
+              --replace-fail 'vim.g.terminal_color_12 = colors.blue_intense' 'vim.g.terminal_color_12 = colors.bg_term_blue_bright' \
+              --replace-fail 'vim.g.terminal_color_5 = colors.magenta' 'vim.g.terminal_color_5 = colors.bg_term_magenta' \
+              --replace-fail 'vim.g.terminal_color_13 = colors.magenta_intense' 'vim.g.terminal_color_13 = colors.bg_term_magenta_bright' \
+              --replace-fail 'vim.g.terminal_color_6 = colors.cyan' 'vim.g.terminal_color_6 = colors.bg_term_cyan' \
+              --replace-fail 'vim.g.terminal_color_14 = colors.cyan_intense' 'vim.g.terminal_color_14 = colors.bg_term_cyan_bright'
+          '';
+        });
+      };
+
       # Default clang-format to --fallback-style=none so it no-ops when no
       # .clang-format is present (instead of silently reformatting to LLVM).
       clang-tools = prev.symlinkJoin {
