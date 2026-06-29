@@ -161,11 +161,11 @@
                 bind "Alt [" { PreviousSwapLayout; }
                 bind "Alt ]" { NextSwapLayout; }
                 bind "Alt f" { ToggleFloatingPanes; }
-                // bind "Alt h" { MoveFocusOrTab "left"; }
+                bind "Alt h" { MoveFocusOrTab "left"; }
                 bind "Alt i" { MoveTab "left"; }
-                // bind "Alt j" { MoveFocus "down"; }
-                // bind "Alt k" { MoveFocus "up"; }
-                // bind "Alt l" { MoveFocusOrTab "right"; }
+                bind "Alt j" { MoveFocus "down"; }
+                bind "Alt k" { MoveFocus "up"; }
+                bind "Alt l" { MoveFocusOrTab "right"; }
                 bind "Alt n" { NewPane; }
                 bind "Alt o" { MoveTab "right"; }
                 bind "Alt p" { TogglePaneInGroup; }
