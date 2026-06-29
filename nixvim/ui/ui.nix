@@ -25,16 +25,6 @@
         Snacks.toggle.indent():map("<leader>ug")
         Snacks.toggle.zen():map("<leader>uz")
         Snacks.toggle({
-          name = "Auto Format (Global)",
-          get = function() return not vim.g.disable_autoformat end,
-          set = function(state) vim.g.disable_autoformat = not state end,
-        }):map("<leader>uf")
-        Snacks.toggle({
-          name = "Auto Format (Buffer)",
-          get = function() return not (vim.g.disable_autoformat or vim.b.disable_autoformat) end,
-          set = function(state) vim.b.disable_autoformat = not state end,
-        }):map("<leader>uF")
-        Snacks.toggle({
           name = "Git Signs",
           get = function() return require("gitsigns.config").config.signcolumn end,
           set = function(state) require("gitsigns").toggle_signs(state) end,

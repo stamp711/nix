@@ -26,9 +26,6 @@
 
         local map = vim.keymap.set
 
-        -- Route format through conform (code-languages.nix) so nix/python (whose LSPs don't format) are covered too.
-        map({ "n", "x" }, "<leader>cf", function() require("conform").format({ async = true, lsp_format = "fallback" }) end, { desc = "Format" })
-        map({ "n", "x" }, "<leader>cF", function() require("conform").format({ formatters = { "injected" }, timeout_ms = 3000 }) end, { desc = "Format Injected Langs" })
         map("n", "<leader>cs", "<cmd>Trouble symbols toggle<cr>", { desc = "Symbols (Trouble)" })
         map("n", "<leader>cS", "<cmd>Trouble lsp toggle<cr>", { desc = "LSP references/definitions/... (Trouble)" })
         map("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Diagnostics (Trouble)" })
@@ -165,21 +162,6 @@
       };
 
       plugins.todo-comments.enable = true;
-
-      plugins.conform-nvim = {
-        enable = true;
-        autoInstall.enable = true; # bake the formatter packages into the wrapper.
-        settings = {
-          # Conditional autoformat
-          format_on_save.__raw = ''
-            function(bufnr)
-              if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
-                return
-              end
-              return { timeout_ms = 3000, lsp_format = "fallback" }
-            end'';
-        };
-      };
 
       # Linting layer (diagnostics from external tools); linters wired per-ft in code-languages.nix.
       autoGroups.lint.clear = true;
