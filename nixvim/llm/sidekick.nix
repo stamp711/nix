@@ -1,8 +1,47 @@
 {
-  flake.nixvimModules.default = {
+  flake.nixvimModules.default = { lib, ... }: {
 
     plugins.sidekick.enable = true;
     lsp.servers.copilot.enable = true; # sidekick NES (next-edit suggestions) runs off the Copilot LSP
+
+    # NES/CLI status -> lualine_x, order 20 (scheme in ui/lualine.nix)
+    plugins.lualine.settings.sections.lualine_x = lib.mkOrder 20 [
+      # CLI count
+      {
+        __raw = ''
+          {
+            function() local s = require("sidekick.status").cli() return " " .. (#s > 1 and #s or "") end,
+            cond = function() return #require("sidekick.status").cli() > 0 end,
+            color = function() return { fg = Snacks.util.color("Special") } end,
+          }
+        '';
+      }
+      # NES status
+      {
+        __raw = ''
+          (function()
+            local icons = {
+              Error = { "\u{f4b9}", "DiagnosticError" },
+              Inactive = { "\u{f4b9}", "MsgArea" },
+              Warning = { "\u{f4ba}", "DiagnosticWarn" },
+              Normal = { "\u{f4b8}", "Special" },
+            }
+            return {
+              function()
+                local s = require("sidekick.status").get()
+                return s and vim.tbl_get(icons, s.kind, 1)
+              end,
+              cond = function() return require("sidekick.status").get() ~= nil end,
+              color = function()
+                local s = require("sidekick.status").get()
+                local hl = s and (s.busy and "DiagnosticWarn" or vim.tbl_get(icons, s.kind, 2))
+                return { fg = Snacks.util.color(hl) }
+              end,
+            }
+          end)()
+        '';
+      }
+    ];
 
     # sidekick.nvim under <leader>as (CLI) + bare keys (NES)
     extraConfigLua = ''

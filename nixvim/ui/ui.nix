@@ -45,9 +45,10 @@
         })
       '';
 
-      plugins.lualine.enable = true;
-
-      plugins.mini-icons.enable = true;
+      plugins.mini-icons = {
+        enable = true;
+        mockDevIcons = true;
+      };
 
       plugins.noice = {
         enable = true;
