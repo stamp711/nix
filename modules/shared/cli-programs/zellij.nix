@@ -239,6 +239,7 @@
 
         settings = {
           default_mode = "locked";
+          pane_frames = false;
           session_serialization = false;
           # The web server is owned by the zellij-web service unit, not started per-client.
           web_server = false;
