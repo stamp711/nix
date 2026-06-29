@@ -43,6 +43,7 @@
           mode = [
             "n"
             "t" # also in terminal mode
+            "i"
           ];
           action = "<Cmd>wincmd h<CR>";
           options.desc = "Go to Left Window";
@@ -52,6 +53,7 @@
           mode = [
             "n"
             "t"
+            "i"
           ];
           action = "<Cmd>wincmd j<CR>";
           options.desc = "Go to Lower Window";
@@ -61,6 +63,7 @@
           mode = [
             "n"
             "t"
+            "i"
           ];
           action = "<Cmd>wincmd k<CR>";
           options.desc = "Go to Upper Window";
@@ -70,6 +73,7 @@
           mode = [
             "n"
             "t"
+            "i"
           ];
           action = "<Cmd>wincmd l<CR>";
           options.desc = "Go to Right Window";
@@ -254,17 +258,17 @@
           options.desc = "Increase Window Width";
         }
 
-        {
-          key = "<C-s>";
-          mode = [
-            "i"
-            "x"
-            "n"
-            "s"
-          ];
-          action = "<cmd>w<cr><esc>";
-          options.desc = "Save File";
-        }
+        # {
+        #   key = "<C-s>";
+        #   mode = [
+        #     "i"
+        #     "x"
+        #     "n"
+        #     "s"
+        #   ];
+        #   action = "<cmd>w<cr><esc>";
+        #   options.desc = "Save File";
+        # }
         {
           key = "<leader>K";
           mode = "n";

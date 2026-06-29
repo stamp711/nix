@@ -109,7 +109,7 @@
         sk("n", "gD", vim.lsp.buf.declaration, { desc = "Goto Declaration", lsp = {} })
         sk("n", "K", function() return vim.lsp.buf.hover() end, { desc = "Hover", lsp = {} })
         sk("n", "gK", function() return vim.lsp.buf.signature_help() end, { desc = "Signature Help", lsp = { method = "textDocument/signatureHelp" } })
-        sk("i", "<c-k>", function() return vim.lsp.buf.signature_help() end, { desc = "Signature Help", lsp = { method = "textDocument/signatureHelp" } })
+        sk("i", "<C-s>", function() return vim.lsp.buf.signature_help() end, { desc = "Signature Help", lsp = { method = "textDocument/signatureHelp" } })
         sk({ "n", "x" }, "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Action", lsp = { method = "textDocument/codeAction" } })
         sk({ "n", "x" }, "<leader>cc", vim.lsp.codelens.run, { desc = "Run Codelens", lsp = { method = "textDocument/codeLens" } })
         sk("n", "<leader>cC", vim.lsp.codelens.refresh, { desc = "Refresh & Display Codelens", lsp = { method = "textDocument/codeLens" } })
