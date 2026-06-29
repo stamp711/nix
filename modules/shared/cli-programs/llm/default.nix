@@ -35,8 +35,9 @@ in
 
         settings = {
           theme = "auto";
-          effortLevel = "high";
-          tui = "fullscreen";
+          effortLevel = "xhigh";
+          alwaysThinkingEnabled = true;
+          showThinkingSummaries = true;
           worktree.bgIsolation = "none";
           permissions = {
             allow = [
