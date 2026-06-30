@@ -87,8 +87,12 @@
             goto_previous_end = { ["[F"] = "@function.outer", ["[C"] = "@class.outer", ["[A"] = "@parameter.inner" },
           }
           local function have(ft)
+            -- get_lang falls back to ft, so a missing grammar isn't nil; language.add gates
+            -- query.get without throwing (query.get would otherwise assert on no parser).
             local lang = vim.treesitter.language.get_lang(ft)
-            return lang ~= nil and vim.treesitter.query.get(lang, "textobjects") ~= nil
+            return lang ~= nil
+              and vim.treesitter.language.add(lang)
+              and vim.treesitter.query.get(lang, "textobjects") ~= nil
           end
           local function attach(buf)
             if not have(vim.bo[buf].filetype) then return end
