@@ -59,7 +59,10 @@
         callback.__raw = ''
           function()
             if vim.v.option_old ~= vim.v.option_new then
-              vim.cmd.colorscheme(vim.o.background == "light" and "modus_operandi" or "gruvbox")
+              -- defer the colorscheme switch until after nvim's internal background handling
+              vim.schedule(function()
+                vim.cmd.colorscheme(vim.o.background == "light" and "modus_operandi" or "gruvbox")
+              end)
             end
           end
         '';
