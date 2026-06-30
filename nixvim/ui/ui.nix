@@ -18,8 +18,15 @@
         Snacks.toggle.option("wrap", { name = "Wrap" }):map("<leader>uw")
         Snacks.toggle.option("relativenumber", { name = "Relative Number" }):map("<leader>uL")
         Snacks.toggle.line_number():map("<leader>ul")
-        Snacks.toggle.option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2, name = "Conceal Level" }):map("<leader>uc")
+        Snacks.toggle
+          .option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2, name = "Conceal Level" })
+          :map("<leader>uc")
         Snacks.toggle.diagnostics():map("<leader>ud")
+        Snacks.toggle({
+          name = "Diagnostic Virtual Lines",
+          get = function() return vim.diagnostic.config().virtual_lines ~= false end,
+          set = function(state) vim.diagnostic.config({ virtual_lines = state }) end,
+        }):map("<leader>uv")
         Snacks.toggle.treesitter():map("<leader>uT")
         Snacks.toggle.inlay_hints():map("<leader>uh")
         Snacks.toggle.indent():map("<leader>ug")
@@ -34,7 +41,9 @@
           get = function() return not vim.g.minipairs_disable end,
           set = function(state) vim.g.minipairs_disable = not state end,
         }):map("<leader>up")
-        Snacks.toggle.option("showtabline", { off = 0, on = vim.o.showtabline > 0 and vim.o.showtabline or 2, name = "Tabline" }):map("<leader>uA")
+        Snacks.toggle
+          .option("showtabline", { off = 0, on = vim.o.showtabline > 0 and vim.o.showtabline or 2, name = "Tabline" })
+          :map("<leader>uA")
         Snacks.toggle.zoom():map("<leader>wm"):map("<leader>uZ")
 
         -- re-sort bufferline after a session restore adds buffers en masse
