@@ -62,8 +62,8 @@
           map("n", "<leader>ghd", function() gs.diffthis() end, { desc = "Diff This" })
           map("n", "<leader>ghD", function() gs.diffthis("~") end, { desc = "Diff This ~" })
 
-          pick("<leader>gd", "Git Diff (hunks)", "git_diff")
-          pick("<leader>gs", "Git Status", "git_status")
+          map("n", "<leader>gd", function() Snacks.picker.git_diff({ cwd = Root.git() }) end, { desc = "Git Diff (hunks)" })
+          map("n", "<leader>gs", function() Snacks.picker.git_status({ cwd = Root.git() }) end, { desc = "Git Status" })
           pick("<leader>gS", "Git Stash", "git_stash")
           map("n", "<leader>gl", function() Snacks.picker.git_log({ cwd = Root.git() }) end, { desc = "Git Log" })
           pick("<leader>gb", "Git Blame Line", "git_log_line")
