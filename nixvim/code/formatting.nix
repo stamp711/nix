@@ -41,16 +41,23 @@
       autoInstall.enable = true; # bake the formatter packages into the wrapper.
       settings = {
         default_format_opts.lsp_format = "prefer"; # CLI is the fallback
-        # Format only VCS-changed lines on save. No git context (nil hunks: no repo or untracked) -> full format.
+        # Format VCS-changed lines on save, outer language then injected blocks.
+        # No git context (nil hunks: no repo or untracked) -> full format of both.
         format_on_save.__raw = ''
           function(bufnr)
             if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
               return
             end
-            if not _G.FormatHunks(bufnr) then
-              return { timeout_ms = 3000 } -- no git context -> full format
+            -- lsp_format = "never" so conform runs the injected formatter instead of short-circuiting to LSP-only.
+            local injected = { formatters = { "injected" }, lsp_format = "never" }
+            if _G.FormatHunks(bufnr) then
+              _G.FormatHunks(bufnr, injected) -- changed hunks: outer done above, now injected
+            else
+              require("conform").format({ bufnr = bufnr, timeout_ms = 3000 })
+              require("conform").format(vim.tbl_extend("error", injected, { bufnr = bufnr, timeout_ms = 3000 }))
             end
-          end'';
+          end
+        '';
       };
     };
 
