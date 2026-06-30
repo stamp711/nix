@@ -7,6 +7,8 @@
         # Security
         _1password-cli
 
+        bear
+
         # Python
         uv
 
