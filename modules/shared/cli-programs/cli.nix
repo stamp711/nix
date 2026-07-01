@@ -30,6 +30,9 @@
         watch
         wakatime-cli
         wget
+
+        b4
+        public-inbox
       ];
 
       # Modern ls replacement
