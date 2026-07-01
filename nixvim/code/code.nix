@@ -150,6 +150,8 @@
 
       };
 
+      plugins.otter.enable = true;
+
       plugins.blink-cmp = {
         enable = true;
         settings = {
