@@ -20,6 +20,7 @@
         age-plugin-1p
         doxygen
         eternal-terminal
+        ghgrab
         imgcat
         helix
         just
@@ -29,7 +30,6 @@
         watch
         wakatime-cli
         wget
-
       ];
 
       # Modern ls replacement
