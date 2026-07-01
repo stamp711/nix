@@ -1,10 +1,15 @@
-# Motion habits: hardtime blocks hjkl/arrow spam, precognition hints the better motion.
+# Motion habits: hardtime blocks jk/arrow spam, precognition hints the better motion.
 {
   flake.nixvimModules.default = {
 
     plugins.hardtime = {
       enable = true;
       settings.disable_mouse = false; # keep the mouse
+      # h/l belong to nvim-origami, hardtime breaks it.
+      settings.restricted_keys = {
+        h = [ ];
+        l = [ ];
+      };
     };
 
     plugins.precognition = {
