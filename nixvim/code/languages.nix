@@ -1,7 +1,10 @@
 # Per-language support: LSP servers, formatters, and linters.
 # Treesitter grammars use the nixvim default (all grammars).
 {
-  flake.nixvimModules.default = {
+  flake.nixvimModules.default = { pkgs, ... }: {
+
+    # .fbs: no treesitter parser or LSP exists, so vim syntax for highlighting.
+    extraPlugins = [ pkgs.vimPlugins.vim-flatbuffers ];
 
     plugins.lsp.servers = {
       clangd.enable = true;
@@ -9,6 +12,7 @@
       marksman.enable = true;
       nil_ls.enable = true;
       basedpyright.enable = true;
+      protols.enable = true;
       taplo.enable = true;
       zls.enable = true;
     };
@@ -24,6 +28,7 @@
       lua = [ "stylua" ];
       markdown = [ "prettierd" ];
       nix = [ "nixfmt" ];
+      proto = [ "clang_format" ];
       python = [ "ruff_format" ];
       toml = [ "taplo" ];
       zig = [ "zigfmt" ];
