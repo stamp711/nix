@@ -35,6 +35,7 @@ in
 
         settings = {
           theme = "auto";
+          tui = "fullscreen";
           effortLevel = "xhigh";
           alwaysThinkingEnabled = true;
           showThinkingSummaries = true;
