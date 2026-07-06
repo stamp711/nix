@@ -156,7 +156,7 @@
 
       programs.fzf = {
         enable = true;
-        enableZshIntegration = false; # atuin handles ctrl-r, disable the rest
+        historyWidget.command = "";
       };
       programs.television.enable = true;
 
