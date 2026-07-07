@@ -1,6 +1,6 @@
 {
   flake.nixvimModules.default =
-    # Folds: nvim-origami — LSP folds (treesitter/indent fallback), foldtext (line+diag+git), h/l/^/$ fold keys.
+    # Folds: nvim-origami — LSP folds (treesitter/indent fallback), foldtext (line+diag+git). h/l/^/$ remaps disabled.
     { pkgs, ... }:
     {
       extraPlugins = [ pkgs.vimPlugins.nvim-origami ];
@@ -20,6 +20,7 @@
         require("which-key").add({ { "z", group = "fold" } })
         -- nr2char(0xF0616) = nf-md-arrow_expand
         require("origami").setup({
+          foldKeymaps = { setup = false }, -- don't remap h/l/^/$
           autoFold = { kinds = { "imports" } }, -- auto-fold imports, not comments
           foldtext = {
             lineCount = { template = vim.fn.nr2char(0xF0616) .. " %d" },
