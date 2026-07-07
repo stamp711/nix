@@ -25,6 +25,26 @@
       settings.startVisible = false;
     };
 
+    # <C-d>/<C-u>: half-screen is too jumpy, use a 10-line step.
+    keymaps =
+      let
+        step = "10";
+      in
+      [
+        {
+          key = "<C-d>";
+          mode = "n";
+          action = "${step}<C-d>";
+          options.desc = "Scroll down";
+        }
+        {
+          key = "<C-u>";
+          mode = "n";
+          action = "${step}<C-u>";
+          options.desc = "Scroll up";
+        }
+      ];
+
     # Post for the Snacks global. precognition exposes no visibility getter, so track it.
     extraConfigLuaPost = ''
       Snacks.toggle({
