@@ -1,4 +1,4 @@
-# Per-language support: LSP servers, formatters, and linters.
+# Per-language support: LSP servers, formatters, linters, and preview plugins.
 # Treesitter grammars use the nixvim default (all grammars).
 {
   flake.nixvimModules.default = { pkgs, ... }: {
@@ -12,14 +12,18 @@
       marksman.enable = true;
       nil_ls.enable = true;
       basedpyright.enable = true;
-      protols.enable = true;
-      taplo.enable = true;
-      zls.enable = true;
+      protols.enable = true; # protobuf
+      taplo.enable = true; # TOML
+      tinymist.enable = true; # typst
+      zls.enable = true; # Zig
     };
 
     # Rust goes through rustaceanvim (pulls rust-analyzer); don't also enable
     # lsp.servers.rust_analyzer.
     plugins.rustaceanvim.enable = true;
+
+    # :TypstPreview
+    plugins.typst-preview.enable = true;
 
     plugins.conform-nvim.settings.formatters_by_ft = {
       c = [ "clang_format" ];
@@ -31,6 +35,8 @@
       proto = [ "clang_format" ];
       python = [ "ruff_format" ];
       toml = [ "taplo" ];
+      # changed-lines save formats by range; tinymist has no rangeFormatting
+      typst = [ "typstyle" ];
       zig = [ "zigfmt" ];
     };
 

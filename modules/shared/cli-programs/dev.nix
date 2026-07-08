@@ -19,6 +19,9 @@
         zig
         zls
 
+        typst
+        typstyle
+
         # Language servers
         lua-language-server
         nil
