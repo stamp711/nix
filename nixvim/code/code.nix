@@ -167,7 +167,26 @@
         settings.modes.lsp.win.position = "right";
       };
 
-      plugins.todo-comments.enable = true;
+      plugins.todo-comments = {
+        enable = true;
+        # Also match TODO(name): (folke#326, folke#370).
+        settings = {
+          # vim very-magic:
+          #   - `.*<`        : lead+word-start
+          #   - `(KEYWORDS)` : keyword grp1
+          #   - `\s*`        : opt ws
+          #   - `%(\(…\))?`  : opt (name)
+          #   - `:`          : colon
+          highlight.pattern = ''.*<(KEYWORDS)\s*%(\([^)]*\))?:'';
+          # ripgrep:
+          #   - `\b`         : word-bdry
+          #   - `(KEYWORDS)` : keyword
+          #   - `\s*`        : opt ws
+          #   - `(?:\(…\))?` : opt (name)
+          #   - `:`          : colon
+          search.pattern = ''\b(KEYWORDS)\s*(?:\([^)]*\))?:'';
+        };
+      };
 
       # Linting layer (diagnostics from external tools); linters wired per-ft in code-languages.nix.
       autoGroups.lint.clear = true;
