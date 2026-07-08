@@ -22,7 +22,8 @@
           local hunk = hunks[i]
           if hunk.type ~= "delete" then
             local first = hunk.added.start
-            local last = first + hunk.added.count
+            -- clamp: gitsigns can report the added region one past EOF, which would make nvim_buf_get_lines error
+            local last = math.min(first + hunk.added.count, vim.api.nvim_buf_line_count(bufnr) + 1)
             -- nvim_buf_get_lines is 0-based end-exclusive; grab the last changed line for its length
             local last_line = vim.api.nvim_buf_get_lines(bufnr, last - 2, last - 1, true)[1]
             format(vim.tbl_extend("error", opts or {}, {
