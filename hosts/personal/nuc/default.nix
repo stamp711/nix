@@ -33,8 +33,9 @@ in
 
           # Accept GPD's and Surface's host keys for remote build offload
           users.users.${username}.openssh.authorizedKeys.keys = [
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGTQLBSo+0ienoQG9TV4XyNt3vbN60uS10OD4TUDB1an"
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH5Pi9art3cmYnc8yuldBqGvtLWWwSK5zjnRKF0l2MyG"
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGTQLBSo+0ienoQG9TV4XyNt3vbN60uS10OD4TUDB1an" # GPD
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH5Pi9art3cmYnc8yuldBqGvtLWWwSK5zjnRKF0l2MyG" # Surface
+            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMcqFJen/UmBUeC70rkomrV3IGez6ceovQQpCWjs9WGm" # stamp@Surface
           ];
 
           # Always-on desktop - disable all sleep states
