@@ -24,6 +24,7 @@ in
       self.nixosModules.charon
       self.nixosModules.linux-gaming
       self.nixosModules.tailscale
+      self.nixosModules.nas-smb-mounts
       (
         { pkgs, ... }:
         {

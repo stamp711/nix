@@ -22,6 +22,7 @@ in
       inputs.nixos-hardware.nixosModules.gpd-pocket-4
       ./lte.nix
       self.nixosModules.tailscale
+      self.nixosModules.nas-smb-mounts
       {
         my.primaryUser = username;
         networking.hostName = hostname;
