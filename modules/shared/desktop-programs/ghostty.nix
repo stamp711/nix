@@ -10,6 +10,8 @@
           font-family = "Monaco Nerd Font";
           font-size = 13;
           cursor-style-blink = false;
+          cursor-color = "cell-foreground";
+          cursor-text = "cell-background";
           shell-integration-features = "cursor,sudo,title,ssh-env,ssh-terminfo,path";
           macos-option-as-alt = true;
           keybind = [ "global:ctrl+enter=toggle_quick_terminal" ];
