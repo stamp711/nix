@@ -2,28 +2,23 @@
 {
   flake.nixvimModules.default = {
 
-    plugins.hardtime = {
-      enable = true;
-      settings = {
-        disable_mouse = false; # keep the mouse
-        # h/l belong to nvim-origami, hardtime breaks it.
-        restricted_keys = {
-          h.__raw = "false";
-          l.__raw = "false";
-        };
-        disabled_keys = {
-          "<Up>".__raw = "false";
-          "<Down>".__raw = "false";
-          "<Left>".__raw = "false";
-          "<Right>".__raw = "false";
-        };
-      };
-    };
-
     plugins.precognition = {
       enable = true;
       settings.startVisible = false;
     };
+
+    # Post for the Snacks global. precognition exposes no visibility getter, so track it.
+    extraConfigLuaPost = ''
+      local precognition_visible = false;
+      Snacks.toggle({
+        name = "Precognition",
+        get = function() return precognition_visible end,
+        set = function(s)
+          precognition_visible = s
+          require("precognition")[s and "show" or "hide"]()
+        end,
+      }):map("<leader>uP")
+    '';
 
     # <C-d>/<C-u>: half-screen is too jumpy, use a 10-line step.
     keymaps =
@@ -44,25 +39,6 @@
           options.desc = "Scroll up";
         }
       ];
-
-    # Post for the Snacks global. precognition exposes no visibility getter, so track it.
-    extraConfigLuaPost = ''
-      Snacks.toggle({
-        name = "Hardtime",
-        get = function() return require("hardtime").is_plugin_enabled end,
-        set = function(s) require("hardtime")[s and "enable" or "disable"]() end,
-      }):map("<leader>uH")
-
-      local precognition_visible = true
-      Snacks.toggle({
-        name = "Precognition",
-        get = function() return precognition_visible end,
-        set = function(s)
-          precognition_visible = s
-          require("precognition")[s and "show" or "hide"]()
-        end,
-      }):map("<leader>uP")
-    '';
 
   };
 }
