@@ -9,6 +9,7 @@ in
     inherit system;
     modules = [
       self.profiles.darwin.desktop
+      self.darwinModules.personal
       { my.primaryUser = username; }
     ];
   };
