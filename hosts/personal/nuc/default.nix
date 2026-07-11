@@ -39,6 +39,10 @@ in
             "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMcqFJen/UmBUeC70rkomrV3IGez6ceovQQpCWjs9WGm" # stamp@Surface
           ];
 
+          # Tailscale exit node
+          services.tailscale.useRoutingFeatures = "both";
+          services.tailscale.extraSetFlags = [ "--advertise-exit-node" ];
+
           # Always-on desktop - disable all sleep states
           systemd.targets.sleep.enable = false;
           systemd.targets.suspend.enable = false;
