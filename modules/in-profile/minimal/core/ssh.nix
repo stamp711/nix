@@ -57,6 +57,15 @@ in
     { config, ... }:
     {
       users.users.${config.my.primaryUser}.openssh.authorizedKeys.keys = [ sshPubKey ];
+
+      services.openssh = {
+        enable = true;
+        extraConfig = ''
+          PasswordAuthentication no
+          PermitRootLogin no
+        '';
+      };
+
       services.eternal-terminal.enable = true;
     };
 
