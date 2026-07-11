@@ -19,6 +19,16 @@
         doCheck = false;
       });
 
+      # dpcontracts' README doctest calls asyncio.get_event_loop() (removed in
+      # python 3.14); reaches us via nix-alien -> pylddwrap -> icontract.
+      pythonPackagesExtensions = (prev.pythonPackagesExtensions or [ ]) ++ [
+        (_: pyprev: {
+          dpcontracts = pyprev.dpcontracts.overridePythonAttrs (_: {
+            doCheck = false;
+          });
+        })
+      ];
+
       gamescope = prev.gamescope.overrideAttrs (old: {
         patches = (old.patches or [ ]) ++ [ ./gamescope-nvidia-hdr-toggle-flicker.patch ];
       });

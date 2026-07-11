@@ -22,6 +22,7 @@ in
         inputs.agenix-rekey.overlays.default
         inputs.llm-agents.overlays.default
         inputs.brew-nix.overlays.default
+        inputs.nix-alien.overlays.default
       ];
     };
 
