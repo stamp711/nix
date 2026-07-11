@@ -22,7 +22,8 @@ in
       {
         my.primaryUser = username;
         networking.hostName = hostname;
-        networking.networkmanager.enable = lib.mkForce false; # WSL2 owns networking
+        networking.networkmanager.enable = lib.mkForce false; # Windows owns networking
+        services.tailscale.enable = lib.mkForce false; # Windows runs Tailscale
         age.rekey.hostPubkey = hostPubkey;
 
         wsl.enable = true;
