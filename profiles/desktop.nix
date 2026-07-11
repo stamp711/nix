@@ -3,7 +3,6 @@
   flake.profiles.nixos.desktop = {
     imports = [
       self.profiles.nixos.headless
-      self.nixosModules.networking
       self.nixosModules.desktop-environment
       self.nixosModules.desktop-programs
     ];

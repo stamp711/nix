@@ -14,8 +14,9 @@
   flake.profiles.nixos.headless = {
     imports = [
       self.profiles.nixos.minimal
-      self.nixosModules.cli-environment
       self.nixosModules.hardware
+      self.nixosModules.networking
+      self.nixosModules.cli-environment
       self.nixosModules.cli-programs
     ];
 

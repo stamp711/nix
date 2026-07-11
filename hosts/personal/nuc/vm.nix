@@ -1,7 +1,6 @@
 # Windows 11 VM with VFIO GPU passthrough (NixVirt declarative domain)
-{ inputs, ... }:
-{
-  flake.nixosModules.nuc-vm =
+{ inputs, ... }: {
+  flake.nixosModules.nuc =
     {
       lib,
       config,

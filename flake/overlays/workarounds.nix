@@ -1,5 +1,5 @@
 { lib, ... }: {
-  flake.overlays.workarounds = final: prev: {
+  flake.overlays.workarounds = _: prev: {
 
     # 2026-07-11
     # dpcontracts' README doctest calls asyncio.get_event_loop() (removed in

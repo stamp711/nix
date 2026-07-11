@@ -7,44 +7,21 @@ let
   userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBt5OaxhvkIQJWZ80eX8czcCESykRu8oNlx1UIFiQz0G";
 in
 {
-  imports = [
-    ./hardware.nix
-    ./fingerprint.nix
-  ];
+
+  imports = (inputs.import-dir ./. { collect = true; })._all;
 
   flake.nixosConfigurations.${hostname} = self.lib.mkNixos {
     inherit system;
     modules = [
       self.profiles.nixos.desktop
       self.nixosModules.linux-gaming
-      self.nixosModules.gpd-hardware
-      self.nixosModules.gpd-fingerprint
-      inputs.nixos-hardware.nixosModules.gpd-pocket-4
-      ./lte.nix
-      self.nixosModules.tailscale
-      self.nixosModules.nas-smb-mounts
+      self.nixosModules.personal
+      self.nixosModules.gpd
+      self.nixosModules.use-build-machine
       {
         my.primaryUser = username;
         networking.hostName = hostname;
         age.rekey.hostPubkey = hostPubkey;
-
-        # Offload builds to NUC
-        nix.distributedBuilds = true;
-        nix.settings.builders-use-substitutes = true;
-        nix.buildMachines = [
-          {
-            hostName = "NUC";
-            sshUser = username;
-            sshKey = "/persist/etc/ssh/ssh_host_ed25519_key";
-            systems = [ system ];
-            protocol = "ssh-ng";
-            maxJobs = 8;
-            supportedFeatures = self.nixosConfigurations.NUC.config.nix.settings.system-features;
-          }
-        ];
-        programs.ssh.knownHosts."NUC".publicKey =
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIClC3VLrypgdZbvJPhufSe6BeWcijyTrnl4JqBs/r566";
-
         my.boot-disk = {
           enable = true;
           layout = "efi-luks-btrfs";
@@ -59,9 +36,9 @@ in
     inherit system;
     modules = [
       self.profiles.homeManager.desktop
-      self.homeModules.personal
       self.homeModules.linux-gaming
-      self.homeModules.gpd-hardware
+      self.homeModules.personal
+      self.homeModules.gpd
       {
         my.primaryUser = username;
         age.rekey.hostPubkey = userPubkey;
@@ -84,4 +61,5 @@ in
       };
     };
   };
+
 }

@@ -7,24 +7,17 @@ let
   userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDbNYaZnOCmlfKtRpPEq12Ot3iaVjq0AFj7vsB3DcjQ+";
 in
 {
-  imports = [
-    ./hardware.nix
-    ./vm.nix
-    ./ariadne.nix
-    ./charon.nix
-  ];
+
+  imports = (inputs.import-dir ./. { collect = true; })._all;
+
   flake.nixosConfigurations.${hostname} = self.lib.mkNixos {
     inherit system;
     nixpkgsConfig.cudaSupport = true;
     modules = [
       self.profiles.nixos.desktop
-      self.nixosModules.nuc-hardware
-      self.nixosModules.nuc-vm
-      self.nixosModules.ariadne
-      self.nixosModules.charon
       self.nixosModules.linux-gaming
-      self.nixosModules.tailscale
-      self.nixosModules.nas-smb-mounts
+      self.nixosModules.personal
+      self.nixosModules.nuc
       (
         { pkgs, ... }:
         {
@@ -36,7 +29,6 @@ in
           users.users.${username}.openssh.authorizedKeys.keys = [
             "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGTQLBSo+0ienoQG9TV4XyNt3vbN60uS10OD4TUDB1an" # GPD
             "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH5Pi9art3cmYnc8yuldBqGvtLWWwSK5zjnRKF0l2MyG" # Surface
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMcqFJen/UmBUeC70rkomrV3IGez6ceovQQpCWjs9WGm" # stamp@Surface
           ];
 
           # Tailscale exit node
@@ -67,8 +59,8 @@ in
     inherit system;
     modules = [
       self.profiles.homeManager.desktop
-      self.homeModules.personal
       self.homeModules.linux-gaming
+      self.homeModules.personal
       {
         my.primaryUser = username;
         age.rekey.hostPubkey = userPubkey;
@@ -92,4 +84,5 @@ in
       };
     };
   };
+
 }

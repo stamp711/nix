@@ -1,24 +1,28 @@
 {
   outputs =
     inputs:
-    let
-      import-dir = (import ./flake/lib/import.nix { inherit inputs; }).importDir;
-    in
     inputs.flake-parts.lib.mkFlake { inherit inputs; } {
       imports =
-        (import-dir ./flake { collect = true; })._all
-        ++ (import-dir ./hosts { collect = true; })._all
-        ++ (import-dir ./modules { collect = true; })._all
-        ++ (import-dir ./nixvim { collect = true; })._all
-        ++ (import-dir ./packages { collect = true; })._all
-        ++ (import-dir ./profiles { collect = true; })._all
-        ++ (import-dir ./shells { collect = true; })._all;
+        (inputs.import-dir ./flake { collect = true; })._all
+        ++ (inputs.import-dir ./hosts { collect = true; })._all
+        ++ (inputs.import-dir ./modules { collect = true; })._all
+        ++ (inputs.import-dir ./nixvim { collect = true; })._all
+        ++ (inputs.import-dir ./packages { collect = true; })._all
+        ++ (inputs.import-dir ./profiles { collect = true; })._all
+        ++ (inputs.import-dir ./shells { collect = true; })._all;
     };
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-parts.url = "github:hercules-ci/flake-parts";
-    systems.url = "github:nix-systems/default";
+    import-dir = {
+      url = "path:./import-dir";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    systems = {
+      url = "path:./flake.systems.nix";
+      flake = false;
+    };
     # Generates options.json from arbitrary modules for nix-search-tv
     unf = {
       url = "git+https://git.atagen.co/atagen/unf";

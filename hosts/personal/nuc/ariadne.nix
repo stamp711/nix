@@ -1,7 +1,6 @@
 # ariadne: reverse-SSH tunnel anchor VM w/ passt networking.
-{ inputs, ... }:
-{
-  flake.nixosModules.ariadne =
+{ inputs, ... }: {
+  flake.nixosModules.nuc =
     {
       config,
       lib,

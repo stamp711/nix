@@ -17,7 +17,7 @@
 # branch merges (it adds our specific PID).
 # { inputs, ... }:
 {
-  flake.nixosModules.gpd-fingerprint =
+  flake.nixosModules.gpd =
     { pkgs, ... }:
     # let
     #   libfprint-focaltech = pkgs.libfprint.overrideAttrs (old: {

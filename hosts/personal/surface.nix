@@ -1,4 +1,9 @@
-{ self, inputs, ... }:
+{
+  self,
+  inputs,
+  lib,
+  ...
+}:
 let
   username = "stamp";
   hostname = "Surface";
@@ -12,30 +17,16 @@ in
     modules = [
       inputs.nixos-wsl.nixosModules.default
       self.profiles.nixos.headless
+      self.nixosModules.personal
+      self.nixosModules.use-build-machine
       {
         my.primaryUser = username;
         networking.hostName = hostname;
+        networking.networkmanager.enable = lib.mkForce false; # WSL2 owns networking
         age.rekey.hostPubkey = hostPubkey;
 
         wsl.enable = true;
         wsl.defaultUser = username;
-
-        # Offload builds to NUC
-        nix.distributedBuilds = true;
-        nix.settings.builders-use-substitutes = true;
-        nix.buildMachines = [
-          {
-            hostName = "NUC";
-            sshUser = username;
-            sshKey = "/persist/etc/ssh/ssh_host_ed25519_key";
-            systems = [ system ];
-            protocol = "ssh-ng";
-            maxJobs = 8;
-            supportedFeatures = self.nixosConfigurations.NUC.config.nix.settings.system-features;
-          }
-        ];
-        programs.ssh.knownHosts."NUC".publicKey =
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIClC3VLrypgdZbvJPhufSe6BeWcijyTrnl4JqBs/r566";
       }
     ];
   };

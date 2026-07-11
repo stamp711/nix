@@ -1,7 +1,6 @@
 # charon: domain-allowlisted forward proxy (tinyproxy) behind SSH, egress via Surge.
-{ inputs, self, ... }:
-{
-  flake.nixosModules.charon =
+{ inputs, self, ... }: {
+  flake.nixosModules.nuc =
     {
       config,
       lib,

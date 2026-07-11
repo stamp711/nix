@@ -1,6 +1,6 @@
 # NUC13RNGi9 hardware (Intel i9-13900, Intel iGPU + NVIDIA RTX 4080)
 { inputs, ... }: {
-  flake.nixosModules.nuc-hardware = { pkgs, ... }: {
+  flake.nixosModules.nuc = { pkgs, ... }: {
 
     imports = [
       inputs.nixos-hardware.nixosModules.common-gpu-intel
