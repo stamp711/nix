@@ -26,18 +26,23 @@
     plugins.typst-preview.enable = true;
 
     plugins.conform-nvim.settings.formatters_by_ft = {
-      c = [ "clang_format" ];
-      cpp = [ "clang_format" ];
-      json = [ "prettierd" ];
+
+      ## LSP doesn't format
       lua = [ "stylua" ];
       markdown = [ "prettierd" ];
-      nix = [ "nixfmt" ];
       proto = [ "clang_format" ];
       python = [ "ruff_format" ];
+
+      ## LSP can format, but doesn't range format
+      nix = [ "nixfmt" ];
       toml = [ "taplo" ];
-      # changed-lines save formats by range; tinymist has no rangeFormatting
-      typst = [ "typstyle" ];
       zig = [ "zigfmt" ];
+
+      ## We deliberately don't want LSP's formatter
+      c = [ "clang_format" ];
+      cpp = [ "clang_format" ]; # we have a custom clang_format wrapper
+      json = [ "prettierd" ];
+
     };
 
     plugins.lint.lintersByFt = {

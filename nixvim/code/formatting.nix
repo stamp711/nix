@@ -41,7 +41,7 @@
       enable = true;
       autoInstall.enable = true; # bake the formatter packages into the wrapper.
       settings = {
-        default_format_opts.lsp_format = "prefer"; # CLI is the fallback
+        default_format_opts.lsp_format = "fallback";
         # Format VCS-changed lines on save, outer language then injected blocks.
         # No git context (nil hunks: no repo or untracked) -> full format of both.
         format_on_save.__raw = ''
@@ -49,7 +49,7 @@
             if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
               return
             end
-            -- lsp_format = "never" so conform runs the injected formatter instead of short-circuiting to LSP-only.
+            -- lsp_format = "never" runs the injected formatter, never the buffer's LSP.
             local injected = { formatters = { "injected" }, lsp_format = "never" }
             if _G.FormatHunks(bufnr) then
               _G.FormatHunks(bufnr, injected) -- changed hunks: outer done above, now injected
@@ -72,8 +72,7 @@
         action.__raw = ''function() require("conform").format({ async = true }) end'';
         options.desc = "Format";
       }
-      # lsp_format = "never" overrides the global "prefer" default so conform runs the injected
-      # formatter instead of short-circuiting to LSP-only (which would skip it). Applies to ci too.
+      # lsp_format = "never" runs the injected formatter, not the buffer's LSP.
       {
         mode = [
           "n"
