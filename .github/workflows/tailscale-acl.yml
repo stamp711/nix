@@ -1,0 +1,29 @@
+name: Tailscale ACL
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [master]
+    paths: ["tailscale-policy.hujson"]
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write # OIDC JWT for Tailscale federated identity
+
+jobs:
+  acl:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: tailscale/gitops-acl-action@v1
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_ID }}
+          audience: ${{ secrets.TS_AUDIENCE }}
+          tailnet: ${{ secrets.TS_TAILNET }}
+          policy-file: tailscale-policy.hujson
+          action: apply

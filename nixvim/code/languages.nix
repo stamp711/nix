@@ -42,8 +42,14 @@
       c = [ "clang_format" ];
       cpp = [ "clang_format" ]; # we have a custom clang_format wrapper
       json = [ "prettierd" ];
+      jsonc = [ "prettier" ];
 
     };
+
+    # Tailscale .hujson is just jsonc
+    filetype.extension.hujson = "jsonc";
+    # prettier can't infer .hujson's parser; force the jsonc parser.
+    plugins.conform-nvim.settings.formatters.prettier.options.ft_parsers.jsonc = "jsonc";
 
     plugins.lint.lintersByFt = {
       sh = [ "shellcheck" ];

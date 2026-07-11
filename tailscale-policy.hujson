@@ -1,0 +1,21 @@
+{
+  "tagOwners": {
+    "tag:untrusted": [],
+    "tag:surge": [],
+  },
+  "grants": [
+    {
+      "src": ["autogroup:owner", "tag:surge"],
+      "dst": ["*"],
+      "ip": ["*"],
+    },
+  ],
+  "ssh": [
+    {
+      "action": "accept",
+      "src": ["autogroup:owner"],
+      "dst": ["autogroup:self"],
+      "users": ["autogroup:nonroot"],
+    },
+  ],
+}
