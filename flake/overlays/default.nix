@@ -42,6 +42,22 @@
         '';
       });
 
+      # starship's notify feature links mac-notification-sys, which crashes classic ld64
+      # on aarch64-darwin; link with ld64.lld. throwIf trips when nixpkgs#540463 lands.
+      starship = prev.starship.overrideAttrs (
+        old:
+        prev.lib.optionalAttrs prev.stdenv.hostPlatform.isDarwin (
+          prev.lib.throwIf (old.env or { } ? NIX_CFLAGS_LINK)
+            "starship override obsolete: nixpkgs#540463 landed, remove it"
+            {
+              nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ prev.llvmPackages.lld ];
+              env = (old.env or { }) // {
+                NIX_CFLAGS_LINK = "-fuse-ld=${prev.lib.getExe' prev.llvmPackages.lld "ld64.lld"}";
+              };
+            }
+        )
+      );
+
       # modus's util.lua sets the :terminal slots from bg_main/fg_main/*_intense instead of its
       # own spec bg_term_* keys (the extras use those); on light themes that makes highlights black.
       vimPlugins = prev.vimPlugins.extend (
