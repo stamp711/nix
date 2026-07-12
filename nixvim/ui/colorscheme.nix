@@ -4,17 +4,17 @@
     # We pick the active colorscheme ourselves (below), so suppress nixvim's auto-apply.
     colorscheme = lib.mkForce null;
 
-    colorschemes.gruvbox = {
+    # dark
+    colorschemes.kanagawa = {
       enable = true;
-      settings.italic = {
-        strings = false;
-        comments = false;
-        operators = false;
-        folds = false;
-        emphasis = false;
+      settings = {
+        theme = "wave";
+        commentStyle.italic = false;
+        keywordStyle.italic = false;
       };
     };
 
+    # light
     colorschemes.modus = {
       enable = true;
       settings = {
@@ -51,7 +51,7 @@
 
     extraConfigLua = ''
       require("auto-dark-mode").setup() -- defaults to set `background` to dark/light from the OS
-      vim.cmd.colorscheme(vim.o.background == "light" and "modus_operandi" or "gruvbox")
+      vim.cmd.colorscheme(vim.o.background == "light" and "modus_operandi" or "kanagawa")
     '';
 
     # When background is changed, apply the theme.
@@ -66,7 +66,7 @@
             if vim.v.option_old ~= vim.v.option_new then
               -- defer the colorscheme switch until after nvim's internal background handling
               vim.schedule(function()
-                vim.cmd.colorscheme(vim.o.background == "light" and "modus_operandi" or "gruvbox")
+                vim.cmd.colorscheme(vim.o.background == "light" and "modus_operandi" or "kanagawa")
               end)
             end
           end
