@@ -12,7 +12,6 @@
         wrap_spell.clear = true;
         json_conceal.clear = true;
         auto_create_dir.clear = true;
-        term_insert.clear = true;
       };
 
       autoCmd = [
@@ -157,27 +156,6 @@
               end
               local file = vim.uv.fs_realpath(event.match) or event.match
               vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
-            end
-          '';
-        }
-        {
-          event = [
-            "TermOpen"
-            "BufEnter"
-          ];
-          group = "term_insert";
-          desc = "Enter terminal mode when focusing a terminal";
-          # schedule so it sticks: a BufEnter startinsert is otherwise overridden when nvim finalizes the window mode
-          callback.__raw = ''
-            function()
-              if vim.bo.buftype ~= "terminal" then
-                return
-              end
-              vim.schedule(function()
-                if vim.bo.buftype == "terminal" then
-                  vim.cmd("startinsert")
-                end
-              end)
             end
           '';
         }

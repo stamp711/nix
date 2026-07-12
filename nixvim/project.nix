@@ -118,18 +118,6 @@
             options.desc = "Find Config File";
           }
           {
-            key = "<leader>ft";
-            mode = "n";
-            action.__raw = "function() Snacks.terminal(nil, { cwd = Root() }) end";
-            options.desc = "Terminal (Root Dir)";
-          }
-          {
-            key = "<leader>fT";
-            mode = "n";
-            action.__raw = "function() Snacks.terminal() end";
-            options.desc = "Terminal (cwd)";
-          }
-          {
             key = "<leader>sw";
             mode = [
               "n"

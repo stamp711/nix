@@ -362,15 +362,6 @@
           action = "<cmd>tabfirst<cr>";
           options.desc = "First Tab";
         }
-        {
-          key = "<C-`>";
-          mode = [
-            "n"
-            "t"
-          ];
-          action.__raw = "function() Snacks.terminal.focus(nil, { cwd = Root() }) end";
-          options.desc = "Terminal (Root Dir)";
-        }
       ];
     };
 }
