@@ -9,6 +9,7 @@
     plugins.lsp.servers = {
       clangd.enable = true;
       jsonls.enable = true;
+      lua_ls.enable = true;
       marksman.enable = true;
       nil_ls.enable = true;
       basedpyright.enable = true;
@@ -16,6 +17,17 @@
       taplo.enable = true; # TOML
       tinymist.enable = true; # typst
       zls.enable = true; # Zig
+    };
+
+    # neovim + plugin types for lua_ls
+    plugins.lazydev = {
+      enable = true;
+      settings.library = [
+        {
+          path = "${pkgs.vimPlugins.snacks-nvim}"; # needs absolute path
+          words = [ "Snacks" ];
+        }
+      ];
     };
 
     # Rust goes through rustaceanvim (pulls rust-analyzer); don't also enable
