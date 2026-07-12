@@ -2,6 +2,7 @@ local M = {
   items = {}, -- open terminals in tab order (creation order, left to right)
   selected = nil, -- the selected tab: shown now, or restored on next toggle (not the focused window)
   next_id = 1, -- id for the next tab; part of Snacks' (cwd, count) key so each tab stays distinct
+  zoomed = false, -- persistent full-screen preference; the layout follows focus (see zoom below)
 }
 
 -- `manager_win` (winbar + terminal-mode keys, scoped to manager terminals) is
@@ -25,11 +26,84 @@ local function hide_others(keep)
   end
 end
 
--- select `term`, hide the others, and focus its window
+-- the manager terminal whose window is `win`, or nil
+local function term_at(win)
+  for _, t in ipairs(M.items) do
+    if t:win_valid() and t.win == win then
+      return t
+    end
+  end
+end
+
+-- Zoom: a persistent full-screen preference for the pane, like Zed's shift-esc. The
+-- editor shrinks to a 1-row sliver, never 0 -- a 0-row window crashes Neovide, which
+-- reads the cursor cell as `% rows` on every flush. show() applies it to whichever tab
+-- becomes visible; the autocmds below re-apply on re-entry and revert on leaving.
+local saved_h ---@type number?
+
+-- grow the selected terminal to fill the screen; winminheight's default of 1 keeps the
+-- editor at a 1-row sliver. saved_h is the pre-zoom terminal height, nil when not applied.
+local function apply_zoom()
+  local t = M.selected
+  if saved_h or not (t and t:win_valid()) then
+    return
+  end
+  saved_h = vim.api.nvim_win_get_height(t.win)
+  vim.api.nvim_win_set_height(t.win, vim.o.lines)
+end
+
+local function revert_zoom()
+  if not saved_h then
+    return
+  end
+  local t = M.selected
+  if t and t:win_valid() then
+    pcall(vim.api.nvim_win_set_height, t.win, saved_h)
+  end
+  vim.cmd("wincmd =") -- editor windows reclaim their share; the terminal stays put via winfixheight
+  saved_h = nil
+end
+
+-- re-apply when re-entering the zoomed pane (e.g. window-nav back in)
+vim.api.nvim_create_autocmd("WinEnter", {
+  callback = function()
+    if term_at(vim.api.nvim_get_current_win()) and M.zoomed then
+      apply_zoom()
+    end
+  end,
+})
+
+-- revert_zoom guards on saved_h, which is set only while the zoomed terminal is focused,
+-- so this reverts exactly when leaving it -- even if it's mid-teardown (shell exited)
+vim.api.nvim_create_autocmd("WinLeave", {
+  callback = function()
+    revert_zoom()
+  end,
+})
+
+-- <C-Esc>: flip the preference and act on it now (we're inside the terminal)
+function M.zoom()
+  local t = M.selected
+  if not (t and t:win_valid()) then
+    return
+  end
+  M.zoomed = not M.zoomed
+  if M.zoomed then
+    apply_zoom()
+  else
+    revert_zoom()
+  end
+end
+
+-- select `term`, hide the others, focus it, and apply the pane's zoom (WinEnter can't
+-- cover creation -- it fires before M.new registers the terminal)
 local function show(term)
   hide_others(term)
   M.selected = term
   term:show():focus()
+  if M.zoomed then
+    apply_zoom()
+  end
   vim.cmd("redrawstatus")
 end
 
@@ -94,6 +168,18 @@ function M.cycle(delta)
   end
   local cur = index_of(M.selected) or 1
   show(M.items[((cur - 1 + delta) % #M.items) + 1])
+end
+
+-- lazyvim term_nav for <C-hjkl>: go to the window in `dir`, or send the key to the shell
+-- at a window edge or in a floating terminal. Leaving a zoomed pane needs no special case
+-- here -- WinLeave un-zooms first. expr handler for every Snacks terminal; wired in default.nix.
+function M.nav(self, dir)
+  if self:is_floating() or vim.fn.winnr(dir) == vim.fn.winnr() then
+    return "<c-" .. dir .. ">"
+  end
+  vim.schedule(function()
+    vim.cmd.wincmd(dir)
+  end)
 end
 
 -- one tab's label: the running program name, %-escaped for the statusline
