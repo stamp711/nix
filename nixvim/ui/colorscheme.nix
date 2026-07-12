@@ -37,6 +37,7 @@
             hl.LspInlayHint.italic = false
             hl.Cursor.bg = "#5a544c" -- Zed: players.cursor
             hl.Visual = { bg = "#c2bcb5" } -- Zed: players[0].background; bg-only so syntax colors show through the selection
+            hl.SnacksIndent = { fg = c.bg_dim } -- indent guides at modus's own quiet bg_dim, not the loud NonText
             -- Trouble sidebar on editor Normal, not modus's dark float bg (bg_active); indent sub-groups follow TroubleIndent.
             for _, g in ipairs({ "TroubleNormal", "TroubleNormalNC", "TroubleIndent" }) do
               hl[g] = { link = "Normal" }
