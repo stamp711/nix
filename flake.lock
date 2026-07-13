@@ -222,6 +222,22 @@
         "type": "github"
       }
     },
+    "claude-code-wakatime": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1783730816,
+        "narHash": "sha256-YakGUXt+q7aHLAufD9LxYVVK4BgP8ASOpvrvvXLUVcY=",
+        "owner": "wakatime",
+        "repo": "claude-code-wakatime",
+        "rev": "e7f755d168ff735fdf31922de81f599e37a4ec94",
+        "type": "github"
+      },
+      "original": {
+        "owner": "wakatime",
+        "repo": "claude-code-wakatime",
+        "type": "github"
+      }
+    },
     "cloudflare-ips": {
       "flake": false,
       "locked": {
@@ -232,6 +248,22 @@
       "original": {
         "type": "file",
         "url": "https://api.cloudflare.com/client/v4/ips"
+      }
+    },
+    "codex-cli-wakatime": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1781616533,
+        "narHash": "sha256-xzUudO+3DCPiJMzMzKODY5X6T/32XvKIJ1OXGN/uLvs=",
+        "owner": "wakatime",
+        "repo": "codex-cli-wakatime",
+        "rev": "a0218436d549915c521287b9436782891e75e856",
+        "type": "github"
+      },
+      "original": {
+        "owner": "wakatime",
+        "repo": "codex-cli-wakatime",
+        "type": "github"
       }
     },
     "darwin": {
@@ -1073,7 +1105,9 @@
         "agenix-rekey": "agenix-rekey",
         "brew-api": "brew-api",
         "brew-nix": "brew-nix",
+        "claude-code-wakatime": "claude-code-wakatime",
         "cloudflare-ips": "cloudflare-ips",
+        "codex-cli-wakatime": "codex-cli-wakatime",
         "deploy-rs": "deploy-rs",
         "disko": "disko",
         "flake-parts": "flake-parts",

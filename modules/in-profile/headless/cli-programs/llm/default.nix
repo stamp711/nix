@@ -25,6 +25,37 @@ in
       hunkSkills = importSkills (inputs.hunk + "/skills");
 
       skills = hunkSkills // localSkills;
+
+      # Self-contained WakaTime plugins (node + wakatime-cli pinned for their hooks)
+      claude-wakatime =
+        let
+          src = inputs.claude-code-wakatime;
+          run = pkgs.writeShellScript "claude-code-wakatime-run" ''
+            export PATH=${pkgs.wakatime-cli}/bin:$PATH
+            unset NODE_OPTIONS
+            exec ${pkgs.nodejs}/bin/node ${src}/dist/index.js "$@"
+          '';
+        in
+        pkgs.runCommand "claude-code-wakatime" { } ''
+          cp -r ${src} $out
+          chmod -R +w $out
+          install -m755 ${run} $out/scripts/run
+        '';
+
+      codex-wakatime =
+        let
+          src = "${inputs.codex-cli-wakatime}/plugins/codex-cli-wakatime"; # Codex plugin lives in a marketplace subdir
+          run = pkgs.writeShellScript "codex-cli-wakatime-run" ''
+            export PATH=${pkgs.wakatime-cli}/bin:$PATH
+            unset NODE_OPTIONS
+            exec ${pkgs.nodejs}/bin/node ${src}/bin/codex-cli-wakatime.js --background
+          '';
+        in
+        pkgs.runCommand "codex-cli-wakatime" { } ''
+          cp -r ${src} $out
+          chmod -R +w $out
+          install -m755 ${run} $out/scripts/run
+        '';
     in
     {
       programs.claude-code = {
@@ -32,6 +63,7 @@ in
         package = llm-agents.claude-code;
         enableMcpIntegration = true;
         inherit skills;
+        plugins = [ claude-wakatime ];
 
         settings = {
           theme = "auto";
@@ -72,6 +104,7 @@ in
         package = llm-agents.codex;
         enableMcpIntegration = true;
         inherit skills;
+        plugins = [ codex-wakatime ];
       };
 
       # programs.gemini-cli = {

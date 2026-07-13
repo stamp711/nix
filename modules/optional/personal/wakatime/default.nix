@@ -1,7 +1,7 @@
 { self, ... }:
 {
   flake.homeModules.personal =
-    { config, ... }:
+    { config, pkgs, ... }:
     let
       file = ./wakatime.cfg.age;
       name = self.lib.ageSecretName file;
@@ -12,5 +12,7 @@
       home.file.".wakatime.cfg".source =
         config.lib.file.mkOutOfStoreSymlink
           config.age.secrets.${name}.path;
+
+      home.packages = [ pkgs.wakatime-cli ];
     };
 }
