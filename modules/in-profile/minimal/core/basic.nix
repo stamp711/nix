@@ -17,6 +17,7 @@
 
       programs.nh.enable = true;
       programs.nh.flake = config.my.flake;
+      home.sessionVariables.NH_SHOW_ACTIVATION_LOGS = "1";
     };
 
   flake.darwinModules.core = {
