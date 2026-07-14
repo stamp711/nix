@@ -171,13 +171,13 @@
         enable = true;
         # Also match TODO(name): (folke#326, folke#370).
         settings = {
-          # vim very-magic:
-          #   - `.*<`        : lead+word-start
-          #   - `(KEYWORDS)` : keyword grp1
-          #   - `\s*`        : opt ws
-          #   - `%(\(…\))?`  : opt (name)
-          #   - `:`          : colon
-          highlight.pattern = ''.*<(KEYWORDS)\s*%(\([^)]*\))?:'';
+          # vim very-magic; grp1 = highlighted span, grp2 = keyword for color.
+          # Span wraps the (name) so wide-mode's +1 pad lands on `:`, not `(`.
+          #   - `.*<`          : lead+word-start
+          #   - `((KEYWORDS)`  : span grp1 opens, keyword grp2
+          #   - `\s*%(\(…\))?` : opt ws + opt (name)
+          #   - `):`           : span closes, colon
+          highlight.pattern = ''.*<((KEYWORDS)\s*%(\([^)]*\))?):'';
           # ripgrep:
           #   - `\b`         : word-bdry
           #   - `(KEYWORDS)` : keyword
