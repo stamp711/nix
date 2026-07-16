@@ -111,6 +111,7 @@
 
       programs.jujutsu.enable = true;
       programs.jujutsu.settings.ui.default-command = [ "log" ];
+      programs.jujutsu.settings.ui.show-cryptographic-signatures = true;
 
       # oyui interactive diff editor
       programs.jujutsu.settings.ui.diff-editor = "oyui";
