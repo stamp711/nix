@@ -232,6 +232,9 @@
             }
         }
       '';
+
+      # Nested inner instance: unlock via Ctrl a so the locked outer (Ctrl g) passes it through.
+      nestedKeybinds = builtins.replaceStrings [ "Ctrl g" ] [ "Ctrl a" ] unlockFirstKeybinds;
     in
     {
       programs.zellij = {
@@ -248,6 +251,19 @@
 
         extraConfig = unlockFirstKeybinds;
       };
+
+      # Config for nested inner sessions; settings mirror programs.zellij.settings above.
+      xdg.configFile."zellij/nested.kdl".text = ''
+        default_mode "locked"
+        pane_frames false
+        session_serialization false
+        web_server false
+        web_sharing "on"
+      ''
+      + nestedKeybinds;
+
+      # Explicit alias to run a nested inner session (Ctrl a unlock, so the locked outer passes it through).
+      home.shellAliases.zellij-nested = "zellij --config ${config.xdg.configHome}/zellij/nested.kdl";
 
       systemd.user.services.zellij-web = {
         Unit = {
