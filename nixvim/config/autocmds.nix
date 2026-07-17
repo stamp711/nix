@@ -11,6 +11,7 @@
         man_unlisted.clear = true;
         wrap_spell.clear = true;
         json_conceal.clear = true;
+        markdown_conceal.clear = true;
         auto_create_dir.clear = true;
       };
 
@@ -139,6 +140,20 @@
           ];
           group = "json_conceal";
           desc = "Disable conceal in json";
+          callback.__raw = ''
+            function()
+              vim.opt_local.conceallevel = 0
+            end
+          '';
+        }
+        {
+          event = "FileType";
+          pattern = [
+            "markdown"
+            "markdown_inline"
+          ];
+          group = "markdown_conceal";
+          desc = "Disable conceal in markdown";
           callback.__raw = ''
             function()
               vim.opt_local.conceallevel = 0
