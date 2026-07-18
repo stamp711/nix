@@ -36,6 +36,11 @@
       '';
     });
 
+    # Let `attach --config` re-bind keys.
+    zellij-unwrapped = prev.zellij-unwrapped.overrideAttrs (old: {
+      patches = (old.patches or [ ]) ++ [ ./zellij-attach-keybinds.patch ];
+    });
+
     vimPlugins = prev.vimPlugins.extend (
       _: super: {
 

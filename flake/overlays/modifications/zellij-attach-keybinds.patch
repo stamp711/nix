@@ -1,0 +1,20 @@
+diff --git a/zellij-server/src/lib.rs b/zellij-server/src/lib.rs
+index a218af5..b0c15f2 100644
+--- a/zellij-server/src/lib.rs
++++ b/zellij-server/src/lib.rs
+@@ -1137,6 +1137,15 @@ pub fn start_server(mut os_input: Box<dyn ServerOsApi>, socket_path: PathBuf) {
+
+                 let mut runtime_configuration = config.clone();
+                 runtime_configuration.options = runtime_config_options.clone();
++                // An explicit --config re-binds keys on attach.
++                if let Some(ref config_file_path) = cli_assets.config_file_path {
++                    let default_config = Config::from_default_assets().unwrap_or_default();
++                    if let Ok(client_config) =
++                        Config::from_path(config_file_path, Some(default_config))
++                    {
++                        runtime_configuration.keybinds = client_config.keybinds;
++                    }
++                }
+                 session_data
+                     .session_configuration
+                     .set_client_runtime_configuration(client_id, runtime_configuration);
