@@ -9,7 +9,6 @@
       };
       options.my.flake = lib.mkOption {
         type = lib.types.str;
-        default = "github:stamp711/nix";
         description = "Flake reference for nh and maintenance";
       };
     };
@@ -23,7 +22,6 @@
       };
       options.my.flake = lib.mkOption {
         type = lib.types.str;
-        default = "github:stamp711/nix";
         description = "Flake reference for nh and maintenance";
       };
     };
@@ -37,7 +35,6 @@
       };
       options.my.flake = lib.mkOption {
         type = lib.types.str;
-        default = "github:stamp711/nix";
         description = "Flake reference for nh and maintenance";
       };
     };

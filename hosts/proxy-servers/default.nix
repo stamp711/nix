@@ -15,6 +15,7 @@ let
         self.nixosModules.fail2ban
         {
           my.primaryUser = "stamp";
+          my.flake = "github:stamp711/nix";
           networking.hostName = hostname;
           age.rekey.hostPubkey = hostPubkey;
 
