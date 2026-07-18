@@ -11,8 +11,6 @@ in
   flake.homeModules.cli-programs =
     { pkgs, ... }:
     let
-      inherit (pkgs) llm-agents;
-
       allowRead = pattern: [
         "Read(${pattern})"
         "Glob(${pattern})"
@@ -60,7 +58,6 @@ in
     {
       programs.claude-code = {
         enable = true;
-        package = llm-agents.claude-code;
         enableMcpIntegration = true;
         inherit skills;
         plugins = [ claude-wakatime ];
@@ -94,23 +91,16 @@ in
 
       programs.opencode = {
         enable = true;
-        package = llm-agents.opencode;
         enableMcpIntegration = true;
         inherit skills;
       };
 
       programs.codex = {
         enable = true;
-        package = llm-agents.codex;
         enableMcpIntegration = true;
         inherit skills;
         plugins = [ codex-wakatime ];
       };
-
-      # programs.gemini-cli = {
-      #   enable = true;
-      #   package = llm-agents.gemini-cli;
-      # };
 
       programs.mcp.enable = true;
       programs.mcp.servers = {

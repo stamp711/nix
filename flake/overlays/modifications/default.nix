@@ -1,8 +1,12 @@
+{ inputs, ... }:
 {
   flake.overlays.modifications = final: prev: {
 
-    # Newer claude-code for everything, incl. nixvim's baked claudecode dependency.
-    claude-code = final.llm-agents.claude-code;
+    inherit (inputs.llm-agents.packages.${prev.stdenv.hostPlatform.system})
+      claude-code
+      codex
+      opencode
+      ;
 
     # Default clang-format to --fallback-style=none so it no-ops when no
     # .clang-format is present (instead of silently reformatting to LLVM).
