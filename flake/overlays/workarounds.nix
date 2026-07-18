@@ -1,3 +1,3 @@
 {
-  flake.overlays.workarounds = _: prev: { };
+  flake.overlays.workarounds = _: _prev: { };
 }

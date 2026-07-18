@@ -1,6 +1,6 @@
 { inputs, ... }:
 {
-  flake.overlays.modifications = final: prev: {
+  flake.overlays.modifications = _final: prev: {
 
     inherit (inputs.llm-agents.packages.${prev.stdenv.hostPlatform.system})
       claude-code
