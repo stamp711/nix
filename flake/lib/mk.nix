@@ -1,6 +1,21 @@
 { self, inputs, ... }:
 let
   inherit (inputs.nixpkgs) lib;
+
+  # Operator identity for agenix-rekey. Used on the workstation at rekey time;
+  # hosts decrypt with their own key via age.identityPaths.
+  rekeyConfig = {
+    age.rekey = {
+      masterIdentities = [
+        {
+          identity = ./ssh-age.pub;
+          pubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHdOxmUp8REg9IBoipLV40VYmLNiD6+TUUHb/ofyor60 ssh-age";
+        }
+      ];
+      storageMode = "local";
+      localStorageDir = lib.mkDefault "${self}/.rekey";
+    };
+  };
 in
 {
   flake.lib = {
@@ -37,6 +52,7 @@ in
           inputs.disko.nixosModules.disko
           inputs.agenix.nixosModules.default
           inputs.agenix-rekey.nixosModules.default
+          rekeyConfig
           {
             nixpkgs.pkgs = self.lib.mkPkgs {
               inherit system;
@@ -94,6 +110,7 @@ in
           # TODO: use inputs.agenix-rekey.homeManagerModules.default once
           # https://github.com/oddlama/agenix-rekey/pull/143 is merged
           (import "${inputs.agenix-rekey}/modules/agenix-rekey.nix" inputs.nixpkgs)
+          rekeyConfig
         ]
         ++ modules;
       };
