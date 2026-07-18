@@ -13,8 +13,6 @@ in
     let
       allowRead = pattern: [
         "Read(${pattern})"
-        "Glob(${pattern})"
-        "Grep(${pattern})"
         "Bash(ls ${pattern})"
         "Bash(cat ${pattern})"
       ];
