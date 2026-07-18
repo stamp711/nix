@@ -1,35 +1,10 @@
 # Git configuration with signing, delta, and GitHub CLI & other VCS tools
-{ self, inputs, ... }:
+{ inputs, ... }:
 {
   flake.homeModules.cli-programs =
-    {
-      lib,
-      config,
-      pkgs,
-      ...
-    }:
+    { lib, pkgs, ... }:
     let
-      mkAgeSecret =
-        file:
-        let
-          name = self.lib.ageSecretName file;
-        in
-        {
-          inherit name;
-          inherit (config.age.secrets.${name}) path;
-          rekey.${name}.rekeyFile = file;
-        };
-
       ghqRoot = if pkgs.stdenv.isDarwin then "~/Developer" else "~/code";
-
-      gitIncludes = [
-        {
-          file = ./git.personal-identity.ini.age;
-          condition = "gitdir:${ghqRoot}/github.com/";
-        }
-      ];
-
-      jjIdentity = mkAgeSecret ./jj.personal-identity.toml.age;
 
       oyui = inputs.oyui.packages.${pkgs.stdenv.hostPlatform.system}.default;
     in
@@ -43,10 +18,7 @@
         init.defaultBranch = "master";
         pull.ff = "only";
         push.autoSetupRemote = true;
-        ghq = {
-          root = ghqRoot;
-          user = "stamp711";
-        };
+        ghq.root = ghqRoot;
         url."ssh://git@github.com/".insteadOf = "https://github.com/";
         aliases.cl = "!git clean -xdf -e .jj";
       };
@@ -125,17 +97,6 @@
         ];
       };
 
-      programs.jujutsu.settings."--scope" = [
-        {
-          "--when".repositories = [ "${ghqRoot}/github.com" ];
-          git.push = "stamp711";
-        }
-        {
-          "--when".repositories = [ "${ghqRoot}/github.com/stamp711" ];
-          git.push = "origin";
-        }
-      ];
-
       programs.jjui.enable = true;
 
       # hunk review-first diff viewer
@@ -177,18 +138,5 @@
         lazyjj
         oyui
       ];
-
-      # Conditional identity (age-encrypted)
-      age.secrets = lib.mkMerge (
-        (map (inc: (mkAgeSecret inc.file).rekey) gitIncludes) ++ [ jjIdentity.rekey ]
-      );
-
-      programs.git.includes = map (inc: {
-        inherit (inc) condition;
-        inherit (mkAgeSecret inc.file) path;
-      }) gitIncludes;
-
-      xdg.configFile."jj/conf.d/identity.toml".source =
-        config.lib.file.mkOutOfStoreSymlink jjIdentity.path;
     };
 }
