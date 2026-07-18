@@ -6,6 +6,7 @@
 }:
 let
   system = "x86_64-linux";
+  username = "stamp";
   mkProxy = hostname: hostPubkey: {
     flake.nixosConfigurations.${hostname} = self.lib.mkNixos {
       inherit system;
@@ -14,8 +15,10 @@ let
         self.nixosModules.allow-cloudflare-443
         self.nixosModules.fail2ban
         {
-          my.primaryUser = "stamp";
+          my.primaryUser = username;
           my.flake = "github:stamp711/nix";
+          # Only way in: these hosts opt out of nixosModules.personal.
+          users.users.${username}.openssh.authorizedKeys.keys = [ self.lib.sshPubKey ];
           networking.hostName = hostname;
           age.rekey.hostPubkey = hostPubkey;
 
