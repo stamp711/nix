@@ -1,42 +1,29 @@
-{ self, ... }:
-let
-  passwordSecretName = self.lib.ageSecretName ./password.age;
-in
 {
-  flake.nixosModules.core =
-    { config, ... }:
-    {
-      age.secrets.${passwordSecretName}.rekeyFile = ./password.age;
+  flake.nixosModules.core = { config, ... }: {
+    users.users.${config.my.primaryUser} = {
+      uid = 1000;
+      isNormalUser = true;
+      linger = true;
+      extraGroups = [
+        "wheel"
+        "networkmanager"
 
-      users.users.${config.my.primaryUser} = {
-        uid = 1000;
-        isNormalUser = true;
-        linger = true;
-        hashedPasswordFile = config.age.secrets.${passwordSecretName}.path;
-        extraGroups = [
-          "wheel"
-          "networkmanager"
-
-          "video"
-          "render"
-          "input"
-          "uinput"
-          "dialout"
-          "kvm"
-          "tss" # TPM access
-        ];
-      };
+        "video"
+        "render"
+        "input"
+        "uinput"
+        "dialout"
+        "kvm"
+        "tss" # TPM access
+      ];
     };
+  };
 
-  flake.darwinModules.core =
-    { config, ... }:
-    {
-      system.primaryUser = config.my.primaryUser;
-    };
+  flake.darwinModules.core = { config, ... }: {
+    system.primaryUser = config.my.primaryUser;
+  };
 
-  flake.homeModules.core =
-    { config, ... }:
-    {
-      home.username = config.my.primaryUser;
-    };
+  flake.homeModules.core = { config, ... }: {
+    home.username = config.my.primaryUser;
+  };
 }
