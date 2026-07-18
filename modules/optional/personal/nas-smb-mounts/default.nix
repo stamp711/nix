@@ -8,12 +8,12 @@
         "Dropbox"
         "Z"
       ];
-      secretName = self.lib.ageSecretName ./nas-smb.age;
+      s = self.lib.mkAgeSecret config ./nas-smb.age;
       primaryUser = config.users.users.${config.my.primaryUser};
     in
     {
       # mount.cifs credentials format
-      age.secrets.${secretName}.rekeyFile = ./nas-smb.age;
+      age.secrets = s.ageSecret;
 
       fileSystems = lib.listToAttrs (
         map (share: {
@@ -22,7 +22,7 @@
             device = "//synology.boar-char.ts.net/${share}";
             fsType = "cifs";
             options = [
-              "credentials=${config.age.secrets.${secretName}.path}"
+              "credentials=${s.path}"
               "vers=3.1.1"
               "uid=${toString primaryUser.uid}"
               "gid=${toString config.users.groups.${primaryUser.group}.gid}"
