@@ -19,6 +19,11 @@
           server = "10.0.10.10";
           port = 6153;
         };
+        surge-ts = {
+          type = "socks5";
+          server = "lius-mac-mini.boar-char.ts.net";
+          port = 6153;
+        };
         charon = {
           type = "http";
           server = "127.0.0.1";
@@ -31,6 +36,7 @@
           [
             "surge-local"
             "surge-lan"
+            "surge-ts"
           ]
           (lib.mkOrder 9999 [ "DIRECT" ])
         ];
@@ -42,6 +48,7 @@
         proxies = [
           "surge-local"
           "surge-lan"
+          "surge-ts"
           "charon"
         ];
         url = "http://www.google.com/generate_204";
