@@ -12,9 +12,8 @@ in
     { pkgs, ... }:
     let
       localSkills = importSkills ./skills;
-      hunkSkills = importSkills (inputs.hunk + "/skills");
 
-      skills = hunkSkills // localSkills;
+      skills = localSkills;
 
       # Self-contained WakaTime plugins (node + wakatime-cli pinned for their hooks)
       claude-wakatime =

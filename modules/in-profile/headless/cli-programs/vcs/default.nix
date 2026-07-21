@@ -9,8 +9,6 @@
       oyui = inputs.oyui.packages.${pkgs.stdenv.hostPlatform.system}.default;
     in
     {
-      imports = [ inputs.hunk.homeManagerModules.default ];
-
       programs.git.enable = true;
 
       # Some basic settings
@@ -98,32 +96,6 @@
       };
 
       programs.jjui.enable = true;
-
-      # hunk review-first diff viewer
-      programs.hunk.enable = true;
-      programs.hunk.settings = {
-        theme = "auto";
-        agent_notes = true;
-      };
-      # bun binary: Nix loader baked in, no RPATH -> picks up system libc and
-      # segfaults off NixOS. Can't patchelf (corrupts bun's appended bundle) or
-      # use an explicit loader (breaks process.execPath, which hunk self-spawns).
-      programs.hunk.package =
-        let
-          hunk = inputs.hunk.packages.${pkgs.stdenv.hostPlatform.system}.default;
-        in
-        if pkgs.stdenv.isDarwin then
-          hunk
-        else
-          pkgs.runCommandLocal "hunk-${hunk.version}"
-            {
-              nativeBuildInputs = [ pkgs.makeWrapper ];
-              inherit (hunk) meta;
-            }
-            ''
-              makeWrapper ${hunk}/bin/hunk $out/bin/hunk \
-                --prefix LD_LIBRARY_PATH : ${pkgs.stdenv.cc.libc}/lib
-            '';
 
       # jj/gg diff with diffnav
       programs.zsh.initContent = lib.mkAfter ''

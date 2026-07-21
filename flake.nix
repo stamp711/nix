@@ -109,13 +109,6 @@
       inputs.rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.inputs.systems.follows = "systems";
     };
-    hunk = {
-      url = "github:modem-dev/hunk";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.bun2nix.inputs.systems.follows = "systems";
-      inputs.bun2nix.inputs.flake-parts.follows = "flake-parts";
-      inputs.bun2nix.inputs.treefmt-nix.follows = "treefmt-nix";
-    };
     monaco = {
       url = "github:thep0y/monaco-nerd-font";
       flake = false;
