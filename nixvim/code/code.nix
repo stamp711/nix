@@ -165,6 +165,7 @@
       plugins.trouble = {
         enable = true;
         settings.modes.lsp.win.position = "right";
+        settings.modes.lsp.win.size = 60; # columns
       };
 
       plugins.todo-comments = {
