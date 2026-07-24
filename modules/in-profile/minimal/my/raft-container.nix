@@ -145,6 +145,7 @@
                 imports = self.lib.homeBaseModules { rekey = true; } ++ [
                   self.profiles.homeManager.headless
                   self.homeModules.raft-computer
+                  self.homeModules.agent-sandbox
                 ];
               };
             };
