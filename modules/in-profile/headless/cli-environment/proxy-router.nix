@@ -14,7 +14,7 @@
           server = "127.0.0.1";
           port = 6153;
         };
-        surge-lan = {
+        surge-aprixnet = {
           type = "socks5";
           server = "10.0.10.10";
           port = 6153;
@@ -22,6 +22,11 @@
         surge-ts = {
           type = "socks5";
           server = "lius-mac-mini.boar-char.ts.net";
+          port = 6153;
+        };
+        surge-hotspot = {
+          type = "socks5";
+          server = "172.20.10.1";
           port = 6153;
         };
         charon = {
@@ -35,7 +40,8 @@
         proxies = lib.mkMerge [
           [
             "surge-local"
-            "surge-lan"
+            "surge-hotspot"
+            "surge-aprixnet"
             "surge-ts"
           ]
           (lib.mkOrder 9999 [ "DIRECT" ])
@@ -47,7 +53,8 @@
       fallbackProxyGroups.native = {
         proxies = [
           "surge-local"
-          "surge-lan"
+          "surge-hotspot"
+          "surge-aprixnet"
           "surge-ts"
           "charon"
         ];

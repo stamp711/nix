@@ -38,11 +38,11 @@
           };
           url = lib.mkOption {
             type = lib.types.str;
-            description = "Health-check URL — must be reachable by every member of the group.";
+            description = "Health-check URL.";
           };
           interval = lib.mkOption {
             type = lib.types.int;
-            default = 60;
+            default = 30;
             description = "Health-check interval in seconds.";
           };
         };
