@@ -1,4 +1,4 @@
-{ self, ... }:
+{ lib, self, ... }:
 {
   flake.profiles.homeManager.headless = {
     imports = [
@@ -7,8 +7,8 @@
       self.homeModules.cli-programs
     ];
 
-    my.maintenance.autoUpdate = true;
-    my.maintenance.autoClean = true;
+    my.maintenance.autoUpdate = lib.mkDefault true;
+    my.maintenance.autoClean = lib.mkDefault true;
   };
 
   flake.profiles.nixos.headless = {
@@ -20,8 +20,8 @@
       self.nixosModules.cli-programs
     ];
 
-    my.maintenance.autoUpdate = true;
-    my.maintenance.autoClean = true;
+    my.maintenance.autoUpdate = lib.mkDefault true;
+    my.maintenance.autoClean = lib.mkDefault true;
   };
 
   flake.profiles.darwin.headless = {
@@ -31,8 +31,8 @@
     ];
 
     # TODO: impl darwinModules.my.maintenance
-    # my.maintenance.autoUpdate = true;
-    # my.maintenance.autoClean = true;
+    # my.maintenance.autoUpdate = lib.mkDefault true;
+    # my.maintenance.autoClean = lib.mkDefault true;
   };
 
   flake.profiles.systemManager.headless = {

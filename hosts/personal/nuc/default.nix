@@ -42,6 +42,11 @@ in
             my.win11-vm.enable = true;
           };
 
+          my.raft-container.enable = true;
+          my.raft-container.macvlan = "enp4s0";
+          my.raft-container.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHDWaJF4rGW5epZONjj0vio3aEMDUKDav+E2Y4Ud0+WM";
+          my.raft-container.userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIM9xfQ5oWVVe1AX9PJh0Dy5DJUZ8YMDbwTD9t1/c2K4f";
+
           specialisation.lts.configuration = {
             system.nixos.tags = [ "lts" ];
             boot.kernelPackages = pkgs.linuxPackages;

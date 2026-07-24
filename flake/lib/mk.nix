@@ -39,6 +39,29 @@ in
         ];
       };
 
+    nixosBaseModules =
+      {
+        system,
+        nixpkgsConfig ? { },
+        rekey ? true,
+      }:
+      [
+        inputs.disko.nixosModules.disko
+        inputs.agenix.nixosModules.default
+      ]
+      ++ lib.optionals rekey [
+        inputs.agenix-rekey.nixosModules.default
+        rekeyConfig
+      ]
+      ++ [
+        {
+          nixpkgs.pkgs = self.lib.mkPkgs {
+            inherit system;
+            config = nixpkgsConfig;
+          };
+        }
+      ];
+
     # Create a NixOS system configuration.
     mkNixos =
       {
@@ -48,19 +71,7 @@ in
       }:
       lib.nixosSystem {
         inherit system;
-        modules = [
-          inputs.disko.nixosModules.disko
-          inputs.agenix.nixosModules.default
-          inputs.agenix-rekey.nixosModules.default
-          rekeyConfig
-          {
-            nixpkgs.pkgs = self.lib.mkPkgs {
-              inherit system;
-              config = nixpkgsConfig;
-            };
-          }
-        ]
-        ++ modules;
+        modules = self.lib.nixosBaseModules { inherit system nixpkgsConfig; } ++ modules;
       };
 
     # Create a system-manager configuration (for non-NixOS Linux).
@@ -97,6 +108,18 @@ in
         ++ modules;
       };
 
+    homeBaseModules =
+      {
+        rekey ? true,
+      }:
+      [ inputs.agenix.homeManagerModules.default ]
+      ++ lib.optionals rekey [
+        # TODO: use inputs.agenix-rekey.homeManagerModules.default once
+        # https://github.com/oddlama/agenix-rekey/pull/143 is merged
+        (import "${inputs.agenix-rekey}/modules/agenix-rekey.nix" inputs.nixpkgs)
+        rekeyConfig
+      ];
+
     # Create a home-manager configuration. Set my.primaryUser in modules.
     mkHome =
       {
@@ -105,14 +128,7 @@ in
       }:
       inputs.home-manager.lib.homeManagerConfiguration {
         pkgs = self.lib.mkPkgs { inherit system; };
-        modules = [
-          inputs.agenix.homeManagerModules.default
-          # TODO: use inputs.agenix-rekey.homeManagerModules.default once
-          # https://github.com/oddlama/agenix-rekey/pull/143 is merged
-          (import "${inputs.agenix-rekey}/modules/agenix-rekey.nix" inputs.nixpkgs)
-          rekeyConfig
-        ]
-        ++ modules;
+        modules = self.lib.homeBaseModules { } ++ modules;
       };
 
   };

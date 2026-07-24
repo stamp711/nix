@@ -20,9 +20,9 @@ in
 {
 
   flake.homeModules.core =
-    { pkgs, ... }:
+    { lib, pkgs, ... }:
     {
-      nix.package = pkgs.nix;
+      nix.package = lib.mkDefault pkgs.nix; # HM nixos integration also sets it
       nix.registry.nixpkgs.flake = inputs.nixpkgs;
       nix.settings = nixConfig;
       xdg.configFile."nixpkgs/config.nix".text = ''

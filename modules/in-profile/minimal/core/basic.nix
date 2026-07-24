@@ -1,7 +1,12 @@
-{
+{ lib, ... }: {
 
   flake.homeModules.core =
-    { config, pkgs, ... }:
+    {
+      config,
+      options,
+      pkgs,
+      ...
+    }:
     {
       home.stateVersion = "26.11";
       home.homeDirectory =
@@ -16,7 +21,7 @@
       };
 
       programs.nh.enable = true;
-      programs.nh.flake = config.my.flake;
+      programs.nh.flake = lib.mkIf options.my.flake.isDefined config.my.flake;
       home.sessionVariables.NH_SHOW_ACTIVATION_LOGS = "1";
     };
 
@@ -28,6 +33,7 @@
     {
       config,
       lib,
+      options,
       pkgs,
       ...
     }:
@@ -40,11 +46,18 @@
       i18n.defaultLocale = "en_US.UTF-8";
       users.mutableUsers = false;
       security.sudo.wheelNeedsPassword = false;
+      # trusted local wheel: no polkit password for machinectl
+      security.polkit.extraConfig = ''
+        polkit.addRule(function(action, subject) {
+          if (action.id.startsWith("org.freedesktop.machine1.") && subject.isInGroup("wheel"))
+            return polkit.Result.YES;
+        });
+      '';
       environment.enableAllTerminfo = true; # Terminfo for ghostty, kitty, foot, etc.
       programs.nix-ld.enable = true; # Run unpatched dynamic binaries on NixOS
 
       programs.nh.enable = true;
-      programs.nh.flake = config.my.flake;
+      programs.nh.flake = lib.mkIf options.my.flake.isDefined config.my.flake;
 
       # System-core state that must survive @root wipes (impermanence).
       my.persistence.directories = [

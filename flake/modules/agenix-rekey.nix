@@ -5,10 +5,33 @@ let
   agenix-rekey =
     { self, config, ... }:
     let
-      hasRekey = _: cfg: (cfg.config ? age) && (cfg.config.age ? rekey);
-      rekeyNixos = lib.filterAttrs hasRekey (config.flake.nixosConfigurations or { });
-      rekeyHome = lib.filterAttrs hasRekey (config.flake.homeConfigurations or { });
       rekeyDir = self + "/.rekey";
+
+      hasRekey = _: cfg: (cfg.config ? age) && (cfg.config.age ? rekey);
+
+      nixosConfigs = config.flake.nixosConfigurations or { };
+
+      rekeyNixos = lib.filterAttrs hasRekey nixosConfigs;
+
+      # nixos-containers that opt into rekey are their own rekey nodes, like nested HM users.
+      rekeyContainers = lib.concatMapAttrs (
+        host: cfg:
+        lib.mapAttrs' (cname: c: lib.nameValuePair "${host}-${cname}" { inherit (c) config; }) (
+          lib.filterAttrs hasRekey (cfg.config.containers or { })
+        )
+      ) nixosConfigs;
+
+      rekeyHome = lib.filterAttrs hasRekey (config.flake.homeConfigurations or { });
+
+      # HM users embedded in a nixos/container config are rekey nodes too (the app collects them; mirror it for the check).
+      homeInNixos = lib.concatMapAttrs (
+        name: cfg:
+        lib.mapAttrs' (u: uc: lib.nameValuePair "${name}-${u}" { config = uc; }) (
+          cfg.config.home-manager.users or { }
+        )
+      ) (rekeyNixos // rekeyContainers);
+
+      rekeyHomeInNixos = lib.filterAttrs hasRekey homeInNixos;
 
       extractExpectedFiles =
         configurations:
@@ -23,7 +46,12 @@ let
           ) configurations
         );
 
-      expectedFiles = lib.unique (extractExpectedFiles rekeyNixos ++ extractExpectedFiles rekeyHome);
+      expectedFiles = lib.unique (
+        extractExpectedFiles rekeyNixos
+        ++ extractExpectedFiles rekeyContainers
+        ++ extractExpectedFiles rekeyHome
+        ++ extractExpectedFiles rekeyHomeInNixos
+      );
 
       actualFiles =
         if builtins.pathExists rekeyDir then
@@ -37,7 +65,7 @@ let
     {
       flake.agenix-rekey = inputs.agenix-rekey.configure {
         userFlake = self;
-        nixosConfigurations = rekeyNixos;
+        nixosConfigurations = rekeyNixos // rekeyContainers;
         homeConfigurations = rekeyHome;
       };
 
