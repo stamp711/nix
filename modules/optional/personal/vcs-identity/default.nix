@@ -11,8 +11,14 @@
     lib.mkMerge [
       (lib.mkIf config.programs.git.enable {
         programs.git.settings.ghq.user = "stamp711";
+        # Reach GitHub over ssh.
+        programs.git.settings.url."ssh://git@github.com/".insteadOf = "https://github.com/";
         age.secrets = gitIdentity.ageSecret;
         programs.git.includes = [ { inherit (gitIdentity) path; } ];
+      })
+
+      (lib.mkIf config.programs.gh.enable {
+        programs.gh.settings.git_protocol = "ssh";
       })
 
       (lib.mkIf config.programs.jujutsu.enable {

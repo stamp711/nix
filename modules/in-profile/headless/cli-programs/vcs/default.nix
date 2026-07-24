@@ -17,7 +17,6 @@
         pull.ff = "only";
         push.autoSetupRemote = true;
         ghq.root = ghqRoot;
-        url."ssh://git@github.com/".insteadOf = "https://github.com/";
         aliases.cl = "!git clean -xdf -e .jj";
       };
 
@@ -66,7 +65,6 @@
         enable = true;
         extensions = [ pkgs.gh-eco ];
         settings = {
-          git_protocol = "ssh";
           prompt = "enabled";
           aliases = {
             co = "pr checkout";
