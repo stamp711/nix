@@ -1,4 +1,4 @@
-# Lua helpers: Root() / Root.git(): project root, full mirror of LazyVim's util/root.lua.
+# Lua helpers: buffer-derived Root() and tab-local TabRoot().
 {
   flake.nixvimModules.default.extraConfigLua = ''
     do
@@ -18,6 +18,7 @@
       end
 
       local M = setmetatable({}, { __call = function(m, ...) return m.get(...) end })
+      local T = setmetatable({}, { __call = function(t, ...) return t.get(...) end })
       M.spec = { "lsp", { ".git", "lua" }, "cwd" }
       M.detectors = {}
       M.cache = {}
@@ -26,6 +27,14 @@
         if path == "" or path == nil then return nil end
         path = not is_win() and vim.uv.fs_realpath(path) or path
         return norm(path)
+      end
+
+      -- Canonical working directory for the current or specified tabpage handle.
+      function T.get(tab)
+        if tab == nil or tab == 0 then tab = vim.api.nvim_get_current_tabpage() end
+        assert(vim.api.nvim_tabpage_is_valid(tab), "invalid tabpage")
+        local cwd = vim.fn.getcwd(-1, vim.api.nvim_tabpage_get_number(tab))
+        return M.realpath(cwd) or norm(cwd)
       end
 
       function M.bufpath(buf) return M.realpath(vim.api.nvim_buf_get_name(assert(buf))) end
@@ -149,6 +158,7 @@
 
       M.setup()
       _G.Root = M
+      _G.TabRoot = T
     end
   '';
 }
