@@ -12,15 +12,13 @@
       (lib.mkIf config.programs.git.enable {
         programs.git.settings.ghq.user = "stamp711";
         age.secrets = gitIdentity.ageSecret;
-        programs.git.includes = [
-          {
-            inherit (gitIdentity) path;
-            condition = "gitdir:${ghqRoot}/github.com/";
-          }
-        ];
+        programs.git.includes = [ { inherit (gitIdentity) path; } ];
       })
 
       (lib.mkIf config.programs.jujutsu.enable {
+        age.secrets = jjIdentity.ageSecret;
+        xdg.configFile."jj/conf.d/identity.toml".source =
+          config.lib.file.mkOutOfStoreSymlink jjIdentity.path;
         programs.jujutsu.settings."--scope" = [
           {
             "--when".repositories = [ "${ghqRoot}/github.com" ];
@@ -31,9 +29,6 @@
             git.push = "origin";
           }
         ];
-        age.secrets = jjIdentity.ageSecret;
-        xdg.configFile."jj/conf.d/identity.toml".source =
-          config.lib.file.mkOutOfStoreSymlink jjIdentity.path;
       })
     ];
 }
