@@ -36,7 +36,7 @@
         hostDirs = lib.mkOption {
           type = lib.types.listOf lib.types.path;
           default = [ ];
-          description = "Host dirs bind-mounted rw into the container at the same path.";
+          description = "Host dirs bind-mounted rw into the container at the same path; created on the host if missing.";
         };
         extraModules = lib.mkOption {
           type = lib.types.listOf lib.types.deferredModule;
@@ -61,7 +61,9 @@
           "d ${cfg.statePath} 0755 root root - -"
           "d ${cfg.statePath}/home 0700 ${user} ${group} - -"
           "d ${cfg.statePath}/persist 0700 root root - -"
-        ];
+        ]
+        # Ensure bind sources exist.
+        ++ map (d: "d ${d} 0755 ${user} ${group} - -") cfg.hostDirs;
 
         containers.raft = {
           autoStart = true;
