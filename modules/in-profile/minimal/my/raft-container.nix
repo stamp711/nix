@@ -146,6 +146,7 @@
                   self.profiles.homeManager.headless
                   self.homeModules.raft-computer
                   self.homeModules.agent-sandbox
+                  self.homeModules.github-ratelimit-token
                 ];
               };
             };
