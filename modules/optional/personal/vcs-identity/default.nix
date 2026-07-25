@@ -10,11 +10,11 @@
     in
     lib.mkMerge [
       (lib.mkIf config.programs.git.enable {
-        programs.git.settings.ghq.user = "stamp711";
-        # Reach GitHub over ssh.
-        programs.git.settings.url."ssh://git@github.com/".insteadOf = "https://github.com/";
         age.secrets = gitIdentity.ageSecret;
         programs.git.includes = [ { inherit (gitIdentity) path; } ];
+        programs.git.settings.commit.gpgSign = true;
+        programs.git.settings.ghq.user = "stamp711";
+        programs.git.settings.url."ssh://git@github.com/".insteadOf = "https://github.com/";
       })
 
       (lib.mkIf config.programs.gh.enable {
@@ -25,6 +25,7 @@
         age.secrets = jjIdentity.ageSecret;
         xdg.configFile."jj/conf.d/identity.toml".source =
           config.lib.file.mkOutOfStoreSymlink jjIdentity.path;
+        programs.jujutsu.settings.signing.sign-all = true;
         programs.jujutsu.settings."--scope" = [
           {
             "--when".repositories = [ "${ghqRoot}/github.com" ];
