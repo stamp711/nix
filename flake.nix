@@ -146,6 +146,10 @@
       url = "github:wakatime/codex-cli-wakatime";
       flake = false;
     };
+    opencode-wakatime = {
+      url = "github:angristan/opencode-wakatime";
+      flake = false;
+    };
     nix-darwin = {
       url = "github:nix-darwin/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";

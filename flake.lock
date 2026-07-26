@@ -932,6 +932,22 @@
         "type": "github"
       }
     },
+    "opencode-wakatime": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784027420,
+        "narHash": "sha256-EZDLpq8Q2L6SE8Y7QgwlzCLnt0dS3e1B9ArBTWA5+Y8=",
+        "owner": "angristan",
+        "repo": "opencode-wakatime",
+        "rev": "8fa8e32aa03f1db2835caf9674686886c27d8946",
+        "type": "github"
+      },
+      "original": {
+        "owner": "angristan",
+        "repo": "opencode-wakatime",
+        "type": "github"
+      }
+    },
     "oyui": {
       "inputs": {
         "flake-utils": "flake-utils_2",
@@ -1036,6 +1052,7 @@
         "nixpkgs": "nixpkgs_3",
         "nixvim": "nixvim",
         "nvim-99": "nvim-99",
+        "opencode-wakatime": "opencode-wakatime",
         "oyui": "oyui",
         "solaar": "solaar",
         "system-manager": "system-manager",

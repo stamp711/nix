@@ -45,6 +45,29 @@ in
           chmod -R +w $out
           install -m755 ${run} $out/scripts/run
         '';
+
+      # No prebuilt bundle upstream, so build it.
+      opencode-wakatime = pkgs.buildNpmPackage {
+        pname = "opencode-wakatime";
+        version = "1.3.9";
+        src = inputs.opencode-wakatime;
+        # It normally resolves wakatime-cli from PATH and downloads one when absent,
+        # we pin the nix store one instead.
+        postPatch = ''
+          substituteInPlace src/dependencies.ts \
+            --replace-fail 'const globalPath = whichSync(binaryName);' \
+              'const globalPath = "${pkgs.wakatime-cli}/bin/wakatime-cli";'
+        '';
+        # hashes come from package-lock.json, so bumping the input needs no manual update
+        npmDeps = pkgs.importNpmLock { npmRoot = inputs.opencode-wakatime; };
+        npmConfigHook = pkgs.importNpmLock.npmConfigHook;
+        npmFlags = [ "--ignore-scripts" ]; # husky
+        installPhase = ''
+          runHook preInstall
+          install -Dm644 dist/bundle.js $out/wakatime.js
+          runHook postInstall
+        '';
+      };
     in
     {
       programs.claude-code = {
@@ -99,6 +122,8 @@ in
         enableMcpIntegration = true;
         inherit skills;
       };
+      # opencode 1.18.5 only loads plugins from here, not from settings.plugin or XDG.
+      home.file.".opencode/plugin/wakatime.js".source = "${opencode-wakatime}/wakatime.js";
 
       programs.pi-coding-agent.enable = true;
 
