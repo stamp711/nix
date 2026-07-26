@@ -42,6 +42,10 @@ in
             my.win11-vm.enable = true;
           };
 
+          # Stationary host, so writing back to the NAS is fine here.
+          my.smbMounts.nas.shares.Dropbox.rw = true;
+          my.smbMounts.nas.shares.Z = { };
+
           my.raft-container.enable = true;
           my.raft-container.macvlan = "enp4s0";
           my.raft-container.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHDWaJF4rGW5epZONjj0vio3aEMDUKDav+E2Y4Ud0+WM";
