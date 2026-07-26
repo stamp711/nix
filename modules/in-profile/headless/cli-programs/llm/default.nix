@@ -94,6 +94,14 @@ in
         plugins = [ codex-wakatime ];
       };
 
+      programs.opencode = {
+        enable = true;
+        enableMcpIntegration = true;
+        inherit skills;
+      };
+
+      programs.pi-coding-agent.enable = true;
+
       programs.mcp.enable = true;
       programs.mcp.servers = { };
     };
