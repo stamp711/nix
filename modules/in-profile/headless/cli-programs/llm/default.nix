@@ -116,6 +116,8 @@ in
         inherit skills;
         plugins = [ codex-wakatime ];
       };
+      # Let codex own this file, since it really wants to mutate it at runtime.
+      home.file.".codex/config.toml".enable = false;
 
       programs.opencode = {
         enable = true;
