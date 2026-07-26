@@ -4,19 +4,19 @@
   flake.homeModules.agent-sandbox =
     { lib, pkgs, ... }:
     let
+      # claude-code reports the edited file; codex reports only the session cwd.
       snapshot = pkgs.writeShellScript "jj-snapshot" ''
-        file=$(${lib.getExe pkgs.jq} -r '.tool_input.file_path // empty') || exit 0
-        [ -n "$file" ] || exit 0
+        target=$(${lib.getExe pkgs.jq} -r '.tool_input.file_path // .cwd // empty') || exit 0
+        [ -n "$target" ] || exit 0
         # agents work in their own workspaces; nothing else is ours to snapshot
-        case "$file" in "$HOME"/agents/*) ;; *) exit 0 ;; esac
-        cd "$(dirname "$file")" 2>/dev/null || exit 0
+        case "$target" in "$HOME"/agents/*) ;; *) exit 0 ;; esac
+        [ -d "$target" ] || target=$(dirname "$target")
+        cd "$target" 2>/dev/null || exit 0
         ${lib.getExe pkgs.jujutsu} status >/dev/null 2>&1 || true
       '';
-    in
-    {
-      programs.claude-code.settings.hooks.PostToolUse = [
+      hook = matcher: [
         {
-          matcher = "Write|Edit";
+          inherit matcher;
           hooks = [
             {
               type = "command";
@@ -25,5 +25,9 @@
           ];
         }
       ];
+    in
+    {
+      programs.claude-code.settings.hooks.PostToolUse = hook "Write|Edit";
+      programs.codex.hooks.PostToolUse = hook "apply_patch";
     };
 }
