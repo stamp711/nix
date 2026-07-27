@@ -99,8 +99,9 @@
               }
               ++ cfg.extraModules
               ++ [
-                self.profiles.nixos.headless
                 inputs.home-manager.nixosModules.home-manager
+                self.profiles.nixos.headless
+                self.nixosModules.agent-sandbox
               ]
               ++ lib.optional (cfg.macvlan != null) {
                 networking.useNetworkd = true;
