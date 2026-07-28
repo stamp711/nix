@@ -11,10 +11,7 @@ in
   flake.homeModules.cli-programs =
     _:
     let
-      localSkills = importSkills ./skills;
-
-      skills = localSkills;
-
+      skills = importSkills ./skills;
     in
     {
       programs.claude-code = {
