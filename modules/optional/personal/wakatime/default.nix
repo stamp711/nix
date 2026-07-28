@@ -8,12 +8,16 @@
     {
       home.packages = [ pkgs.wakatime-cli ];
       age.secrets = s.ageSecret;
-      home.file.".wakatime.cfg".text = ''
+      home.file.".wakatime.cfg".text = /* ini */ ''
         [settings]
-        # the key is the only secret here, so the rest can stay in the store
         api_key_vault_cmd = ${pkgs.coreutils}/bin/cat ${s.path}
         # exclude raft.build agent notes
         exclude = /[.]slock/agents/
+        [projectmap]
+        ^/home/stamp/code/[^/]+/[^/]+/([^/]+) = {0}
+        ^/home/stamp/agents/[^/]+/[^/]+/[^/]+/([^/]+) = {0}
+        ^/Users/Developer/stamp/code/[^/]+/[^/]+/([^/]+) = {0}
+        ^/Users/Developer/stamp/agents/[^/]+/[^/]+/[^/]+/([^/]+) = {0}
       '';
     };
 
