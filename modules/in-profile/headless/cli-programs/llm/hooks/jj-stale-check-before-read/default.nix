@@ -25,9 +25,24 @@ let
       inherit reason;
       jj = pkgs.lib.getExe pkgs.jujutsu;
     };
+
+  # codex blocks on exit 2 and relays stderr to the model
+  codexHook =
+    { pkgs, ... }:
+    {
+      my.codex.managedHooks.jj-stale-check-before-read = {
+        event = "PreToolUse";
+        matcher = "apply_patch";
+        command = pkgs.writeShellScript "jj-stale-check-before-read-codex" ''
+          ${detect pkgs ../codex-edited-path.jq}
+          printf ${pkgs.lib.escapeShellArg reason} "$PWD" >&2
+          exit 2
+        '';
+      };
+    };
 in
 {
-  flake.homeModules.agent-sandbox =
+  flake.homeModules.cli-programs =
     { pkgs, ... }:
     let
       guard = pkgs.writeShellScript "jj-stale-check-before-read" ''
@@ -55,22 +70,11 @@ in
         }
       ];
 
+      # TODO: validate those, and add omp
       home.file.".opencode/plugin/jj-stale-check-before-read.js".source = plugin pkgs ./opencode.js;
       home.file.".pi/agent/extensions/jj-stale-check-before-read.ts".source = plugin pkgs ./pi.ts;
     };
 
-  flake.nixosModules.agent-sandbox =
-    { pkgs, ... }:
-    {
-      # codex blocks on exit 2 and relays stderr to the model
-      my.codex.managedHooks.jj-stale-check-before-read = {
-        event = "PreToolUse";
-        matcher = "apply_patch";
-        command = pkgs.writeShellScript "jj-stale-check-before-read-codex" ''
-          ${detect pkgs ../codex-edited-path.jq}
-          printf ${pkgs.lib.escapeShellArg reason} "$PWD" >&2
-          exit 2
-        '';
-      };
-    };
+  flake.nixosModules.cli-programs = codexHook;
+  flake.darwinModules.cli-programs = codexHook;
 }

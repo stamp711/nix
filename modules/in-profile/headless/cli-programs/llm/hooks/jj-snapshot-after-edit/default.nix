@@ -16,9 +16,19 @@ let
 
   # opencode and pi run hooks in-process, so they take a plugin rather than a script
   plugin = pkgs: src: pkgs.replaceVars src { jj = pkgs.lib.getExe pkgs.jujutsu; };
+
+  codexHook =
+    { pkgs, ... }:
+    {
+      my.codex.managedHooks.jj-snapshot-after-edit = {
+        event = "PostToolUse";
+        matcher = "apply_patch";
+        command = snapshot pkgs ../codex-edited-path.jq;
+      };
+    };
 in
 {
-  flake.homeModules.agent-sandbox =
+  flake.homeModules.cli-programs =
     { pkgs, ... }:
     {
       programs.claude-code.settings.hooks.PostToolUse = [
@@ -33,17 +43,11 @@ in
         }
       ];
 
+      # TODO: validate those, and add omp
       home.file.".opencode/plugin/jj-snapshot-after-edit.js".source = plugin pkgs ./opencode.js;
       home.file.".pi/agent/extensions/jj-snapshot-after-edit.ts".source = plugin pkgs ./pi.ts;
     };
 
-  flake.nixosModules.agent-sandbox =
-    { pkgs, ... }:
-    {
-      my.codex.managedHooks.jj-snapshot-after-edit = {
-        event = "PostToolUse";
-        matcher = "apply_patch";
-        command = snapshot pkgs ../codex-edited-path.jq;
-      };
-    };
+  flake.nixosModules.cli-programs = codexHook;
+  flake.darwinModules.cli-programs = codexHook;
 }

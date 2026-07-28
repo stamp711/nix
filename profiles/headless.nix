@@ -28,6 +28,7 @@
     imports = [
       self.profiles.darwin.minimal
       self.darwinModules.cli-environment
+      self.darwinModules.cli-programs
     ];
 
     # TODO: impl darwinModules.my.maintenance

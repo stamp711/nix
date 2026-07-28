@@ -1,7 +1,7 @@
 # Managed hooks don't need TUI trust.
 { lib, ... }:
-{
-  flake.nixosModules.my =
+let
+  codexManagedHooks =
     { config, pkgs, ... }:
     let
       cfg = config.my.codex.managedHooks;
@@ -73,4 +73,8 @@
         ) cfg;
       };
     };
+in
+{
+  flake.nixosModules.my = codexManagedHooks;
+  flake.darwinModules.my = codexManagedHooks;
 }
