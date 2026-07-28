@@ -62,5 +62,8 @@
       programs.codex.plugins = [ codex-wakatime ];
       # opencode 1.18.5 only loads plugins from here, not from settings.plugin or XDG.
       home.file.".opencode/plugin/wakatime.js".source = "${opencode-wakatime}/wakatime.js";
+
+      # those are raft agent notes, give it a project name, so they don't show as uuid
+      home.file.".slock/agents/.wakatime-project".text = "raft-agents";
     };
 }
