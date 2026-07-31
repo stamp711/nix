@@ -34,7 +34,7 @@
         inccommand = "nosplit";
 
         completeopt = "menu,menuone,noselect";
-        conceallevel = 2;
+        conceallevel = 0;
         formatexpr = "v:lua.require'conform'.formatexpr()"; # gq runs conform
         formatoptions = "jcroqlnt";
 
