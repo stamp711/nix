@@ -14,10 +14,11 @@ in
       skills = importSkills ./skills;
     in
     {
+      my.llm.skills = skills;
+
       programs.claude-code = {
         enable = true;
         enableMcpIntegration = true;
-        inherit skills;
 
         settings = {
           theme = "auto";
@@ -56,7 +57,6 @@ in
       programs.codex = {
         enable = true;
         enableMcpIntegration = true;
-        inherit skills;
       };
       # Let codex own this file, since it really wants to mutate it at runtime.
       home.file.".codex/config.toml".enable = false;
@@ -64,7 +64,6 @@ in
       programs.opencode = {
         enable = true;
         enableMcpIntegration = true;
-        inherit skills;
       };
 
       programs.pi-coding-agent.enable = true;
