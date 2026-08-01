@@ -18,50 +18,42 @@ in
       self.nixosModules.linux-gaming
       self.nixosModules.personal
       self.nixosModules.nuc
-      (
-        { pkgs, ... }:
-        {
-          my.primaryUser = username;
-          networking.hostName = hostname;
-          age.rekey.hostPubkey = hostPubkey;
+      {
+        my.primaryUser = username;
+        networking.hostName = hostname;
+        age.rekey.hostPubkey = hostPubkey;
 
-          # Accept GPD's and Surface's host keys for remote build offload
-          users.users.${username}.openssh.authorizedKeys.keys = [
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGTQLBSo+0ienoQG9TV4XyNt3vbN60uS10OD4TUDB1an" # GPD
-            "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH5Pi9art3cmYnc8yuldBqGvtLWWwSK5zjnRKF0l2MyG" # Surface
-          ];
+        # Accept GPD's and Surface's host keys for remote build offload.
+        users.users.${username}.openssh.authorizedKeys.keys = [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGTQLBSo+0ienoQG9TV4XyNt3vbN60uS10OD4TUDB1an" # GPD
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH5Pi9art3cmYnc8yuldBqGvtLWWwSK5zjnRKF0l2MyG" # Surface
+        ];
 
-          # Always-on desktop - disable all sleep states
-          systemd.targets.sleep.enable = false;
-          systemd.targets.suspend.enable = false;
-          systemd.targets.hibernate.enable = false;
-          systemd.targets.hybrid-sleep.enable = false;
+        # Disable all sleep states.
+        systemd.targets.sleep.enable = false;
+        systemd.targets.suspend.enable = false;
+        systemd.targets.hibernate.enable = false;
+        systemd.targets.hybrid-sleep.enable = false;
 
-          specialisation.vm.configuration = {
-            system.nixos.tags = [ "vm" ];
-            my.win11-vm.enable = true;
-          };
+        specialisation.vm.configuration = {
+          system.nixos.tags = [ "vm" ];
+          my.win11-vm.enable = true;
+        };
 
-          # Stationary host, so writing back to the NAS is fine here.
-          my.smbMounts.nas.shares.Dropbox.rw = true;
-          my.smbMounts.nas.shares.Z = { };
+        # Stationary host, so writing back to the NAS is fine here.
+        my.smbMounts.nas.shares.Dropbox.rw = true;
+        my.smbMounts.nas.shares.Z = { };
 
-          my.raft-container.enable = true;
-          my.raft-container.macvlan = "enp4s0";
-          my.raft-container.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHDWaJF4rGW5epZONjj0vio3aEMDUKDav+E2Y4Ud0+WM";
-          my.raft-container.userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIM9xfQ5oWVVe1AX9PJh0Dy5DJUZ8YMDbwTD9t1/c2K4f";
-          # Share the owner's repo stores + agent jj workspaces at identical paths.
-          my.raft-container.hostDirs = [
-            "/home/${username}/code"
-            "/home/${username}/agents"
-          ];
-
-          specialisation.lts.configuration = {
-            system.nixos.tags = [ "lts" ];
-            boot.kernelPackages = pkgs.linuxPackages;
-          };
-        }
-      )
+        my.raft-container.enable = true;
+        my.raft-container.macvlan = "enp4s0";
+        my.raft-container.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHDWaJF4rGW5epZONjj0vio3aEMDUKDav+E2Y4Ud0+WM";
+        my.raft-container.userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIM9xfQ5oWVVe1AX9PJh0Dy5DJUZ8YMDbwTD9t1/c2K4f";
+        # Share the owner's repo stores + agent jj workspaces at identical paths.
+        my.raft-container.hostDirs = [
+          "/home/${username}/code"
+          "/home/${username}/agents"
+        ];
+      }
     ];
   };
 
