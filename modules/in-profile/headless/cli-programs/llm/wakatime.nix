@@ -4,17 +4,21 @@
   flake.homeModules.cli-programs =
     { pkgs, ... }:
     let
+      claude-wakatime-src = inputs.claude-code-wakatime;
+
+      claude-wakatime-plugin-name =
+        (builtins.fromJSON (builtins.readFile "${claude-wakatime-src}/.claude-plugin/plugin.json")).name;
+
       claude-wakatime =
         let
-          src = inputs.claude-code-wakatime;
           run = pkgs.writeShellScript "claude-code-wakatime-run" ''
             export PATH=${pkgs.wakatime-cli}/bin:$PATH
             unset NODE_OPTIONS
-            exec ${pkgs.nodejs}/bin/node ${src}/dist/index.js "$@"
+            exec ${pkgs.nodejs}/bin/node ${claude-wakatime-src}/dist/index.js "$@"
           '';
         in
         pkgs.runCommand "claude-code-wakatime" { } ''
-          cp -r ${src} $out
+          cp -r ${claude-wakatime-src} $out
           chmod -R +w $out
           install -m755 ${run} $out/scripts/run
         '';
@@ -58,7 +62,7 @@
       };
     in
     {
-      programs.claude-code.plugins = [ claude-wakatime ];
+      programs.claude-code.plugins.${claude-wakatime-plugin-name} = claude-wakatime;
       programs.codex.plugins = [ codex-wakatime ];
       # opencode 1.18.5 only loads plugins from here, not from settings.plugin or XDG.
       home.file.".opencode/plugin/wakatime.js".source = "${opencode-wakatime}/wakatime.js";
