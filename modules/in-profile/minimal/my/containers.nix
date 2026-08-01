@@ -22,8 +22,9 @@
           mode = "0700";
         }
         {
+          # traversable: services running as the container user can keep state below it
           directory = "${cfg.statePath}/persist";
-          mode = "0700";
+          mode = "0755";
         }
       ];
 
@@ -33,7 +34,7 @@
         [
           "d ${cfg.statePath} 0755 root root - -"
           "d ${cfg.statePath}/home 0700 ${user} ${group} - -"
-          "d ${cfg.statePath}/persist 0700 root root - -"
+          "d ${cfg.statePath}/persist 0755 root root - -"
         ]
         ++ map (d: "d ${d} 0755 ${user} ${group} - -") cfg.hostDirs;
 
