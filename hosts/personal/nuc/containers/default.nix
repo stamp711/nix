@@ -1,5 +1,5 @@
 # Agent sandboxes: the raft.build daemon and the Hermes agent, one container each.
-{ self, ... }:
+{ lib, self, ... }:
 {
   flake.nixosModules.nuc =
     { config, ... }:
@@ -30,6 +30,26 @@
           nixosModules = [
             self.profiles.nixos.headless
             self.nixosModules.hermes-agent
+            # Dashboard auth for its serve unit.
+            (
+              { config, ... }:
+              let
+                auth = self.lib.mkAgeSecret config ./dashboard-auth.env.age;
+              in
+              {
+                age.secrets = lib.recursiveUpdate auth.ageSecret {
+                  ${auth.name}.generator.script =
+                    { pkgs, ... }:
+                    ''
+                      echo "HERMES_DASHBOARD_BASIC_AUTH_USERNAME=${config.my.primaryUser}"
+                      echo "HERMES_DASHBOARD_BASIC_AUTH_PASSWORD=$(${pkgs.openssl}/bin/openssl rand -base64 24)"
+                      echo "HERMES_DASHBOARD_BASIC_AUTH_SECRET=$(${pkgs.openssl}/bin/openssl rand -base64 32)"
+                    '';
+                };
+                # merged into $HERMES_HOME/.env at activation, which both units read
+                services.hermes-agent.environmentFiles = [ auth.path ];
+              }
+            )
           ];
           homeModules = [ self.profiles.homeManager.headless ];
         };

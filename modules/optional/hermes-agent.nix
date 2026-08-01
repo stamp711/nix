@@ -38,7 +38,7 @@
       };
 
       # Upstream's module doesn't have the `hermes serve` unit.
-      # Both processes share one HERMES_HOME.
+      # The two processes need to share the same HERMES_HOME.
       systemd.services.hermes-serve = {
         description = "Hermes Agent backend server";
         wantedBy = [ "multi-user.target" ];
@@ -57,9 +57,9 @@
           WorkingDirectory = cfg.workingDirectory;
           # written by the gateway module's activation from its environmentFiles
           EnvironmentFile = "-${cfg.stateDir}/.hermes/.env";
-          # A non-loopback bind demands an auth provider, so stay on loopback until the
-          # credentials secret exists. --skip-build: the web UI is prebuilt, npm is absent.
-          ExecStart = "${cfg.package}/bin/hermes serve --host 127.0.0.1 --port 9119 --skip-build";
+          # NOTE: Binding 0.0.0.0 will refuse to start without auth from environmentFiles.
+          # --skip-build: the web UI is prebuilt, npm isn't here.
+          ExecStart = "${cfg.package}/bin/hermes serve --host 0.0.0.0 --port 9119 --skip-build";
           Restart = "always";
           RestartSec = 5;
           UMask = "0007";
