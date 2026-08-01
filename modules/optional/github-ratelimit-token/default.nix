@@ -3,7 +3,7 @@
   flake.homeModules.github-ratelimit-token =
     { config, ... }:
     let
-      token = self.lib.mkAgeSecret config ./token.age;
+      token = self.lib.mkAgeSecret config { rekeyFile = ./token.age; };
     in
     {
       age.secrets = token.ageSecret;

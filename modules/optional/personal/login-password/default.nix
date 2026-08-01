@@ -4,7 +4,7 @@
   flake.nixosModules.personal =
     { config, ... }:
     let
-      s = self.lib.mkAgeSecret config ./password.age;
+      s = self.lib.mkAgeSecret config { rekeyFile = ./password.age; };
     in
     {
       age.secrets = s.ageSecret;

@@ -3,7 +3,7 @@
   flake.homeModules.personal-wakatime =
     { config, pkgs, ... }:
     let
-      s = self.lib.mkAgeSecret config ./wakatime-api-key.age;
+      s = self.lib.mkAgeSecret config { rekeyFile = ./wakatime-api-key.age; };
       home = config.home.homeDirectory;
       ghqRoot = lib.replaceStrings [ "~" ] [ home ] config.programs.git.settings.ghq.root;
     in

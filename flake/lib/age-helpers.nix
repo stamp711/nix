@@ -16,15 +16,16 @@
       in
       lib.removeSuffix ".age" (builtins.replaceStrings [ "/" ] [ "__" ] relative);
 
+    # Takes an agenix secret definition, names it after its rekeyFile, hands back the path.
     mkAgeSecret =
-      config: file:
+      config: secret:
       let
-        name = self.lib.ageSecretName file;
+        name = self.lib.ageSecretName secret.rekeyFile;
       in
       {
         inherit name;
         inherit (config.age.secrets.${name}) path;
-        ageSecret.${name}.rekeyFile = file;
+        ageSecret.${name} = secret;
       };
 
   };

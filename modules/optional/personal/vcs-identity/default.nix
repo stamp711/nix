@@ -4,8 +4,8 @@
   flake.homeModules.personal =
     { lib, config, ... }:
     let
-      gitIdentity = self.lib.mkAgeSecret config ./git.personal-identity.ini.age;
-      jjIdentity = self.lib.mkAgeSecret config ./jj.personal-identity.toml.age;
+      gitIdentity = self.lib.mkAgeSecret config { rekeyFile = ./git.personal-identity.ini.age; };
+      jjIdentity = self.lib.mkAgeSecret config { rekeyFile = ./jj.personal-identity.toml.age; };
       ghqRoot = config.programs.git.settings.ghq.root;
     in
     lib.mkMerge [

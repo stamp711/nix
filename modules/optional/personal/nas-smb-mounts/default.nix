@@ -5,7 +5,7 @@
     { config, ... }:
     let
       # mount.cifs credentials format
-      s = self.lib.mkAgeSecret config ./nas-smb.age;
+      s = self.lib.mkAgeSecret config { rekeyFile = ./nas-smb.age; };
     in
     {
       age.secrets = s.ageSecret;
