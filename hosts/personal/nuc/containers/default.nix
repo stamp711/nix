@@ -26,6 +26,9 @@
           ];
         };
         hermes = {
+          macvlan = "enp4s0";
+          hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJSkkfNGI3x2T3HWlgV3srGzd7Rj7VborpcFaQAGk/+c";
+          userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEUMf5TI9bZBu1f4RgAAu7vrmPlLqqZ7xTq5tkHIjYQu";
           hostDirs = [ "${home}/code" ];
           nixosModules = [
             self.profiles.nixos.headless
