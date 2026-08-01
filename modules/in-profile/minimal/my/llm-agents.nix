@@ -11,10 +11,10 @@
             inherit source;
             recursive = true;
           }
-        ) config.my.llm.skills;
+        ) config.my.llm-agents.skills;
     in
     {
-      options.my.llm.skills = lib.mkOption {
+      options.my.llm-agents.skills = lib.mkOption {
         type = lib.types.attrsOf (
           lib.types.oneOf [
             lib.types.path

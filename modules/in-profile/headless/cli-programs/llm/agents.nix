@@ -14,7 +14,7 @@ in
       skills = importSkills ./skills;
     in
     {
-      my.llm.skills = skills;
+      my.llm-agents.skills = skills;
 
       programs.claude-code = {
         enable = true;
