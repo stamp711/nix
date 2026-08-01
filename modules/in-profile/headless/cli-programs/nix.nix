@@ -60,6 +60,8 @@
         # Third-party module options not covered by the builtin indexes.
         # unf evaluates a module standalone into an options.json; disko,
         # system-manager, agenix-rekey, and nixos-wsl don't evaluate in isolation.
+        # NOTE: unf's `args.pkgs = mkForce …` misses a `lib.`, bites when the module reads pkgs.
+        # TODO: fork and fix unf, then fold this back into mkOpts.
         experimental.options_file =
           let
             mkOpts =
@@ -78,6 +80,19 @@
             microvm = mkOpts inputs.microvm inputs.microvm.nixosModules.microvm;
             nixvirt = mkOpts inputs.NixVirt inputs.NixVirt.nixosModules.default;
             solaar = mkOpts inputs.solaar inputs.solaar.nixosModules.solaar;
+            hermes-agent =
+              let
+                eval = lib.evalModules {
+                  modules = [
+                    inputs.hermes-agent.nixosModules.default
+                    {
+                      _module.check = false;
+                      _module.args.pkgs = pkgs;
+                    }
+                  ];
+                };
+              in
+              "${(pkgs.nixosOptionsDoc { inherit (eval) options; }).optionsJSON}/share/doc/nixos/options.json";
 
             my-home = mkOpts inputs.self inputs.self.homeModules.my;
             my-nixos = mkOpts inputs.self inputs.self.nixosModules.my;
