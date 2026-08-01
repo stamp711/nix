@@ -7,22 +7,27 @@ let
     updateDates = lib.mkOption {
       type = lib.types.str;
       default = "daily";
+      description = "OnCalendar for the update timer.";
     };
     cleanDates = lib.mkOption {
       type = lib.types.str;
       default = "weekly";
+      description = "OnCalendar for the garbage collection timer.";
     };
     keepSince = lib.mkOption {
       type = lib.types.str;
       default = "7d";
+      description = "Age below which generations survive garbage collection (`nh clean --keep-since`).";
     };
     keepGenerations = lib.mkOption {
       type = lib.types.int;
       default = 3;
+      description = "Generations to keep regardless of age (`nh clean --keep`).";
     };
     randomizedDelaySec = lib.mkOption {
       type = lib.types.str;
       default = "4h";
+      description = "RandomizedDelaySec on both timers, so hosts don't all fire at once.";
     };
   };
 in

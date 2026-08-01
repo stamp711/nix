@@ -59,16 +59,19 @@
               owner = mkOption {
                 type = str;
                 default = "0";
+                description = "Owner of the generated file.";
               };
 
               group = mkOption {
                 type = str;
                 default = "0";
+                description = "Group of the generated file.";
               };
 
               mode = mkOption {
                 type = str;
                 default = "0400";
+                description = "Permissions of the generated file.";
               };
             };
           }
@@ -79,11 +82,13 @@
         directory = mkOption {
           type = types.path;
           default = "/run/agenix-template";
+          description = "Default directory for generated files.";
         };
 
         files = mkOption {
           type = types.attrsOf fileConfig;
           default = { };
+          description = "Templates rendered from decrypted secrets during activation.";
         };
       };
 

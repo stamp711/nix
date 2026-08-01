@@ -70,8 +70,7 @@
                 inherit self pkgs;
                 modules = [ module ];
               }}";
-            # For modules unf chokes on. warningsAreErrors is off because unf renders
-            # optionsNix itself, so these have never been through the description check.
+            # For modules unf chokes on.
             mkOptsRaw =
               module:
               let
@@ -85,12 +84,7 @@
                   ];
                 };
               in
-              "${
-                (pkgs.nixosOptionsDoc {
-                  inherit (eval) options;
-                  warningsAreErrors = false;
-                }).optionsJSON
-              }/share/doc/nixos/options.json";
+              "${(pkgs.nixosOptionsDoc { inherit (eval) options; }).optionsJSON}/share/doc/nixos/options.json";
           in
           {
             nixvim = "${

@@ -17,6 +17,7 @@
         openFirewall = lib.mkEnableOption "Open the Snell port in the firewall";
         port = lib.mkOption {
           type = lib.types.port;
+          description = "Port Snell listens on. No default: it should differ per host.";
         };
         pskSecretFile = lib.mkOption {
           type = lib.types.path;

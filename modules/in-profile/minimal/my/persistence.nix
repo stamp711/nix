@@ -63,6 +63,7 @@
         files = lib.mkOption {
           type = lib.types.listOf entryType;
           default = [ ];
+          description = "Absolute paths to persist individually, for state that isn't a whole directory.";
         };
         users = lib.mkOption {
           type = lib.types.listOf lib.types.str;
@@ -78,6 +79,7 @@
         user.files = lib.mkOption {
           type = lib.types.listOf entryType;
           default = [ ];
+          description = "Paths under each persisted user's home, for state that isn't a whole directory.";
         };
         externalPaths = lib.mkOption {
           type = lib.types.listOf lib.types.str;

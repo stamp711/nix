@@ -80,13 +80,16 @@
             "efi-luks-btrfs"
             "mbr-ext4"
           ];
+          description = "Partition scheme to lay down on {option}`device`.";
         };
         device = lib.mkOption {
           type = lib.types.str;
+          description = "Disk to partition. Prefer a stable /dev/disk/by-id path.";
         };
         swapSize = lib.mkOption {
           type = lib.types.str;
           default = "16G";
+          description = "Size of the btrfs swapfile. Unused by the mbr-ext4 layout.";
         };
         wipeTargets = lib.mkOption {
           type = lib.types.listOf lib.types.str;

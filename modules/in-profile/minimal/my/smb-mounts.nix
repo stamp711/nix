@@ -27,6 +27,7 @@
                 mountBase = lib.mkOption {
                   type = lib.types.str;
                   default = "/mnt/${name}";
+                  description = "Where this server's shares are mounted.";
                 };
                 label = lib.mkOption {
                   type = lib.types.str;
@@ -44,6 +45,7 @@
                       };
                     }
                   );
+                  description = "Shares to mount, keyed by their name on the server.";
                 };
               };
             }
