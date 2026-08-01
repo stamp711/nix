@@ -1,9 +1,11 @@
-{ self, ... }:
+{ lib, self, ... }:
 {
   flake.homeModules.personal-wakatime =
     { config, pkgs, ... }:
     let
       s = self.lib.mkAgeSecret config ./wakatime-api-key.age;
+      home = config.home.homeDirectory;
+      ghqRoot = lib.replaceStrings [ "~" ] [ home ] config.programs.git.settings.ghq.root;
     in
     {
       home.packages = [ pkgs.wakatime-cli ];
@@ -13,11 +15,10 @@
         api_key_vault_cmd = ${pkgs.coreutils}/bin/cat ${s.path}
         # exclude raft.build agent notes
         exclude = /[.]slock/agents/
+        # name the project after the repo, not after whoever edited it
         [projectmap]
-        ^/home/stamp/code/[^/]+/[^/]+/([^/]+) = {0}
-        ^/home/stamp/agents/[^/]+/[^/]+/[^/]+/([^/]+) = {0}
-        ^/Users/Developer/stamp/code/[^/]+/[^/]+/([^/]+) = {0}
-        ^/Users/Developer/stamp/agents/[^/]+/[^/]+/[^/]+/([^/]+) = {0}
+        ^${ghqRoot}/[^/]+/[^/]+/([^/]+) = {0}
+        ^${home}/agents/[^/]+/[^/]+/[^/]+/([^/]+) = {0}
       '';
     };
 
