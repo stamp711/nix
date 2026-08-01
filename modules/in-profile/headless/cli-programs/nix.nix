@@ -58,10 +58,9 @@
           "nur"
         ];
         # Third-party module options not covered by the builtin indexes.
-        # unf evaluates a module standalone into an options.json; disko,
-        # system-manager, agenix-rekey, and nixos-wsl don't evaluate in isolation.
         # NOTE: unf's `args.pkgs = mkForce …` misses a `lib.`, bites when the module reads pkgs.
-        # TODO: fork and fix unf, then fold this back into mkOpts.
+        # TODO: fork and fix unf, then fold mkOptsRaw back into mkOpts.
+        # agenix-rekey has no entry: rendering its options forces age.rekey.storageMode's abort default.
         experimental.options_file =
           let
             mkOpts =
@@ -97,6 +96,18 @@
             solaar = mkOpts inputs.solaar inputs.solaar.nixosModules.solaar;
             hermes-agent = mkOptsRaw inputs.hermes-agent.nixosModules.default;
             hermes-webui = mkOptsRaw inputs.hermes-webui.nixosModules.default;
+            nixos-wsl = mkOptsRaw inputs.nixos-wsl.nixosModules.default;
+            # Its whole option surface is one type from its own lib, as upstream's doc.nix does it.
+            disko = mkOptsRaw {
+              options.disko.devices = lib.mkOption {
+                type = inputs.disko.lib.toplevel;
+                default = { };
+                description = "The devices to set up";
+              };
+            };
+            system-manager = "${
+              inputs.system-manager.docs.${pkgs.stdenv.hostPlatform.system}.optionsJSON
+            }/share/doc/nixos/options.json";
             my-home = mkOpts inputs.self inputs.self.homeModules.my;
             my-nixos = mkOptsRaw inputs.self.nixosModules.my;
             my-darwin = mkOpts inputs.self inputs.self.darwinModules.my;
