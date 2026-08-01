@@ -1,5 +1,5 @@
 # Agent sandboxes: the raft.build daemon and the Hermes agent, one container each.
-{ self, ... }:
+{ lib, self, ... }:
 {
   flake.nixosModules.nuc =
     { config, ... }:
@@ -32,12 +32,10 @@
           hostDirs = [ "${home}/code" ];
           nixosModules = [
             self.profiles.nixos.headless
-            self.nixosModules.hermes-agent
-            # Dashboard auth for its serve unit.
             (
               { config, ... }:
               let
-                auth = self.lib.mkAgeSecret config {
+                serve = self.lib.mkAgeSecret config {
                   rekeyFile = ./dashboard-auth.env.age;
                   generator.script =
                     { pkgs, ... }:
@@ -47,17 +45,6 @@
                       echo "HERMES_DASHBOARD_BASIC_AUTH_SECRET=$(${pkgs.openssl}/bin/openssl rand -base64 32)"
                     '';
                 };
-              in
-              {
-                age.secrets = auth.ageSecret;
-                # merged into $HERMES_HOME/.env at activation, which both units read
-                services.hermes-agent.environmentFiles = [ auth.path ];
-              }
-            )
-            # WebUI has its own login, so its own password.
-            (
-              { config, ... }:
-              let
                 webui = self.lib.mkAgeSecret config {
                   rekeyFile = ./webui-auth.env.age;
                   generator.script =
@@ -68,8 +55,23 @@
                 };
               in
               {
-                age.secrets = webui.ageSecret;
-                services.hermes-webui.environmentFiles = [ webui.path ];
+                age.secrets = lib.mkMerge [
+                  serve.ageSecret
+                  webui.ageSecret
+                ];
+                my.hermes = {
+                  enable = true;
+                  serve = {
+                    enable = true;
+                    host = "0.0.0.0";
+                    authFile = serve.path;
+                  };
+                  webui = {
+                    enable = true;
+                    host = "0.0.0.0";
+                    authFile = webui.path;
+                  };
+                };
               }
             )
           ];

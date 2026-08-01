@@ -70,6 +70,27 @@
                 inherit self pkgs;
                 modules = [ module ];
               }}";
+            # For modules unf chokes on. warningsAreErrors is off because unf renders
+            # optionsNix itself, so these have never been through the description check.
+            mkOptsRaw =
+              module:
+              let
+                eval = lib.evalModules {
+                  modules = [
+                    module
+                    {
+                      _module.check = false;
+                      _module.args.pkgs = pkgs;
+                    }
+                  ];
+                };
+              in
+              "${
+                (pkgs.nixosOptionsDoc {
+                  inherit (eval) options;
+                  warningsAreErrors = false;
+                }).optionsJSON
+              }/share/doc/nixos/options.json";
           in
           {
             nixvim = "${
@@ -80,22 +101,10 @@
             microvm = mkOpts inputs.microvm inputs.microvm.nixosModules.microvm;
             nixvirt = mkOpts inputs.NixVirt inputs.NixVirt.nixosModules.default;
             solaar = mkOpts inputs.solaar inputs.solaar.nixosModules.solaar;
-            hermes-agent =
-              let
-                eval = lib.evalModules {
-                  modules = [
-                    inputs.hermes-agent.nixosModules.default
-                    {
-                      _module.check = false;
-                      _module.args.pkgs = pkgs;
-                    }
-                  ];
-                };
-              in
-              "${(pkgs.nixosOptionsDoc { inherit (eval) options; }).optionsJSON}/share/doc/nixos/options.json";
-
+            hermes-agent = mkOptsRaw inputs.hermes-agent.nixosModules.default;
+            hermes-webui = mkOptsRaw inputs.hermes-webui.nixosModules.default;
             my-home = mkOpts inputs.self inputs.self.homeModules.my;
-            my-nixos = mkOpts inputs.self inputs.self.nixosModules.my;
+            my-nixos = mkOptsRaw inputs.self.nixosModules.my;
             my-darwin = mkOpts inputs.self inputs.self.darwinModules.my;
           };
       };
