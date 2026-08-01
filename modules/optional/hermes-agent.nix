@@ -1,5 +1,5 @@
 # Hermes Agent: upstream's gateway module plus the parts it leaves out, and the client backend.
-{ lib, inputs, ... }:
+{ inputs, ... }:
 {
   flake.nixosModules.hermes-agent =
     { config, pkgs, ... }:
@@ -7,6 +7,8 @@
       cfg = config.services.hermes-agent;
       user = config.my.primaryUser;
       home = config.users.users.${user}.home;
+      # Both processes must land on one HERMES_HOME, so take the gateway's rather than restate it.
+      agentEnv = config.systemd.services.hermes-agent.environment;
     in
     {
       imports = [ inputs.hermes-agent.nixosModules.default ];
@@ -16,8 +18,8 @@
         inherit user;
         group = config.users.users.${user}.group;
         createUser = false;
-        # The container is ephemeral; only /persist and the home bind survive.
-        stateDir = "/persist/hermes";
+        # It runs as the owner, so its state is the owner's: this lands HERMES_HOME on ~/.hermes.
+        stateDir = home;
         addToSystemPackages = true;
       };
 
@@ -30,11 +32,7 @@
           ExecReload = "${pkgs.coreutils}/bin/kill -USR1 $MAINPID";
           ExecStopPost = "-${cfg.package.hermesVenv}/bin/python3 -m gateway.cgroup_cleanup";
           KillMode = "mixed";
-          # ProtectSystem=strict, and the agent edits the owner's checkouts.
-          ReadWritePaths = [ home ];
         };
-        # HOME is pinned to stateDir upstream, which hides git/jj/ssh identity from the agent.
-        environment.HOME = lib.mkForce home;
       };
 
       # Upstream's module doesn't have the `hermes serve` unit.
@@ -42,13 +40,10 @@
       systemd.services.hermes-serve = {
         description = "Hermes Agent backend server";
         wantedBy = [ "multi-user.target" ];
-        after = [ "network-online.target" ];
-        wants = [ "network-online.target" ];
+        after = [ "network.target" ];
 
         environment = {
-          HOME = home;
-          HERMES_HOME = "${cfg.stateDir}/.hermes";
-          HERMES_MANAGED = "true";
+          inherit (agentEnv) HOME HERMES_HOME HERMES_MANAGED;
         };
 
         serviceConfig = {
@@ -56,7 +51,7 @@
           Group = cfg.group;
           WorkingDirectory = cfg.workingDirectory;
           # written by the gateway module's activation from its environmentFiles
-          EnvironmentFile = "-${cfg.stateDir}/.hermes/.env";
+          EnvironmentFile = "-${agentEnv.HERMES_HOME}/.env";
           # NOTE: Binding 0.0.0.0 will refuse to start without auth from environmentFiles.
           # --skip-build: the web UI is prebuilt, npm isn't here.
           ExecStart = "${cfg.package}/bin/hermes serve --host 0.0.0.0 --port 9119 --skip-build";
@@ -70,7 +65,6 @@
           ReadWritePaths = [
             cfg.stateDir
             cfg.workingDirectory
-            home
           ];
           PrivateTmp = true;
         };
