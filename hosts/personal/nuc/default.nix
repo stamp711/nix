@@ -44,15 +44,23 @@ in
         my.smbMounts.nas.shares.Dropbox.rw = true;
         my.smbMounts.nas.shares.Z = { };
 
-        my.raft-container.enable = true;
-        my.raft-container.macvlan = "enp4s0";
-        my.raft-container.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHDWaJF4rGW5epZONjj0vio3aEMDUKDav+E2Y4Ud0+WM";
-        my.raft-container.userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIM9xfQ5oWVVe1AX9PJh0Dy5DJUZ8YMDbwTD9t1/c2K4f";
-        # Share the owner's repo stores + agent jj workspaces at identical paths.
-        my.raft-container.hostDirs = [
-          "/home/${username}/code"
-          "/home/${username}/agents"
-        ];
+        my.containers.raft = {
+          macvlan = "enp4s0";
+          hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHDWaJF4rGW5epZONjj0vio3aEMDUKDav+E2Y4Ud0+WM";
+          userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIM9xfQ5oWVVe1AX9PJh0Dy5DJUZ8YMDbwTD9t1/c2K4f";
+          # Share the owner's repo stores + agent jj workspaces at identical paths.
+          hostDirs = [
+            "/home/${username}/code"
+            "/home/${username}/agents"
+          ];
+          nixosModules = [ self.profiles.nixos.headless ];
+          homeModules = [
+            self.profiles.homeManager.headless
+            self.homeModules.raft-computer
+            self.homeModules.agent-sandbox
+            self.homeModules.github-ratelimit-token
+          ];
+        };
       }
     ];
   };
