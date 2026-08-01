@@ -14,7 +14,20 @@
       group = config.users.users.${user}.group;
       hostName = config.networking.hostName;
 
-      # Ensure bind sources exist.
+      # Persist what we bind, not the parent, or the mount hides it.
+      stateDirs = cfg: [
+        {
+          directory = "${cfg.statePath}/home";
+          inherit user group;
+          mode = "0700";
+        }
+        {
+          directory = "${cfg.statePath}/persist";
+          mode = "0700";
+        }
+      ];
+
+      # Ensure bind sources exist. Redundant with the above wherever my.persistence is on.
       dirRules =
         cfg:
         [
@@ -167,7 +180,7 @@
       };
 
       config = {
-        my.persistence.directories = lib.mapAttrsToList (_: cfg: cfg.statePath) config.my.containers;
+        my.persistence.directories = lib.concatMap stateDirs (lib.attrValues config.my.containers);
         systemd.tmpfiles.rules = lib.concatMap dirRules (lib.attrValues config.my.containers);
         containers = lib.mapAttrs mkContainer config.my.containers;
       };
