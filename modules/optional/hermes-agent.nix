@@ -1,4 +1,4 @@
-# Hermes Agent: upstream's gateway module plus the parts it leaves out, and the client backend.
+# Hermes Agent: upstream's gateway module plus the parts it leaves out, the backend server, and the web UI.
 { inputs, ... }:
 {
   flake.nixosModules.hermes-agent =
@@ -7,11 +7,28 @@
       cfg = config.services.hermes-agent;
       user = config.my.primaryUser;
       home = config.users.users.${user}.home;
-      # Both processes must land on one HERMES_HOME, so take the gateway's rather than restate it.
+      # All three must land on one HERMES_HOME, so take the gateway's rather than restate it.
       agentEnv = config.systemd.services.hermes-agent.environment;
     in
     {
-      imports = [ inputs.hermes-agent.nixosModules.default ];
+      imports = [
+        inputs.hermes-agent.nixosModules.default
+        inputs.hermes-webui.nixosModules.default
+      ];
+
+      # Runs the agent in-process off the same HERMES_HOME; the browser/PWA client.
+      services.hermes-webui = {
+        enable = true;
+        host = "0.0.0.0";
+        port = 8787;
+        inherit user;
+        group = config.users.users.${user}.group;
+        hermesHome = agentEnv.HERMES_HOME;
+        # the container is ephemeral, and passkeys live in here
+        stateDir = "${home}/.hermes-webui";
+        # it derives HERMES_WEBUI_PYTHON from the agent package's passthru.hermesVenv
+        agent.package = cfg.package;
+      };
 
       services.hermes-agent = {
         enable = true;
@@ -36,7 +53,7 @@
       };
 
       # Upstream's module doesn't have the `hermes serve` unit.
-      # The two processes need to share the same HERMES_HOME.
+      # It needs the same HERMES_HOME as the other two.
       systemd.services.hermes-serve = {
         description = "Hermes Agent backend server";
         wantedBy = [ "multi-user.target" ];

@@ -566,6 +566,26 @@
         "type": "github"
       }
     },
+    "hermes-webui": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1785524301,
+        "narHash": "sha256-jcUygH3JLFNCR6RXN1uRF8NM5yS1bm1D6ukeKfwLcGQ=",
+        "owner": "nesquena",
+        "repo": "hermes-webui",
+        "rev": "320789ae596a3963d726d90f6c7f3bc86f7f2d6d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nesquena",
+        "repo": "hermes-webui",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -1134,6 +1154,7 @@
         "disko": "disko",
         "flake-parts": "flake-parts",
         "hermes-agent": "hermes-agent",
+        "hermes-webui": "hermes-webui",
         "home-manager": "home-manager",
         "homebrew-cask": "homebrew-cask",
         "homebrew-core": "homebrew-core",

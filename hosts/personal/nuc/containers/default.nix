@@ -54,6 +54,24 @@
                 services.hermes-agent.environmentFiles = [ auth.path ];
               }
             )
+            # WebUI has its own login, so its own password.
+            (
+              { config, ... }:
+              let
+                webui = self.lib.mkAgeSecret config {
+                  rekeyFile = ./webui-auth.env.age;
+                  generator.script =
+                    { pkgs, ... }:
+                    ''
+                      echo "HERMES_WEBUI_PASSWORD=$(${pkgs.openssl}/bin/openssl rand -base64 24)"
+                    '';
+                };
+              in
+              {
+                age.secrets = webui.ageSecret;
+                services.hermes-webui.environmentFiles = [ webui.path ];
+              }
+            )
           ];
           homeModules = [ self.profiles.homeManager.headless ];
         };

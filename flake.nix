@@ -104,6 +104,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-parts.follows = "flake-parts";
     };
+    hermes-webui = {
+      url = "github:nesquena/hermes-webui";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     jj-starship = {
       url = "github:dmmulroy/jj-starship";
       inputs.nixpkgs.follows = "nixpkgs";
