@@ -10,6 +10,8 @@
       home.packages = [ pkg ];
       systemd.user.services.multica = {
         Install.WantedBy = [ "default.target" ];
+        # Untokened it exits and Restart spins.
+        Unit.ConditionPathExists = "%h/.multica/config.json";
         Service = {
           # --foreground: it forks into the background otherwise.
           # --no-auto-update: it replaces its own binary, which here is in the store.
