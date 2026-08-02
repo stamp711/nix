@@ -4,22 +4,27 @@
     { config, pkgs, ... }:
     let
       s = self.lib.mkAgeSecret config { rekeyFile = ./wakatime-api-key.age; };
-      home = config.home.homeDirectory;
-      ghqRoot = lib.replaceStrings [ "~" ] [ home ] config.programs.git.settings.ghq.root;
     in
-    {
+    # ghqRoot needs the vcs module
+    lib.mkIf config.programs.git.enable {
       home.packages = [ pkgs.wakatime-cli ];
       age.secrets = s.ageSecret;
-      home.file.".wakatime.cfg".text = /* ini */ ''
-        [settings]
-        api_key_vault_cmd = ${pkgs.coreutils}/bin/cat ${s.path}
-        # exclude raft.build agent notes
-        exclude = /[.]slock/agents/
-        # name the project after the repo, not after whoever edited it
-        [projectmap]
-        ^${ghqRoot}/[^/]+/[^/]+/([^/]+) = {0}
-        ^${home}/agents/[^/]+/[^/]+/[^/]+/([^/]+) = {0}
-      '';
+      home.file.".wakatime.cfg".text =
+        let
+          home = config.home.homeDirectory;
+          ghqRoot = lib.replaceStrings [ "~" ] [ home ] config.programs.git.settings.ghq.root;
+        in
+        /* ini */ ''
+          [settings]
+          api_key_vault_cmd = ${pkgs.coreutils}/bin/cat ${s.path}
+          # exclude raft.build agent notes
+          exclude = /[.]slock/agents/
+          # name the project after the repo, not after whoever edited it
+          [projectmap]
+          ^${ghqRoot}/[^/]+/[^/]+/([^/]+) = {0}
+          ^${home}/agents/[^/]+/[^/]+/[^/]+/([^/]+) = {0}
+          github[.]com/[^/]+/([^/]+) = {0}
+        '';
     };
 
   flake.homeModules.personal.imports = [ self.homeModules.personal-wakatime ];
