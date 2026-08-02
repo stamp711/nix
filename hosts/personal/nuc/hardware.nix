@@ -31,7 +31,22 @@
       serviceConfig.RuntimeDirectory = "gpu-led-off";
       serviceConfig.WorkingDirectory = "%t/gpu-led-off";
       serviceConfig.ProtectSystem = "strict"; # ro elsewhere
-      script = "${pkgs.openrgb}/bin/openrgb --noautoconnect --device NVIDIA --mode Off";
+      # OpenRGB sometimes segfaults during the scan. Loop as a workaround for now.
+      script = ''
+        for attempt in 1 2 3 4 5; do
+          if ${pkgs.openrgb}/bin/openrgb --noautoconnect --device NVIDIA --mode Off; then
+            exit 0
+          fi
+
+          if [ "$attempt" -lt 5 ]; then
+            echo "OpenRGB failed on attempt $attempt; retrying"
+            ${pkgs.coreutils}/bin/sleep 2
+          fi
+        done
+
+        echo "OpenRGB failed after 5 attempts"
+        exit 1
+      '';
     };
 
     # LG OLED needs --immediate-flips to avoid flickr; 165Hz from EDID DisplayID block.
