@@ -1,4 +1,5 @@
-# Agent sandboxes: the raft.build daemon and the Hermes agent, one container each.
+# Agent sandboxes: the raft.build daemon, the Hermes agent and the Multica
+# daemon, one container each.
 { lib, self, ... }:
 {
   flake.nixosModules.nuc =
@@ -23,6 +24,14 @@
             self.homeModules.raft-computer
             self.homeModules.agent-sandbox
             self.homeModules.github-ratelimit-token
+          ];
+        };
+        multica = {
+          macvlan = "enp4s0";
+          nixosModules = [ self.profiles.nixos.headless ];
+          homeModules = [
+            self.profiles.homeManager.headless
+            self.homeModules.multica
           ];
         };
         hermes = {
