@@ -18,9 +18,9 @@
         nixosModules = [ self.profiles.nixos.headless ];
         homeModules = [
           self.profiles.homeManager.headless
-          self.homeModules.raft-computer
           self.homeModules.agent-sandbox
           self.homeModules.github-ratelimit-token
+          self.homeModules.raft-computer
         ];
       };
     };

@@ -9,13 +9,12 @@
       my.containers = {
         multica = {
           macvlan = "enp4s0";
-          hostDirs = [
-            "${home}/code"
-            "${home}/agents"
-          ];
+          hostDirs = [ "${home}/code" ];
           nixosModules = [ self.profiles.nixos.headless ];
           homeModules = [
             self.profiles.homeManager.headless
+            self.homeModules.agent-sandbox
+            self.homeModules.github-ratelimit-token
             self.homeModules.multica
           ];
         };

@@ -6,6 +6,48 @@
     { config, ... }:
     let
       home = config.users.users.${config.my.primaryUser}.home;
+
+      hermesModule =
+        { config, ... }:
+        let
+          serve = self.lib.mkAgeSecret config {
+            rekeyFile = ./dashboard-auth.env.age;
+            generator.script =
+              { pkgs, ... }:
+              ''
+                echo "HERMES_DASHBOARD_BASIC_AUTH_USERNAME=${config.my.primaryUser}"
+                echo "HERMES_DASHBOARD_BASIC_AUTH_PASSWORD=$(${pkgs.openssl}/bin/openssl rand -base64 24)"
+                echo "HERMES_DASHBOARD_BASIC_AUTH_SECRET=$(${pkgs.openssl}/bin/openssl rand -base64 32)"
+              '';
+          };
+          webui = self.lib.mkAgeSecret config {
+            rekeyFile = ./webui-auth.env.age;
+            generator.script =
+              { pkgs, ... }:
+              ''
+                echo "HERMES_WEBUI_PASSWORD=$(${pkgs.openssl}/bin/openssl rand -base64 24)"
+              '';
+          };
+        in
+        {
+          age.secrets = lib.mkMerge [
+            serve.ageSecret
+            webui.ageSecret
+          ];
+          my.hermes = {
+            enable = true;
+            serve = {
+              enable = true;
+              host = "0.0.0.0";
+              authFile = serve.path;
+            };
+            webui = {
+              enable = true;
+              host = "0.0.0.0";
+              authFile = webui.path;
+            };
+          };
+        };
     in
     {
       my.containers.hermes = {
@@ -15,50 +57,13 @@
         hostDirs = [ "${home}/code" ];
         nixosModules = [
           self.profiles.nixos.headless
-          (
-            { config, ... }:
-            let
-              serve = self.lib.mkAgeSecret config {
-                rekeyFile = ./dashboard-auth.env.age;
-                generator.script =
-                  { pkgs, ... }:
-                  ''
-                    echo "HERMES_DASHBOARD_BASIC_AUTH_USERNAME=${config.my.primaryUser}"
-                    echo "HERMES_DASHBOARD_BASIC_AUTH_PASSWORD=$(${pkgs.openssl}/bin/openssl rand -base64 24)"
-                    echo "HERMES_DASHBOARD_BASIC_AUTH_SECRET=$(${pkgs.openssl}/bin/openssl rand -base64 32)"
-                  '';
-              };
-              webui = self.lib.mkAgeSecret config {
-                rekeyFile = ./webui-auth.env.age;
-                generator.script =
-                  { pkgs, ... }:
-                  ''
-                    echo "HERMES_WEBUI_PASSWORD=$(${pkgs.openssl}/bin/openssl rand -base64 24)"
-                  '';
-              };
-            in
-            {
-              age.secrets = lib.mkMerge [
-                serve.ageSecret
-                webui.ageSecret
-              ];
-              my.hermes = {
-                enable = true;
-                serve = {
-                  enable = true;
-                  host = "0.0.0.0";
-                  authFile = serve.path;
-                };
-                webui = {
-                  enable = true;
-                  host = "0.0.0.0";
-                  authFile = webui.path;
-                };
-              };
-            }
-          )
+          hermesModule
         ];
-        homeModules = [ self.profiles.homeManager.headless ];
+        homeModules = [
+          self.profiles.homeManager.headless
+          self.homeModules.agent-sandbox
+          self.homeModules.github-ratelimit-token
+        ];
       };
     };
 }
