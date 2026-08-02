@@ -105,6 +105,7 @@
                 description = "The devices to set up";
               };
             };
+            # NOTE: Its docs.nix imports out of pkgs.path, which breaks `nix flake check --no-build`.
             system-manager = "${
               inputs.system-manager.docs.${pkgs.stdenv.hostPlatform.system}.optionsJSON
             }/share/doc/nixos/options.json";
