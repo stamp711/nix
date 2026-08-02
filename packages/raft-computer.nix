@@ -5,19 +5,19 @@
     {
       packages.raft-computer =
         let
-          version = "1.0.14";
+          version = "1.0.15";
           targets = {
             x86_64-linux = {
               file = "raft-computer-linux-x64";
-              sha256 = "a0d9e76e1fdfd8853dad6e9561845b71426724dfdcb6982b2d304d35dac8bccc";
+              sha256 = "3baa65acc66d24670ea48cb610ba43ac64ac5e1af360d15a47afb5dfbc1f0939";
             };
             aarch64-linux = {
               file = "raft-computer-linux-arm64";
-              sha256 = "7493b5a912433da208e24b7ce89f9d9bf542b6cf6f0895844d8199fdccc97515";
+              sha256 = "a65890ee3d0db95ac8afc38357fe974c9d0a0b07e5e62e4ef7d6e7e1408af947";
             };
             aarch64-darwin = {
               file = "raft-computer-darwin-arm64";
-              sha256 = "04e2e804b55df87a9609f2ac2dfd5f732202edd333c6dbcac37e6880b9a2ebd1";
+              sha256 = "87f298144f1dc13393af635d57dad15345a4b31cac032524bf3e9fec965bb51b";
             };
           };
           target =
