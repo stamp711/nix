@@ -757,6 +757,22 @@
         "type": "github"
       }
     },
+    "multica": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1785553450,
+        "narHash": "sha256-XkA5DAC7e47Hj9j2/mAUtSgv0lAi/rlVj+v2Xf0cCAM=",
+        "owner": "multica-ai",
+        "repo": "multica",
+        "rev": "37f3bb7dd9c0fe665051ce26dadab03b090dc1af",
+        "type": "github"
+      },
+      "original": {
+        "owner": "multica-ai",
+        "repo": "multica",
+        "type": "github"
+      }
+    },
     "nix-alien": {
       "inputs": {
         "flake-compat": "flake-compat_3",
@@ -1164,6 +1180,7 @@
         "llm-agents": "llm-agents",
         "microvm": "microvm",
         "monaco": "monaco",
+        "multica": "multica",
         "nix-alien": "nix-alien",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
