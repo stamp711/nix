@@ -19,6 +19,13 @@ in
 {
   flake.lib = {
 
+    # Ours plus the inputs', for every package set however it gets instantiated.
+    allOverlays = builtins.attrValues self.overlays ++ [
+      inputs.agenix-rekey.overlays.default
+      inputs.brew-nix.overlays.default
+      inputs.nix-alien.overlays.default
+    ];
+
     # Create a nixpkgs instance with our standard configuration.
     mkPkgs =
       {
@@ -31,11 +38,7 @@ in
           allowUnfree = true;
         }
         // config;
-        overlays = builtins.attrValues self.overlays ++ [
-          inputs.agenix-rekey.overlays.default
-          inputs.brew-nix.overlays.default
-          inputs.nix-alien.overlays.default
-        ];
+        overlays = self.lib.allOverlays;
       };
 
     nixosBaseModules =
@@ -75,9 +78,8 @@ in
         modules ? [ ],
       }:
       inputs.system-manager.lib.makeSystemConfig {
-        overlays = [
-          inputs.agenix-rekey.overlays.default
-        ];
+        # It instantiates nixpkgs itself; nixpkgs.pkgs is read-only, so mkPkgs cannot be used.
+        overlays = self.lib.allOverlays;
         modules = [
           {
             nixpkgs.hostPlatform = system;
