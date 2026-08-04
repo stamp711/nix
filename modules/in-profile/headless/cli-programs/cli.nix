@@ -1,12 +1,8 @@
 # General CLI tools and utilities
+{ lib, ... }:
 {
   flake.homeModules.cli-programs =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
+    { config, pkgs, ... }:
     {
       home.packages = with pkgs; [
         # Search
@@ -33,6 +29,8 @@
 
         b4
         public-inbox
+
+        my.even-terminal
       ];
 
       # Modern ls replacement
