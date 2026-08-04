@@ -74,10 +74,11 @@
                 useGlobalPkgs = true;
                 useUserPackages = true;
                 users.${user}.imports =
-                  self.lib.homeBaseModules { rekey = true; }
+                  self.lib.homeBaseModules
                   ++ cfg.homeModules
                   ++ lib.singleton {
                     age.rekey.hostPubkey = lib.mkIf (cfg.userPubkey != null) cfg.userPubkey;
+                    age.rekey.localStorageDir = self.lib.rekeyDir "${hostName}-${name}-${user}";
                     my.primaryUser = user;
                   }
                   ++ lib.singleton {
@@ -116,14 +117,12 @@
             systemd.sockets.nix-daemon.enable = lib.mkForce false;
           }
 
-          ++ self.lib.nixosBaseModules {
-            inherit system;
-            rekey = true;
-          }
+          ++ self.lib.nixosBaseModules { inherit system; }
           ++ cfg.nixosModules
           ++ lib.singleton {
             # decrypts its own secrets; identity = the persisted ssh host key (age.identityPaths, from core)
             age.rekey.hostPubkey = lib.mkIf (cfg.hostPubkey != null) cfg.hostPubkey;
+            age.rekey.localStorageDir = self.lib.rekeyDir "${hostName}-${name}";
             my.primaryUser = user;
             users.users.${user}.openssh.authorizedKeys.keys = [ self.lib.sshPubKey ];
           };

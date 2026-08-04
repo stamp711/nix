@@ -84,7 +84,7 @@
       inputs.systems.follows = "systems";
     };
     agenix-rekey = {
-      url = "github:stamp711/agenix-rekey";
+      url = "github:oddlama/agenix-rekey";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-parts.follows = "flake-parts";
       inputs.treefmt-nix.follows = "treefmt-nix";

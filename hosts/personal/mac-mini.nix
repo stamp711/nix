@@ -10,7 +10,10 @@ in
     modules = [
       self.profiles.darwin.minimal
       self.darwinModules.personal
-      { my.primaryUser = username; }
+      {
+        my.primaryUser = username;
+        age.rekey.localStorageDir = self.lib.rekeyDir hostname;
+      }
     ];
   };
 
@@ -22,6 +25,7 @@ in
       {
         my.primaryUser = username;
         age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJDMhZj1dTWzY57OW/HlEdBeChcmknv0GWWzfinhdeYu";
+        age.rekey.localStorageDir = self.lib.rekeyDir "${hostname}-${username}";
       }
     ];
   };

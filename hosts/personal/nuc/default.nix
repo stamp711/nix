@@ -22,6 +22,7 @@ in
         my.primaryUser = username;
         networking.hostName = hostname;
         age.rekey.hostPubkey = hostPubkey;
+        age.rekey.localStorageDir = self.lib.rekeyDir hostname;
 
         # Accept GPD's and Surface's host keys for remote build offload.
         users.users.${username}.openssh.authorizedKeys.keys = [
@@ -56,6 +57,7 @@ in
       {
         my.primaryUser = username;
         age.rekey.hostPubkey = userPubkey;
+        age.rekey.localStorageDir = self.lib.rekeyDir "${hostname}-${username}";
       }
     ];
   };

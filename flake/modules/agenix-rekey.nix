@@ -1,37 +1,47 @@
 { inputs, ... }:
 let
-  inherit (inputs.nixpkgs) lib;
-
   agenix-rekey =
-    { self, config, ... }:
+    {
+      lib,
+      self,
+      config,
+      ...
+    }:
     let
-      rekeyDir = self + "/.rekey";
-
       hasRekey = _: cfg: (cfg.config ? age) && (cfg.config.age ? rekey);
 
-      nixosConfigs = config.flake.nixosConfigurations or { };
-
-      rekeyNixos = lib.filterAttrs hasRekey nixosConfigs;
-
-      # nixos-containers that opt into rekey are their own rekey nodes, like nested HM users.
-      rekeyContainers = lib.concatMapAttrs (
+      # all configs
+      nixos = config.flake.nixosConfigurations or { };
+      containers = lib.concatMapAttrs (
         host: cfg:
         lib.mapAttrs' (cname: c: lib.nameValuePair "${host}-${cname}" { inherit (c) config; }) (
-          lib.filterAttrs hasRekey (cfg.config.containers or { })
+          cfg.config.containers or { }
         )
-      ) nixosConfigs;
+      ) nixos;
+      darwin = config.flake.darwinConfigurations or { };
+      home = config.flake.homeConfigurations or { };
 
-      rekeyHome = lib.filterAttrs hasRekey (config.flake.homeConfigurations or { });
+      # config that has rekey (feed into agenix-rekey.configure)
+      rekeyNixos = lib.filterAttrs hasRekey nixos;
+      rekeyContainers = lib.filterAttrs hasRekey containers;
+      rekeyDarwin = lib.filterAttrs hasRekey darwin;
+      rekeyHome = lib.filterAttrs hasRekey home;
 
-      # HM users embedded in a nixos/container config are rekey nodes too (the app collects them; mirror it for the check).
-      homeInNixos = lib.concatMapAttrs (
+      # HM embedded in a nixos/darwin/containers
+      hosts = self.lib.mergeDisjoint [
+        nixos
+        containers
+        darwin
+      ];
+      homeInHosts = lib.concatMapAttrs (
         name: cfg:
         lib.mapAttrs' (u: uc: lib.nameValuePair "${name}-${u}" { config = uc; }) (
           cfg.config.home-manager.users or { }
         )
-      ) (rekeyNixos // rekeyContainers);
+      ) hosts;
 
-      rekeyHomeInNixos = lib.filterAttrs hasRekey homeInNixos;
+      # embedded HM that has rekey (only for checks)
+      rekeyHomeInHost = lib.filterAttrs hasRekey homeInHosts;
 
       extractExpectedFiles =
         configurations:
@@ -40,32 +50,53 @@ let
             _: cfg:
             let
               inherit (cfg.config.age) secrets;
+              # The directory the node itself names, so this cannot drift from the real one.
+              node = baseNameOf cfg.config.age.rekey.localStorageDir;
+              # Secrets without a rekeyFile are plain agenix ones; does not belong to agenix-rekey.
               rekeyed = lib.filterAttrs (_: s: (s.rekeyFile or null) != null) secrets;
             in
-            lib.mapAttrsToList (_: s: baseNameOf (toString s.file)) rekeyed
+            # s.file is where the rekeyed secret has to land.
+            lib.mapAttrsToList (_: s: "${node}/${baseNameOf (toString s.file)}") rekeyed
           ) configurations
         );
 
       expectedFiles = lib.unique (
         extractExpectedFiles rekeyNixos
         ++ extractExpectedFiles rekeyContainers
+        ++ extractExpectedFiles rekeyDarwin
         ++ extractExpectedFiles rekeyHome
-        ++ extractExpectedFiles rekeyHomeInNixos
+        ++ extractExpectedFiles rekeyHomeInHost
       );
 
-      actualFiles =
-        if builtins.pathExists rekeyDir then
-          lib.filter (f: lib.hasSuffix ".age" f) (builtins.attrNames (builtins.readDir rekeyDir))
-        else
-          [ ];
+      listFiles =
+        dir: prefix:
+        lib.concatLists (
+          lib.mapAttrsToList (
+            name: type:
+            # prefix carries the path back down, so names come out relative to the first dir.
+            if type == "directory" then
+              listFiles "${dir}/${name}" "${prefix}${name}/"
+            else
+              [ "${prefix}${name}" ]
+          ) (builtins.readDir dir)
+        );
+
+      # Both sides are "<node dir>/<file>", so a secret in the wrong node's directory fails.
+      actualFiles = lib.optionals (builtins.pathExists self.lib.rekeyRoot) (
+        listFiles self.lib.rekeyRoot ""
+      );
 
       missing = lib.filter (f: !builtins.elem f actualFiles) expectedFiles;
-      orphaned = lib.filter (f: !builtins.elem f expectedFiles) actualFiles;
+      unexpected = lib.filter (f: !builtins.elem f expectedFiles) actualFiles;
     in
     {
       flake.agenix-rekey = inputs.agenix-rekey.configure {
         userFlake = self;
-        nixosConfigurations = rekeyNixos // rekeyContainers;
+        nixosConfigurations = self.lib.mergeDisjoint [
+          rekeyNixos
+          rekeyContainers
+        ];
+        darwinConfigurations = rekeyDarwin;
         homeConfigurations = rekeyHome;
       };
 
@@ -79,11 +110,11 @@ let
                   missing != [ ]
                 ) "Missing rekeyed secrets: ${builtins.concatStringsSep ", " missing}\n"
                 + lib.optionalString (
-                  orphaned != [ ]
-                ) "Orphaned files in agenix-rekey/: ${builtins.concatStringsSep ", " orphaned}\n"
-                + "Run 'agenix rekey -a' to fix.";
+                  unexpected != [ ]
+                ) "Unexpected files in .rekey/: ${builtins.concatStringsSep ", " unexpected}\n"
+                + "Run 'agenix rekey' to fix.";
             in
-            assert missing == [ ] && orphaned == [ ] || throw msg;
+            assert missing == [ ] && unexpected == [ ] || throw msg;
             pkgs.runCommand "agenix-rekey-check" { } "touch $out";
         };
     };

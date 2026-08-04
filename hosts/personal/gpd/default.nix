@@ -22,6 +22,7 @@ in
         my.primaryUser = username;
         networking.hostName = hostname;
         age.rekey.hostPubkey = hostPubkey;
+        age.rekey.localStorageDir = self.lib.rekeyDir hostname;
         my.boot-disk = {
           enable = true;
           layout = "efi-luks-btrfs";
@@ -42,6 +43,7 @@ in
       {
         my.primaryUser = username;
         age.rekey.hostPubkey = userPubkey;
+        age.rekey.localStorageDir = self.lib.rekeyDir "${hostname}-${username}";
       }
     ];
   };

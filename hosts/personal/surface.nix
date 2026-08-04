@@ -25,6 +25,7 @@ in
         networking.networkmanager.enable = lib.mkForce false; # Windows owns networking
         services.tailscale.enable = lib.mkForce false; # Windows runs Tailscale
         age.rekey.hostPubkey = hostPubkey;
+        age.rekey.localStorageDir = self.lib.rekeyDir hostname;
 
         wsl.enable = true;
         wsl.defaultUser = username;
@@ -40,6 +41,7 @@ in
       {
         my.primaryUser = username;
         age.rekey.hostPubkey = userPubkey;
+        age.rekey.localStorageDir = self.lib.rekeyDir "${hostname}-${username}";
       }
     ];
   };

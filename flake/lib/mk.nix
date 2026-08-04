@@ -13,12 +13,15 @@ let
         }
       ];
       storageMode = "local";
-      localStorageDir = lib.mkDefault "${self}/.rekey";
     };
   };
 in
 {
   flake.lib = {
+
+    # One rekey directory per node; the name must be unique across all of them.
+    rekeyRoot = "${self}/.rekey";
+    rekeyDir = name: "${self.lib.rekeyRoot}/${name}";
 
     # Create a nixpkgs instance with our standard configuration.
     mkPkgs =
@@ -43,17 +46,12 @@ in
       {
         system,
         nixpkgsConfig ? { },
-        rekey ? true,
       }:
       [
         inputs.disko.nixosModules.disko
         inputs.agenix.nixosModules.default
-      ]
-      ++ lib.optionals rekey [
         inputs.agenix-rekey.nixosModules.default
         rekeyConfig
-      ]
-      ++ [
         {
           nixpkgs.pkgs = self.lib.mkPkgs {
             inherit system;
@@ -103,22 +101,19 @@ in
         inherit system;
         modules = [
           inputs.nix-homebrew.darwinModules.nix-homebrew
+          inputs.agenix.darwinModules.default
+          inputs.agenix-rekey.darwinModules.default
+          rekeyConfig
           { nixpkgs.pkgs = self.lib.mkPkgs { inherit system; }; }
         ]
         ++ modules;
       };
 
-    homeBaseModules =
-      {
-        rekey ? true,
-      }:
-      [ inputs.agenix.homeManagerModules.default ]
-      ++ lib.optionals rekey [
-        # TODO: use inputs.agenix-rekey.homeManagerModules.default once
-        # https://github.com/oddlama/agenix-rekey/pull/143 is merged
-        (import "${inputs.agenix-rekey}/modules/agenix-rekey.nix" inputs.nixpkgs)
-        rekeyConfig
-      ];
+    homeBaseModules = [
+      inputs.agenix.homeManagerModules.default
+      inputs.agenix-rekey.homeManagerModules.default
+      rekeyConfig
+    ];
 
     # Create a home-manager configuration. Set my.primaryUser in modules.
     mkHome =
@@ -128,7 +123,7 @@ in
       }:
       inputs.home-manager.lib.homeManagerConfiguration {
         pkgs = self.lib.mkPkgs { inherit system; };
-        modules = self.lib.homeBaseModules { } ++ modules;
+        modules = self.lib.homeBaseModules ++ modules;
       };
 
   };

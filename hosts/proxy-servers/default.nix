@@ -21,6 +21,7 @@ let
           users.users.${username}.openssh.authorizedKeys.keys = [ self.lib.sshPubKey ];
           networking.hostName = hostname;
           age.rekey.hostPubkey = hostPubkey;
+          age.rekey.localStorageDir = self.lib.rekeyDir hostname;
 
           # KVM/virtio kernel modules
           boot.initrd.availableKernelModules = [
