@@ -28,5 +28,9 @@
         ageSecret.${name} = secret;
       };
 
+    # One rekey directory per node; the name must be unique across all of them.
+    rekeyRoot = "${self}/.rekey";
+    rekeyDir = name: "${self.lib.rekeyRoot}/${name}";
+
   };
 }
