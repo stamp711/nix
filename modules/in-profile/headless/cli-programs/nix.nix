@@ -1,16 +1,9 @@
 # Nix development and workflow tools
-{ inputs, ... }: {
+{ lib, inputs, ... }: {
   flake.homeModules.cli-programs =
+    { config, pkgs, ... }:
     {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
-    {
-      imports = [
-        inputs.nix-index-database.homeModules.nix-index
-      ];
+      imports = [ inputs.nix-index-database.homeModules.nix-index ];
 
       home.packages = with pkgs; [
         deploy-rs
@@ -47,72 +40,5 @@
         ];
 
       programs.nix-init.enable = true;
-
-      programs.nix-search-tv.enable = true;
-      programs.nix-search-tv.settings = {
-        indexes = [
-          "nixpkgs"
-          "home-manager"
-          "nixos"
-          "darwin"
-          "nur"
-        ];
-        # Third-party module options not covered by the builtin indexes.
-        # NOTE: unf's `args.pkgs = mkForce …` misses a `lib.`, bites when the module reads pkgs.
-        # TODO: fork and fix unf, then fold mkOptsRaw back into mkOpts.
-        # agenix-rekey has no entry: rendering its options forces age.rekey.storageMode's abort default.
-        experimental.options_file =
-          let
-            mkOpts =
-              self: module:
-              "${inputs.unf.lib.json {
-                inherit self pkgs;
-                modules = [ module ];
-              }}";
-            # For modules unf chokes on.
-            mkOptsRaw =
-              module:
-              let
-                eval = lib.evalModules {
-                  modules = [
-                    module
-                    {
-                      _module.check = false;
-                      _module.args.pkgs = pkgs;
-                    }
-                  ];
-                };
-              in
-              "${(pkgs.nixosOptionsDoc { inherit (eval) options; }).optionsJSON}/share/doc/nixos/options.json";
-          in
-          {
-            nixvim = "${
-              inputs.nixvim.packages.${pkgs.stdenv.hostPlatform.system}.options-json
-            }/share/doc/nixos/options.json";
-            agenix = mkOpts inputs.agenix inputs.agenix.nixosModules.default;
-            impermanence = mkOpts inputs.impermanence inputs.impermanence.nixosModules.impermanence;
-            microvm = mkOpts inputs.microvm inputs.microvm.nixosModules.microvm;
-            nixvirt = mkOpts inputs.NixVirt inputs.NixVirt.nixosModules.default;
-            solaar = mkOpts inputs.solaar inputs.solaar.nixosModules.solaar;
-            hermes-agent = mkOptsRaw inputs.hermes-agent.nixosModules.default;
-            hermes-webui = mkOptsRaw inputs.hermes-webui.nixosModules.default;
-            nixos-wsl = mkOptsRaw inputs.nixos-wsl.nixosModules.default;
-            # Its whole option surface is one type from its own lib, as upstream's doc.nix does it.
-            disko = mkOptsRaw {
-              options.disko.devices = lib.mkOption {
-                type = inputs.disko.lib.toplevel;
-                default = { };
-                description = "The devices to set up";
-              };
-            };
-            # NOTE: Its docs.nix imports out of pkgs.path, which breaks `nix flake check --no-build`.
-            system-manager = "${
-              inputs.system-manager.docs.${pkgs.stdenv.hostPlatform.system}.optionsJSON
-            }/share/doc/nixos/options.json";
-            my-home = mkOpts inputs.self inputs.self.homeModules.my;
-            my-nixos = mkOptsRaw inputs.self.nixosModules.my;
-            my-darwin = mkOpts inputs.self inputs.self.darwinModules.my;
-          };
-      };
     };
 }
