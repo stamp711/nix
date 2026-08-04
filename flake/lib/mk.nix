@@ -89,6 +89,17 @@ in
         ++ modules;
       };
 
+    darwinBaseModules =
+      { system }:
+      [
+        inputs.nix-homebrew.darwinModules.nix-homebrew
+        inputs.nix-apple-container.darwinModules.default
+        inputs.agenix.darwinModules.default
+        inputs.agenix-rekey.darwinModules.default
+        rekeyConfig
+        { nixpkgs.pkgs = self.lib.mkPkgs { inherit system; }; }
+      ];
+
     # Create a nix-darwin system configuration.
     mkDarwin =
       {
@@ -97,14 +108,7 @@ in
       }:
       inputs.nix-darwin.lib.darwinSystem {
         inherit system;
-        modules = [
-          inputs.nix-homebrew.darwinModules.nix-homebrew
-          inputs.agenix.darwinModules.default
-          inputs.agenix-rekey.darwinModules.default
-          rekeyConfig
-          { nixpkgs.pkgs = self.lib.mkPkgs { inherit system; }; }
-        ]
-        ++ modules;
+        modules = self.lib.darwinBaseModules { inherit system; } ++ modules;
       };
 
     homeBaseModules = [

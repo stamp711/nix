@@ -13,6 +13,7 @@ in
       {
         my.primaryUser = username;
         age.rekey.localStorageDir = self.lib.rekeyDir hostname;
+        services.containerization.enable = true;
       }
     ];
   };

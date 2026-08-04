@@ -799,6 +799,26 @@
         "type": "github"
       }
     },
+    "nix-apple-container": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1785320926,
+        "narHash": "sha256-JbfiMHkK46AkMIe0QD6zdcC12+WOB1CKnJ3hujcIzdA=",
+        "owner": "halfwhey",
+        "repo": "nix-apple-container",
+        "rev": "820feea55af3f5936ced8299484fcdca81934555",
+        "type": "github"
+      },
+      "original": {
+        "owner": "halfwhey",
+        "repo": "nix-apple-container",
+        "type": "github"
+      }
+    },
     "nix-darwin": {
       "inputs": {
         "nixpkgs": [
@@ -1169,6 +1189,7 @@
         "monaco": "monaco",
         "multica": "multica",
         "nix-alien": "nix-alien",
+        "nix-apple-container": "nix-apple-container",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",
         "nix-index-database": "nix-index-database",

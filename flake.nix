@@ -172,6 +172,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-homebrew.url = "github:zhaofengli/nix-homebrew";
+    nix-apple-container = {
+      url = "github:halfwhey/nix-apple-container";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     homebrew-core = {
       url = "github:homebrew/homebrew-core";
       flake = false;
