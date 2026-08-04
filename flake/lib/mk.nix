@@ -90,25 +90,29 @@ in
       };
 
     darwinBaseModules =
-      { system }:
+      { system, rekey }:
       [
         inputs.nix-homebrew.darwinModules.nix-homebrew
         inputs.nix-apple-container.darwinModules.default
         inputs.agenix.darwinModules.default
+        { nixpkgs.pkgs = self.lib.mkPkgs { inherit system; }; }
+      ]
+      ++ lib.optionals rekey [
         inputs.agenix-rekey.darwinModules.default
         rekeyConfig
-        { nixpkgs.pkgs = self.lib.mkPkgs { inherit system; }; }
       ];
 
     # Create a nix-darwin system configuration.
     mkDarwin =
       {
         system,
+        # with no hostPubkey agenix-rekey warns with networking.hostName (default null) and errors
+        rekey ? false,
         modules ? [ ],
       }:
       inputs.nix-darwin.lib.darwinSystem {
         inherit system;
-        modules = self.lib.darwinBaseModules { inherit system; } ++ modules;
+        modules = self.lib.darwinBaseModules { inherit system rekey; } ++ modules;
       };
 
     homeBaseModules = [
