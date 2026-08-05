@@ -23,6 +23,12 @@
           target =
             targets.${pkgs.stdenv.hostPlatform.system}
               or (throw "raft-computer: unsupported system ${pkgs.stdenv.hostPlatform.system}");
+
+          # New in 1.0.15, the daemon loads it from beside its own executable.
+          photonWasm = pkgs.fetchurl {
+            url = "https://cdn.raft.build/computer/${version}/photon_rs_bg.wasm";
+            sha256 = "10468181565c56004c867f3a4af96f89a0ef5a63a72f2b5fb12c1f1992a3615c";
+          };
         in
         pkgs.stdenv.mkDerivation {
           pname = "raft-computer";
@@ -38,7 +44,10 @@
             pkgs.stdenv.cc.cc.lib
             pkgs.zlib
           ]; # Node SEA: glibc + libstdc++
-          installPhase = "install -Dm755 $src $out/bin/raft-computer";
+          installPhase = ''
+            install -Dm755 $src $out/bin/raft-computer
+            install -Dm444 ${photonWasm} $out/bin/photon_rs_bg.wasm
+          '';
         };
     };
 }
