@@ -1,4 +1,10 @@
-{ lib, self, ... }: {
+{
+  config,
+  lib,
+  self,
+  ...
+}:
+{
   flake.lib = {
 
     # Derive a stable secret name from a .age file path, relative to the flake root.
@@ -29,8 +35,7 @@
       };
 
     # One rekey directory per node; the name must be unique across all of them.
-    rekeyRoot = "${self}/.rekey";
-    rekeyDir = name: "${self.lib.rekeyRoot}/${name}";
+    rekeyDir = name: "${config.agenix-rekey.rekeyRoot}/${name}";
 
   };
 }

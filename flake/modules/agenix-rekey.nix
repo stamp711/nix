@@ -1,12 +1,15 @@
-{ inputs, ... }:
+{
+  inputs,
+  lib,
+  self,
+  ...
+}:
 let
+  # Ours, bound out here: inside the module `self` is whichever flake imports it.
+  inherit (self.lib) mergeDisjoint;
+
   agenix-rekey =
-    {
-      lib,
-      self,
-      config,
-      ...
-    }:
+    { config, self, ... }:
     let
       hasRekey = _: cfg: (cfg.config ? age) && (cfg.config.age ? rekey);
 
@@ -28,7 +31,7 @@ let
       rekeyHome = lib.filterAttrs hasRekey home;
 
       # HM embedded in a nixos/darwin/containers
-      hosts = self.lib.mergeDisjoint [
+      hosts = mergeDisjoint [
         nixos
         containers
         darwin
@@ -81,42 +84,54 @@ let
           ) (builtins.readDir dir)
         );
 
+      inherit (config.agenix-rekey) rekeyRoot;
+
       # Both sides are "<node dir>/<file>", so a secret in the wrong node's directory fails.
-      actualFiles = lib.optionals (builtins.pathExists self.lib.rekeyRoot) (
-        listFiles self.lib.rekeyRoot ""
-      );
+      actualFiles = lib.optionals (builtins.pathExists rekeyRoot) (listFiles rekeyRoot "");
 
       missing = lib.filter (f: !builtins.elem f actualFiles) expectedFiles;
       unexpected = lib.filter (f: !builtins.elem f expectedFiles) actualFiles;
     in
     {
-      flake.agenix-rekey = inputs.agenix-rekey.configure {
-        userFlake = self;
-        nixosConfigurations = self.lib.mergeDisjoint [
-          rekeyNixos
-          rekeyContainers
-        ];
-        darwinConfigurations = rekeyDarwin;
-        homeConfigurations = rekeyHome;
+      options.agenix-rekey.rekeyRoot = lib.mkOption {
+        type = lib.types.path;
+        default = "${self}/.rekey";
+        defaultText = lib.literalMD "`.rekey` at the flake root";
+        description = ''
+          Where the rekeyed secrets live, one directory per node. Only the check
+          reads it; each node's own `age.rekey.localStorageDir` is what agenix acts on.
+        '';
       };
 
-      perSystem =
-        { pkgs, ... }:
-        {
-          checks.agenix-rekey =
-            let
-              msg =
-                lib.optionalString (
-                  missing != [ ]
-                ) "Missing rekeyed secrets: ${builtins.concatStringsSep ", " missing}\n"
-                + lib.optionalString (
-                  unexpected != [ ]
-                ) "Unexpected files in .rekey/: ${builtins.concatStringsSep ", " unexpected}\n"
-                + "Run 'agenix rekey' to fix.";
-            in
-            assert missing == [ ] && unexpected == [ ] || throw msg;
-            pkgs.runCommand "agenix-rekey-check" { } "touch $out";
+      config = {
+        flake.agenix-rekey = inputs.agenix-rekey.configure {
+          userFlake = self;
+          nixosConfigurations = mergeDisjoint [
+            rekeyNixos
+            rekeyContainers
+          ];
+          darwinConfigurations = rekeyDarwin;
+          homeConfigurations = rekeyHome;
         };
+
+        perSystem =
+          { pkgs, ... }:
+          {
+            checks.agenix-rekey =
+              let
+                msg =
+                  lib.optionalString (
+                    missing != [ ]
+                  ) "Missing rekeyed secrets: ${builtins.concatStringsSep ", " missing}\n"
+                  + lib.optionalString (
+                    unexpected != [ ]
+                  ) "Unexpected files in ${baseNameOf rekeyRoot}/: ${builtins.concatStringsSep ", " unexpected}\n"
+                  + "Run 'agenix rekey' to fix.";
+              in
+              assert missing == [ ] && unexpected == [ ] || throw msg;
+              pkgs.runCommand "agenix-rekey-check" { } "touch $out";
+          };
+      };
     };
 in
 {
