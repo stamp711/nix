@@ -52,7 +52,18 @@ let
           # Proxy services
           my.xray-proxy = {
             enable = true;
-            secretEnvFiles = [ ./xray-proxy.env.age ];
+            paths = {
+              VLESS_PATH = "/api/v2/events";
+              VMESS_PATH = "/api/v2/stream";
+              TROJAN_PATH = "/api/v2/notify";
+            };
+            secrets = {
+              DOMAIN = ./xray-proxy/domain.age;
+              CAMOUFLAGE = ./xray-proxy/camouflage.age;
+              VLESS_UUID = ./xray-proxy/vless-uuid.age;
+              VMESS_UUID = ./xray-proxy/vmess-uuid.age;
+              TROJAN_PASSWORD = ./xray-proxy/trojan-password.age;
+            };
           };
           my.snell = {
             enable = true;
