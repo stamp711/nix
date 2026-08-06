@@ -6,6 +6,8 @@
       # lazygit binary backing Snacks.lazygit (<leader>gg / gG).
       extraPackages = [ pkgs.lazygit ];
 
+      extraPlugins = [ pkgs.vimPlugins.codediff-nvim ];
+
       plugins.gitsigns = {
         enable = true;
         settings = {
@@ -87,6 +89,10 @@
             Snacks.gitbrowse({ open = function(url) vim.fn.setreg("+", url) end, notify = false })
           end, { desc = "Git Browse (copy)" })
           map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", { desc = "GitSigns Select Hunk" })
+
+          map("n", "<leader>gv", "<cmd>CodeDiff<cr>", { desc = "Git Diff (view)" })
+          -- `origin` is a revision, the remote's default branch; `...` diffs from where this branch left it.
+          map("n", "<leader>gV", "<cmd>CodeDiff origin...<cr>", { desc = "Git Diff (view, vs origin)" })
         end
       '';
     };
