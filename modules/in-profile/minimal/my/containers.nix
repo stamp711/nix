@@ -94,7 +94,7 @@
           # Networking
           ++ lib.singleton {
             networking.networkmanager.enable = lib.mkForce false;
-            networking.hostName = "${name}-${hostName}";
+            networking.hostName = "${hostName}-${name}";
           }
           ++ lib.optional (cfg.macvlan != null) {
             networking.useNetworkd = true;
