@@ -21,6 +21,7 @@
         helix
         just
         netcat
+        osc
         scc
         sops
         watch
