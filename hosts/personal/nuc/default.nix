@@ -1,4 +1,9 @@
-{ self, inputs, ... }:
+{
+  lib,
+  self,
+  inputs,
+  ...
+}:
 let
   username = "stamp";
   hostname = "NUC";
@@ -18,18 +23,15 @@ in
       self.nixosModules.linux-gaming
       self.nixosModules.personal
       self.nixosModules.nuc
+
       {
         my.primaryUser = username;
         networking.hostName = hostname;
         age.rekey.hostPubkey = hostPubkey;
         age.rekey.localStorageDir = self.lib.rekeyDir hostname;
+      }
 
-        # Accept GPD's and Surface's host keys for remote build offload.
-        users.users.${username}.openssh.authorizedKeys.keys = [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGTQLBSo+0ienoQG9TV4XyNt3vbN60uS10OD4TUDB1an" # GPD
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH5Pi9art3cmYnc8yuldBqGvtLWWwSK5zjnRKF0l2MyG" # Surface
-        ];
-
+      {
         # Disable all sleep states.
         systemd.targets.sleep.enable = false;
         systemd.targets.suspend.enable = false;
@@ -44,6 +46,24 @@ in
         # Stationary host, so writing back to the NAS is fine here.
         my.smbMounts.nas.shares.Dropbox.rw = true;
         my.smbMounts.nas.shares.Z = { };
+      }
+
+      # builder
+      {
+        # Accept GPD's and Surface's host keys for remote build offload.
+        users.users.${username}.openssh.authorizedKeys.keys = [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGTQLBSo+0ienoQG9TV4XyNt3vbN60uS10OD4TUDB1an" # GPD
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH5Pi9art3cmYnc8yuldBqGvtLWWwSK5zjnRKF0l2MyG" # Surface
+        ];
+
+        # A live output holds its .drv, and a live .drv holds its outputs.
+        nix.settings.keep-outputs = true;
+        nix.settings.keep-derivations = true;
+
+        # Every check on this system but this host's own, carried in its closure.
+        system.extraDependencies = lib.attrValues (
+          lib.filterAttrs (name: _: name != "nixos-${hostname}") self.checks.${system}
+        );
       }
     ];
   };
