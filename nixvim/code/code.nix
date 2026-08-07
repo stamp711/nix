@@ -164,8 +164,12 @@
 
       plugins.trouble = {
         enable = true;
+        settings.win.size = {
+          # at or below 1 it is a fraction
+          width = 0.3;
+          height = 0.3;
+        };
         settings.modes.lsp.win.position = "right";
-        settings.modes.lsp.win.size = 60; # columns
       };
 
       plugins.todo-comments = {
