@@ -1,6 +1,6 @@
 { lib, self, ... }:
 let
-  # Everything a caller sets on either platform; only openFirewall is NixOS-only.
+  # Everything a caller sets on either platform.
   oixcloudOptions = lib: {
     enable = lib.mkEnableOption "the oixCloud external-proxy helper";
     port = lib.mkOption {
@@ -19,7 +19,7 @@ let
       description = "Node mapping ports from {option}`my.oixcloud.mapBasePort` upwards.";
     };
     tokenFile = lib.mkOption {
-      # A path resolved at run time, which under home-manager only a shell can do.
+      # Under home-manager agenix hands out a path that only a shell can resolve.
       type = lib.types.str;
       description = "Decrypted file holding the account's accessToken, nothing else.";
     };
@@ -48,28 +48,29 @@ let
 
   templateName = "oixcloud.json";
 
-  # Upstream's config.json, as one my.age-template entry: its `$name`s are the
-  # placeholders, each filled from the file it is bound to.
+  # Upstream's config.json, as one my.age-template entry.
   templateFile = cfg: {
     placeholders = lib.mkMerge [
       { accessToken = cfg.tokenFile; }
       (lib.mkIf (cfg.lanAuth != null) { lanPassword = cfg.lanAuth.passwordFile; })
     ];
     content = builtins.toJSON (
-      {
-        accessToken = "$accessToken";
-        proxyMode = "map";
-        servePort = cfg.port;
-        inherit (cfg) mapBasePort;
-        listenAddress = "0.0.0.0";
-        simpleRules = false;
-      }
-      // lib.optionalAttrs (cfg.lanAuth != null) {
-        lanAuth = {
-          inherit (cfg.lanAuth) username;
-          password = "$lanPassword";
-        };
-      }
+      self.lib.mergeDisjoint [
+        {
+          accessToken = "$accessToken";
+          # Upstream's default, spelled out because mapBasePort and the firewall assume it.
+          proxyMode = "map";
+          servePort = cfg.port;
+          inherit (cfg) mapBasePort;
+          listenAddress = "0.0.0.0";
+        }
+        (lib.optionalAttrs (cfg.lanAuth != null) {
+          lanAuth = {
+            inherit (cfg.lanAuth) username;
+            password = "$lanPassword";
+          };
+        })
+      ]
     );
   };
 in
@@ -80,13 +81,16 @@ in
       cfg = config.my.oixcloud;
     in
     {
-      options.my.oixcloud = oixcloudOptions lib // {
-        openFirewall = lib.mkOption {
-          type = lib.types.bool;
-          default = true;
-          description = "Open the serve and node ports in the firewall.";
-        };
-      };
+      options.my.oixcloud = self.lib.mergeDisjoint [
+        (oixcloudOptions lib)
+        {
+          openFirewall = lib.mkOption {
+            type = lib.types.bool;
+            default = true;
+            description = "Open the serve and node ports in the firewall.";
+          };
+        }
+      ];
 
       config = lib.mkIf cfg.enable (
         let
@@ -105,7 +109,7 @@ in
             }
           ];
 
-          # Redundant where my.persistence is on; that is what creates the dir.
+          # The data directory when my.persistence is off, which creates it otherwise.
           systemd.tmpfiles.rules = [ "d ${dataDir} 0700 ${uid} ${uid} - -" ];
           my.persistence.directories = [
             {
@@ -126,8 +130,8 @@ in
             ];
           };
 
-          # Nothing else would restart it: the bind mount holds the old inode open,
-          # so a re-rendered config would never reach the running container.
+          # The bind mount pins the inode it started with, so a running container keeps
+          # reading the old config until something restarts it.
           systemd.services.podman-oixcloud.restartTriggers = [ template.renderedFileHash ];
 
           virtualisation.oci-containers.containers.oixcloud = {
@@ -163,7 +167,7 @@ in
       );
     };
 
-  # Darwin runs upstream's macOS build; the container is Linux-only.
+  # Darwin runs upstream's macOS build.
   flake.homeModules.my =
     { config, pkgs, ... }:
     let
@@ -175,15 +179,13 @@ in
       config = lib.mkIf cfg.enable (
         let
           template = config.my.age-template.files.${templateName};
-          # Upstream's own location, linked to the rendered file. It is handed this
-          # path, so whatever it puts beside its config stays in its own directory,
-          # which we never wipe.
+          # Upstream's default config file location.
           configFile = "${config.xdg.configHome}/oixcloud-external-proxy-program/config.json";
           start = pkgs.writeShellApplication {
             name = "oixcloud-start";
             runtimeInputs = [ self.packages.${pkgs.stdenv.hostPlatform.system}.oixcloud ];
-            # Render here, since launchd cannot order us after the age-template agent
-            # and rendering is idempotent.
+            # Rendered here because launchd cannot order us after the age-template
+            # agent. Rendering twice costs nothing.
             text = ''
               ${template.renderScript}
               exec oixcloud-external-proxy-program \
