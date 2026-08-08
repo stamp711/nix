@@ -5,11 +5,6 @@
     { config, pkgs, ... }:
     let
       cfg = config.my.hermes;
-      agent = config.services.hermes-agent;
-      user = config.my.primaryUser;
-      home = config.users.users.${user}.home;
-      # All three must land on one HERMES_HOME, so take the gateway's rather than restate it.
-      agentEnv = config.systemd.services.hermes-agent.environment;
     in
     {
       imports = [
@@ -78,6 +73,13 @@
       };
 
       config = lib.mkIf cfg.enable (
+        let
+          agent = config.services.hermes-agent;
+          user = config.my.primaryUser;
+          home = config.users.users.${user}.home;
+          # The gateway's own environment: all three services share one HERMES_HOME.
+          agentEnv = config.systemd.services.hermes-agent.environment;
+        in
         lib.mkMerge [
           {
             services.hermes-agent = {

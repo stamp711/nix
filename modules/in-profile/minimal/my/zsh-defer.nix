@@ -3,7 +3,7 @@
   flake.homeModules.my =
     {
       config,
-      lib,
+      lib, # for lib.hm.zsh
       pkgs,
       ...
     }:
@@ -11,8 +11,6 @@
       inherit (lib) mkOption types;
 
       cfg = config.my.zsh-defer;
-
-      pluginsDir = "${config.xdg.configHome}/zsh/deferred-plugins";
 
       # Compile .zsh files to .zwc bytecode at build time
       compilePlugin =
@@ -22,45 +20,6 @@
           chmod -R u+w $out
           find $out -name '*.zsh' -exec zsh -c 'zcompile "$0"' {} \;
         '';
-
-      # Re-bind autosuggestion ZLE widgets.
-      # Must run before rebindHighlight so the highlighter ends up as the outermost wrapper.
-      rebindAutosuggest = ''
-        (( $+functions[_zsh_autosuggest_bind_widgets] )) && _zsh_autosuggest_bind_widgets
-      '';
-
-      # Re-bind highlight ZLE widgets.
-      # Must run after rebindAutosuggest to be the outermost wrapper, ensuring all keystrokes trigger highlighting.
-      rebindHighlight = ''
-        (( $+functions[_zsh_highlight_bind_widgets] )) && _zsh_highlight_bind_widgets
-      '';
-
-      # Fetch a suggestion for the current buffer after deferred loading.
-      refreshAutosuggest = ''
-        (( $+functions[_zsh_autosuggest_fetch] )) && _zsh_autosuggest_fetch
-      '';
-
-      # Re-highlight current buffer after deferred syntax highlighting loads.
-      # Registers and invokes a ZLE widget for $region_highlight access.
-      refreshHighlight = ''
-        zsh-defer-rehighlight_() {
-          _ZSH_HIGHLIGHT_PRIOR_BUFFER=
-          (( $+functions[_zsh_highlight] )) && _zsh_highlight
-        }
-        zle -N zsh-defer-rehighlight_
-        zle zsh-defer-rehighlight_
-      '';
-
-      # Flush display changes to screen.
-      redraw = ''
-        zle -R
-      '';
-
-      # Re-bind all widgets and refresh display in one pass after all plugins
-      # have loaded. Avoids multiple ZLE redraws (flicker).
-      # Guards skip inactive plugins.
-      postPluginRefresh =
-        rebindAutosuggest + rebindHighlight + refreshAutosuggest + refreshHighlight + redraw;
 
       pluginModule = types.submodule (
         { config, ... }:
@@ -115,7 +74,6 @@
           };
         };
       };
-
     in
     {
       options.my.zsh-defer = {
@@ -236,6 +194,47 @@
       };
 
       config = lib.mkIf cfg.enable (
+        let
+          pluginsDir = "${config.xdg.configHome}/zsh/deferred-plugins";
+          # Re-bind autosuggestion ZLE widgets.
+          # Must run before rebindHighlight so the highlighter ends up as the outermost wrapper.
+          rebindAutosuggest = ''
+            (( $+functions[_zsh_autosuggest_bind_widgets] )) && _zsh_autosuggest_bind_widgets
+          '';
+
+          # Re-bind highlight ZLE widgets.
+          # Must run after rebindAutosuggest to be the outermost wrapper, ensuring all keystrokes trigger highlighting.
+          rebindHighlight = ''
+            (( $+functions[_zsh_highlight_bind_widgets] )) && _zsh_highlight_bind_widgets
+          '';
+
+          # Fetch a suggestion for the current buffer after deferred loading.
+          refreshAutosuggest = ''
+            (( $+functions[_zsh_autosuggest_fetch] )) && _zsh_autosuggest_fetch
+          '';
+
+          # Re-highlight current buffer after deferred syntax highlighting loads.
+          # Registers and invokes a ZLE widget for $region_highlight access.
+          refreshHighlight = ''
+            zsh-defer-rehighlight_() {
+              _ZSH_HIGHLIGHT_PRIOR_BUFFER=
+              (( $+functions[_zsh_highlight] )) && _zsh_highlight
+            }
+            zle -N zsh-defer-rehighlight_
+            zle zsh-defer-rehighlight_
+          '';
+
+          # Flush display changes to screen.
+          redraw = ''
+            zle -R
+          '';
+
+          # Re-bind all widgets and refresh display in one pass after all plugins
+          # have loaded. Avoids multiple ZLE redraws (flicker).
+          # Guards skip inactive plugins.
+          postPluginRefresh =
+            rebindAutosuggest + rebindHighlight + refreshAutosuggest + refreshHighlight + redraw;
+        in
         lib.mkMerge [
           # Core: zsh-defer plugin, symlinks, fpath/PATH, deferred queue
           {

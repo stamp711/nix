@@ -4,12 +4,7 @@
     { config, lib, ... }:
     let
       sshCfg = config.my.ssh;
-      sshSecretNames = map self.lib.ageSecretName sshCfg.secretConfigFiles;
-      sshDecryptedPaths = map (n: config.age.secrets.${n}.path) sshSecretNames;
-
       zshCfg = config.my.zsh;
-      zshSecretNames = map self.lib.ageSecretName zshCfg.secretEnvExtra;
-      zshDecryptedPaths = map (n: config.age.secrets.${n}.path) zshSecretNames;
     in
     {
       options.my.ssh.secretConfigFiles = lib.mkOption {
@@ -25,27 +20,39 @@
       };
 
       config = lib.mkMerge [
-        (lib.mkIf (sshCfg.secretConfigFiles != [ ]) {
-          programs.ssh.includes = sshDecryptedPaths;
+        (lib.mkIf (sshCfg.secretConfigFiles != [ ]) (
+          let
+            secretNames = map self.lib.ageSecretName sshCfg.secretConfigFiles;
+          in
+          {
+            programs.ssh.includes = map (n: config.age.secrets.${n}.path) secretNames;
 
-          age.secrets = lib.listToAttrs (
-            lib.zipListsWith (name: file: {
-              inherit name;
-              value.rekeyFile = file;
-            }) sshSecretNames sshCfg.secretConfigFiles
-          );
-        })
+            age.secrets = lib.listToAttrs (
+              lib.zipListsWith (name: file: {
+                inherit name;
+                value.rekeyFile = file;
+              }) secretNames sshCfg.secretConfigFiles
+            );
+          }
+        ))
 
-        (lib.mkIf (zshCfg.secretEnvExtra != [ ]) {
-          age.secrets = lib.listToAttrs (
-            lib.zipListsWith (name: file: {
-              inherit name;
-              value.rekeyFile = file;
-            }) zshSecretNames zshCfg.secretEnvExtra
-          );
+        (lib.mkIf (zshCfg.secretEnvExtra != [ ]) (
+          let
+            secretNames = map self.lib.ageSecretName zshCfg.secretEnvExtra;
+          in
+          {
+            age.secrets = lib.listToAttrs (
+              lib.zipListsWith (name: file: {
+                inherit name;
+                value.rekeyFile = file;
+              }) secretNames zshCfg.secretEnvExtra
+            );
 
-          programs.zsh.envExtra = lib.concatMapStringsSep "\n" (p: "source ${p}") zshDecryptedPaths;
-        })
+            programs.zsh.envExtra = lib.concatMapStringsSep "\n" (p: "source ${p}") (
+              map (n: config.age.secrets.${n}.path) secretNames
+            );
+          }
+        ))
       ];
     };
 }
