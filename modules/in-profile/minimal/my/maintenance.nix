@@ -1,7 +1,24 @@
 # Automatic system and home update/cleanup via nh
-
+{ lib, ... }:
 let
-  maintenanceOptions = lib: {
+  # Fails when the flake cannot be refreshed from its remote.
+  # Falling back to a cached revision is only a warning, and cannot be made an error.
+  refreshGuard = flake: /* bash */ ''
+    if ! warnings=$(nix flake metadata --refresh "${flake}" 2>&1 >/dev/null); then
+      printf '%s\n' "$warnings" >&2
+      exit 1
+    fi
+
+    case $warnings in
+      *"using cached version"* | *"most recent version"*)
+        printf '%s\n' "$warnings" >&2
+        echo "nh-update: the flake could not be refreshed, not activating" >&2
+        exit 1
+        ;;
+    esac
+  '';
+
+  maintenanceOptions = {
     autoUpdate = lib.mkEnableOption "automatic update via nh";
     autoClean = lib.mkEnableOption "automatic Nix garbage collection via nh";
     updateDates = lib.mkOption {
@@ -36,12 +53,7 @@ in
   flake.darwinModules.my = { };
 
   flake.nixosModules.my =
-    {
-      lib,
-      config,
-      pkgs,
-      ...
-    }:
+    { config, pkgs, ... }:
     let
       cfg = config.my.maintenance;
 
@@ -54,6 +66,7 @@ in
         name = "nh-update";
         text = ''
           echo "Updating NixOS configuration via nh"
+          ${refreshGuard config.my.flake}
           NH_BYPASS_ROOT_CHECK=true nh os boot --no-nom "${config.my.flake}" -- --refresh
         '';
         inherit runtimeInputs;
@@ -69,7 +82,7 @@ in
       };
     in
     {
-      options.my.maintenance = maintenanceOptions lib;
+      options.my.maintenance = maintenanceOptions;
 
       config = lib.mkMerge [
         # Auto-update
@@ -127,7 +140,7 @@ in
 
   flake.homeModules.my =
     {
-      lib,
+      lib, # for lib.hm.darwin
       config,
       pkgs,
       ...
@@ -144,6 +157,7 @@ in
         name = "nh-update";
         text = ''
           echo "Updating Home Manager configuration via nh"
+          ${refreshGuard config.my.flake}
           nh home switch --no-nom "${config.my.flake}" -- --refresh
         '';
         inherit runtimeInputs;
@@ -159,7 +173,7 @@ in
       };
     in
     {
-      options.my.maintenance = maintenanceOptions lib;
+      options.my.maintenance = maintenanceOptions;
 
       config = lib.mkMerge [
         # Auto-update
