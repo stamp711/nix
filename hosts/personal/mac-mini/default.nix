@@ -1,10 +1,12 @@
-{ self, ... }:
+{ inputs, self, ... }:
 let
   username = "stamp";
   hostname = "Lius-Mac-mini";
   system = "aarch64-darwin";
 in
 {
+  imports = (inputs.import-dir ./. { collect = true; })._all;
+
   flake.darwinConfigurations.${hostname} = self.lib.mkDarwin {
     inherit system;
     modules = [
@@ -22,6 +24,7 @@ in
     modules = [
       self.profiles.homeManager.minimal
       self.homeModules.personal
+      self.homeModules.mac-mini
       {
         my.primaryUser = username;
         age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJDMhZj1dTWzY57OW/HlEdBeChcmknv0GWWzfinhdeYu";
