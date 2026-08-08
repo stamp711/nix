@@ -61,7 +61,7 @@ let
         return values[key]
 
 
-    # A whole name, so $token cannot match the start of $tokenId.
+    # The whole of a placeholder name, so $token does not match inside $tokenId.
     WORD = r"[A-Za-z_][A-Za-z0-9_]*"
     PLACEHOLDER = re.compile(r"\$\{(" + WORD + r")\}|\$(" + WORD + r")")
 
