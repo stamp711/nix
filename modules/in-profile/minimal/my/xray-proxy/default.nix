@@ -47,27 +47,11 @@ in
           secretNames = lib.mapAttrs (_: self.lib.ageSecretName) cfg.secrets;
           secretPaths = lib.mapAttrs (_: secret: config.age.secrets.${secret}.path) secretNames;
 
-          # The decrypted paths for the names a template uses, and nothing else.
+          # Get the decrypted paths for some secret names.
           placeholdersFor = names: lib.getAttrs names secretPaths;
 
-          # Replaces `$VLESS_PATH` and `${VLESS_PATH}` in a template with the path
-          # configured under that name, and the same for the other pathNames.
-          # They are not secret, so they need not go through the render script.
-          substitutePaths =
-            let
-              paths = lib.getAttrs pathNames cfg.paths;
-            in
-            builtins.replaceStrings
-              (lib.concatMap (n: [
-                "\${${n}}"
-                ("$" + n)
-              ]) pathNames)
-              (
-                lib.concatMap (n: [
-                  paths.${n}
-                  paths.${n}
-                ]) pathNames
-              );
+          # Fill `@VLESS_PATH@` and the other pathNames in a template, from cfg.paths.
+          fillPaths = template: self.lib.renderTemplate template (lib.getAttrs pathNames cfg.paths);
         in
         {
           age.secrets = lib.mapAttrs' (
@@ -86,7 +70,7 @@ in
               "DOMAIN"
               "CAMOUFLAGE"
             ];
-            content = substitutePaths (builtins.readFile ./Caddyfile.template);
+            content = fillPaths ./Caddyfile.template;
             owner = "caddy";
             group = "caddy";
           };
@@ -107,7 +91,7 @@ in
               "VMESS_UUID"
               "TROJAN_PASSWORD"
             ];
-            content = substitutePaths (builtins.readFile ./xray-config.json.template);
+            content = fillPaths ./xray-config.json.template;
           };
           services.xray = {
             enable = true;

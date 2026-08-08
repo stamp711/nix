@@ -10,7 +10,7 @@
       },
       "streamSettings": {
         "network": "xhttp",
-        "xhttpSettings": { "path": "$VLESS_PATH" }
+        "xhttpSettings": { "path": "@VLESS_PATH@" }
       }
     },
     {
@@ -21,7 +21,7 @@
       },
       "streamSettings": {
         "network": "ws",
-        "wsSettings": { "path": "$VMESS_PATH" }
+        "wsSettings": { "path": "@VMESS_PATH@" }
       }
     },
     {
@@ -32,7 +32,7 @@
       },
       "streamSettings": {
         "network": "ws",
-        "wsSettings": { "path": "$TROJAN_PATH" }
+        "wsSettings": { "path": "@TROJAN_PATH@" }
       }
     }
   ],
