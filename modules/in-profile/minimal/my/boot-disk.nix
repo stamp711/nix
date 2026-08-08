@@ -1,75 +1,9 @@
+{ lib, ... }:
 {
   flake.nixosModules.my =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
+    { config, pkgs, ... }:
     let
       cfg = config.my.boot-disk;
-
-      espPartition = {
-        size = "1G";
-        type = "EF00";
-        content = {
-          type = "filesystem";
-          format = "vfat";
-          mountpoint = "/boot";
-          mountOptions = [ "umask=0077" ];
-        };
-      };
-
-      luksName = "cryptroot";
-
-      btrfsContent = {
-        type = "btrfs";
-        mountOptions = [
-          "noatime"
-          "ssd"
-          "compress=zstd:3"
-          "space_cache=v2"
-          "discard=async"
-        ];
-        extraArgs = [ "-f" ];
-        subvolumes = {
-          "@root".mountpoint = "/";
-          "@nix".mountpoint = "/nix";
-          "@home".mountpoint = "/home";
-          "@swap".mountpoint = "/.swap";
-          "@swap".swap.swapfile.size = cfg.swapSize;
-
-          "@blank" = { };
-          "@persist".mountpoint = config.my.persistence.path;
-        };
-      };
-
-      rollbackScript = pkgs.writeShellScriptBin "rollback-subvols" ''
-        set -eu
-
-        if [ "$#" -eq 0 ]; then
-          echo "usage: rollback-subvols <subvolume>..."
-          exit 1
-        fi
-
-        mkdir -p /btrfs_tmp
-        ${pkgs.util-linux.mount}/bin/mount -t btrfs -o subvol=/ /dev/mapper/${luksName} /btrfs_tmp
-        trap '${pkgs.util-linux.mount}/bin/umount /btrfs_tmp 2>/dev/null || true' EXIT
-
-        # Refuse to wipe if @blank is missing
-        if ! [ -e /btrfs_tmp/@blank ]; then
-          echo "rollback-subvols: @blank missing, aborting"
-          exit 1
-        fi
-
-        # -R handles any nested subvolumes created at runtime (podman, snapper, etc.).
-        for target in "$@"; do
-          if [ -e "/btrfs_tmp/$target" ]; then
-            ${pkgs.btrfs-progs}/bin/btrfs subvolume delete -R "/btrfs_tmp/$target"
-          fi
-          ${pkgs.btrfs-progs}/bin/btrfs subvolume snapshot /btrfs_tmp/@blank "/btrfs_tmp/$target"
-        done
-      '';
     in
     {
       options.my.boot-disk = {
@@ -112,6 +46,69 @@
       };
 
       config = lib.mkIf cfg.enable (
+        let
+          espPartition = {
+            size = "1G";
+            type = "EF00";
+            content = {
+              type = "filesystem";
+              format = "vfat";
+              mountpoint = "/boot";
+              mountOptions = [ "umask=0077" ];
+            };
+          };
+
+          luksName = "cryptroot";
+
+          btrfsContent = {
+            type = "btrfs";
+            mountOptions = [
+              "noatime"
+              "ssd"
+              "compress=zstd:3"
+              "space_cache=v2"
+              "discard=async"
+            ];
+            extraArgs = [ "-f" ];
+            subvolumes = {
+              "@root".mountpoint = "/";
+              "@nix".mountpoint = "/nix";
+              "@home".mountpoint = "/home";
+              "@swap".mountpoint = "/.swap";
+              "@swap".swap.swapfile.size = cfg.swapSize;
+
+              "@blank" = { };
+              "@persist".mountpoint = config.my.persistence.path;
+            };
+          };
+
+          rollbackScript = pkgs.writeShellScriptBin "rollback-subvols" /* bash */ ''
+            set -eu
+
+            if [ "$#" -eq 0 ]; then
+              echo "usage: rollback-subvols <subvolume>..."
+              exit 1
+            fi
+
+            mkdir -p /btrfs_tmp
+            ${pkgs.util-linux.mount}/bin/mount -t btrfs -o subvol=/ /dev/mapper/${luksName} /btrfs_tmp
+            trap '${pkgs.util-linux.mount}/bin/umount /btrfs_tmp 2>/dev/null || true' EXIT
+
+            # Refuse to wipe if @blank is missing
+            if ! [ -e /btrfs_tmp/@blank ]; then
+              echo "rollback-subvols: @blank missing, aborting"
+              exit 1
+            fi
+
+            # -R handles any nested subvolumes created at runtime (podman, snapper, etc.).
+            for target in "$@"; do
+              if [ -e "/btrfs_tmp/$target" ]; then
+                ${pkgs.btrfs-progs}/bin/btrfs subvolume delete -R "/btrfs_tmp/$target"
+              fi
+              ${pkgs.btrfs-progs}/bin/btrfs subvolume snapshot /btrfs_tmp/@blank "/btrfs_tmp/$target"
+            done
+          '';
+        in
         lib.mkMerge [
 
           # efi-btrfs layout

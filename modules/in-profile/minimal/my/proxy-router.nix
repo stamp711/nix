@@ -1,16 +1,11 @@
 # mihomo proxy router: stable local HTTP+SOCKS endpoint with domain-based routing + health-checked fallback.
 # Runs as a user service: systemd on Linux, launchd on macOS.
+{ lib, ... }:
 {
   flake.homeModules.my =
-    {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
+    { config, pkgs, ... }:
     let
       cfg = config.my.proxyRouter;
-      configDir = "${config.xdg.configHome}/mihomo";
 
       proxyType = lib.types.submodule {
         freeformType = lib.types.attrsOf lib.types.anything;
@@ -47,51 +42,6 @@
           };
         };
       };
-
-      # attrsOf submodule (keyed by name) -> mihomo's list-with-name form
-      named = lib.mapAttrsToList (name: v: { inherit name; } // removeAttrs v [ "_module" ]);
-
-      # the two fixed routing groups -> mihomo proxy-group entries
-      mkGroup = gname: {
-        name = gname;
-        type = "fallback";
-        inherit (cfg.fallbackProxyGroups.${gname}) proxies url interval;
-      };
-
-      settings = {
-        mixed-port = cfg.port;
-        mode = "rule";
-        log-level = "warning";
-        proxies = named cfg.proxies;
-        proxy-groups = [
-          (mkGroup "native")
-          (mkGroup "auto")
-        ];
-        rules =
-          (map (
-            c: "${if lib.hasInfix ":" c then "IP-CIDR6" else "IP-CIDR"},${c},DIRECT,no-resolve"
-          ) cfg.directIPs)
-          ++ (map (d: "DOMAIN-SUFFIX,${d},DIRECT") cfg.directDomains)
-          ++ (map (d: "DOMAIN-SUFFIX,${d},native") cfg.nativeDomains)
-          ++ [ "MATCH,auto" ];
-      }
-      // lib.optionalAttrs (cfg.externalController != null) {
-        external-controller = cfg.externalController;
-      };
-
-      mihomoConfig = (pkgs.formats.yaml { }).generate "mihomo.yaml" settings;
-
-      # loopback is always direct; direct domains + IPs bypass the router too
-      noProxy = lib.concatStringsSep "," (
-        [
-          "localhost"
-          "127.0.0.1"
-          "::1"
-        ]
-        ++ cfg.directDomains
-        ++ cfg.directIPs
-      );
-
     in
     {
       options.my.proxyRouter = {
@@ -150,6 +100,52 @@
       };
 
       config = lib.mkIf cfg.enable (
+        let
+          # attrsOf submodule (keyed by name) -> mihomo's list-with-name form
+          named = lib.mapAttrsToList (name: v: { inherit name; } // removeAttrs v [ "_module" ]);
+
+          # the two fixed routing groups -> mihomo proxy-group entries
+          mkGroup = gname: {
+            name = gname;
+            type = "fallback";
+            inherit (cfg.fallbackProxyGroups.${gname}) proxies url interval;
+          };
+
+          settings = {
+            mixed-port = cfg.port;
+            mode = "rule";
+            log-level = "warning";
+            proxies = named cfg.proxies;
+            proxy-groups = [
+              (mkGroup "native")
+              (mkGroup "auto")
+            ];
+            rules =
+              (map (
+                c: "${if lib.hasInfix ":" c then "IP-CIDR6" else "IP-CIDR"},${c},DIRECT,no-resolve"
+              ) cfg.directIPs)
+              ++ (map (d: "DOMAIN-SUFFIX,${d},DIRECT") cfg.directDomains)
+              ++ (map (d: "DOMAIN-SUFFIX,${d},native") cfg.nativeDomains)
+              ++ [ "MATCH,auto" ];
+          }
+          // lib.optionalAttrs (cfg.externalController != null) {
+            external-controller = cfg.externalController;
+          };
+
+          mihomoConfig = (pkgs.formats.yaml { }).generate "mihomo.yaml" settings;
+
+          # loopback is always direct; direct domains + IPs bypass the router too
+          noProxy = lib.concatStringsSep "," (
+            [
+              "localhost"
+              "127.0.0.1"
+              "::1"
+            ]
+            ++ cfg.directDomains
+            ++ cfg.directIPs
+          );
+          configDir = "${config.xdg.configHome}/mihomo";
+        in
         lib.mkMerge [
           {
             home.packages = [ pkgs.mihomo ];

@@ -25,10 +25,6 @@ in
       dirScript = "dir=${lib.escapeShellArg cfg.filesDir}";
       # Traversable, since the services that read these run as other users.
       dirMode = "0701";
-      renderAll = mkRenderAll {
-        inherit pkgs dirScript dirMode;
-        inherit (cfg) files;
-      };
     in
     {
       options.my.age-template = {
@@ -52,8 +48,14 @@ in
 
       config = lib.mkIf (cfg.files != { }) {
         assertions = mkAssertions cfg.files;
-
-        system.activationScripts.age-template = lib.stringAfter [ "etc" "agenix" ] "${renderAll}";
+        system.activationScripts.age-template =
+          let
+            renderAll = mkRenderAll {
+              inherit pkgs dirScript dirMode;
+              inherit (cfg) files;
+            };
+          in
+          lib.stringAfter [ "etc" "agenix" ] "${renderAll}";
       };
     };
 
@@ -77,11 +79,6 @@ in
 
       # The user's own, so it need not be traversed by anyone else.
       dirMode = "0700";
-
-      renderAll = mkRenderAll {
-        inherit pkgs dirScript dirMode;
-        inherit (cfg) files;
-      };
     in
     {
       options.my.age-template = {
@@ -112,30 +109,38 @@ in
         };
       };
 
-      config = lib.mkIf (cfg.files != { }) {
-        assertions = mkAssertions cfg.files;
+      config = lib.mkIf (cfg.files != { }) (
+        let
+          renderAll = mkRenderAll {
+            inherit pkgs dirScript dirMode;
+            inherit (cfg) files;
+          };
+        in
+        {
+          assertions = mkAssertions cfg.files;
 
-        systemd.user.services.age-template = {
-          Unit = {
-            Description = "Render age templates";
-            After = [ "agenix.service" ];
+          systemd.user.services.age-template = {
+            Unit = {
+              Description = "Render age templates";
+              After = [ "agenix.service" ];
+            };
+            Service = {
+              Type = "oneshot";
+              ExecStart = "${renderAll}";
+            };
+            Install.WantedBy = [ "default.target" ];
           };
-          Service = {
-            Type = "oneshot";
-            ExecStart = "${renderAll}";
-          };
-          Install.WantedBy = [ "default.target" ];
-        };
 
-        launchd.agents.age-template = {
-          enable = true;
-          config = {
-            ProgramArguments = [ "${renderAll}" ];
-            RunAtLoad = true;
-            # Failing is how we wait: launchd cannot order us after agenix.
-            KeepAlive.SuccessfulExit = false;
+          launchd.agents.age-template = {
+            enable = true;
+            config = {
+              ProgramArguments = [ "${renderAll}" ];
+              RunAtLoad = true;
+              # Failing is how we wait: launchd cannot order us after agenix.
+              KeepAlive.SuccessfulExit = false;
+            };
           };
-        };
-      };
+        }
+      );
     };
 }

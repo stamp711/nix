@@ -5,22 +5,6 @@ let
     { config, pkgs, ... }:
     let
       cfg = config.my.codex.managedHooks;
-      # codex only runs commands living under managed_dir
-      managedDir = "/etc/codex/hooks";
-
-      # requirements.toml groups by event, we key by name; regroup
-      byEvent = lib.mapAttrs (
-        _:
-        lib.map (hook: {
-          inherit (hook) matcher;
-          hooks = [
-            {
-              type = "command";
-              command = "${managedDir}/${hook.name}";
-            }
-          ];
-        })
-      ) (lib.groupBy (hook: hook.event) (lib.mapAttrsToList (name: hook: hook // { inherit name; }) cfg));
     in
     {
       options.my.codex.managedHooks = lib.mkOption {
@@ -58,20 +42,39 @@ let
         );
       };
 
-      config = lib.mkIf (cfg != { }) {
-        environment.etc = {
-          "codex/requirements.toml".source = (pkgs.formats.toml { }).generate "codex-requirements" {
-            features.hooks = true;
-            hooks = {
-              managed_dir = managedDir;
-            }
-            // byEvent;
-          };
+      config = lib.mkIf (cfg != { }) (
+        let
+          # codex only runs commands living under managed_dir
+          managedDir = "/etc/codex/hooks";
+          # requirements.toml groups by event, we key by name; regroup
+          byEvent = lib.mapAttrs (
+            _:
+            lib.map (hook: {
+              inherit (hook) matcher;
+              hooks = [
+                {
+                  type = "command";
+                  command = "${managedDir}/${hook.name}";
+                }
+              ];
+            })
+          ) (lib.groupBy (hook: hook.event) (lib.mapAttrsToList (name: hook: hook // { inherit name; }) cfg));
+        in
+        {
+          environment.etc = {
+            "codex/requirements.toml".source = (pkgs.formats.toml { }).generate "codex-requirements" {
+              features.hooks = true;
+              hooks = {
+                managed_dir = managedDir;
+              }
+              // byEvent;
+            };
+          }
+          // lib.mapAttrs' (
+            name: hook: lib.nameValuePair "codex/hooks/${name}" { source = hook.command; }
+          ) cfg;
         }
-        // lib.mapAttrs' (
-          name: hook: lib.nameValuePair "codex/hooks/${name}" { source = hook.command; }
-        ) cfg;
-      };
+      );
     };
 in
 {
