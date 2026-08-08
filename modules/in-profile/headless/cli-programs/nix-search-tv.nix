@@ -11,6 +11,17 @@
           inherit self pkgs;
           modules = [ module ];
         }}";
+
+      # Get the path a declaration sits at, below the store path holding it.
+      # Ours sit below a store path of the flake.
+      # Without this, any edit to the flake rebuilds the document.
+      relativeDeclaration =
+        declaration:
+        let
+          below = builtins.match "/nix/store/[^/]*/(.*)" (toString declaration);
+        in
+        if below == null then toString declaration else lib.head below;
+
       # For modules unf chokes on.
       mkOptsRaw =
         module:
@@ -24,8 +35,13 @@
               }
             ];
           };
+          doc = pkgs.nixosOptionsDoc {
+            inherit (eval) options;
+            transformOptions =
+              option: option // { declarations = map relativeDeclaration option.declarations; };
+          };
         in
-        "${(pkgs.nixosOptionsDoc { inherit (eval) options; }).optionsJSON}/share/doc/nixos/options.json";
+        "${doc.optionsJSON}/share/doc/nixos/options.json";
     in
     {
       programs.nix-search-tv.enable = true;
