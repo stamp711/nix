@@ -10,16 +10,13 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  id-token: write
   contents: write
 
 jobs:
   update:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
     steps:
       - uses: actions/checkout@v6
-      - uses: DeterminateSystems/nix-installer-action@main
-      - uses: DeterminateSystems/magic-nix-cache-action@main
       - run: nix run .#update-inputs
       - uses: actions/upload-artifact@v7
         with:
@@ -30,15 +27,13 @@ jobs:
     needs: update
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+        platform: [linux, macos]
+    runs-on: [self-hosted, "${{ matrix.platform }}"]
     steps:
       - uses: actions/checkout@v6
       - uses: actions/download-artifact@v8
         with:
           name: flake-lock
-      - uses: DeterminateSystems/nix-installer-action@main
-      - uses: DeterminateSystems/magic-nix-cache-action@main
       - run: nix run github:Mic92/nix-fast-build -- --no-nom --skip-cached
 
   commit:

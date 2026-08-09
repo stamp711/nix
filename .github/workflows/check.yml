@@ -1,7 +1,7 @@
 name: Nix Flake Check
 
 on:
-  pull_request:
+  workflow_dispatch:
   push:
     branches: [master]
 
@@ -10,17 +10,14 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  id-token: write
   contents: read
 
 jobs:
   check:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
+        platform: [linux, macos]
+    runs-on: [self-hosted, "${{ matrix.platform }}"]
     steps:
       - uses: actions/checkout@v6
-      - uses: DeterminateSystems/nix-installer-action@main
-      - uses: DeterminateSystems/magic-nix-cache-action@main
       - run: nix run github:Mic92/nix-fast-build -- --no-nom --skip-cached
