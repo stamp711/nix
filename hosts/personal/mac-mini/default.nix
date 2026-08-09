@@ -1,4 +1,9 @@
-{ inputs, self, ... }:
+{
+  inputs,
+  lib,
+  self,
+  ...
+}:
 let
   username = "stamp";
   hostname = "Lius-Mac-mini";
@@ -15,11 +20,26 @@ in
       self.profiles.darwin.minimal
       self.darwinModules.personal
       self.darwinModules.mac-mini
+
       {
         my.primaryUser = username;
         services.containerization.enable = true;
         age.rekey.hostPubkey = systemPubkey;
         age.rekey.localStorageDir = self.lib.rekeyDir hostname;
+      }
+
+      {
+        nix.settings.keep-outputs = true;
+        nix.settings.keep-derivations = true;
+
+        # Every check on this system but this host's own, carried in its closure.
+        # nix-darwin has no `system.extraDependencies` to do it with.
+        system.systemBuilderArgs.extraDependencies = lib.attrValues (
+          lib.filterAttrs (name: _: name != "darwin-${hostname}") self.checks.${system}
+        );
+        system.systemBuilderCommands = ''
+          echo -n "$extraDependencies" > $out/extra-dependencies
+        '';
       }
     ];
   };
