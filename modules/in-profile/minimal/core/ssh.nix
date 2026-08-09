@@ -1,39 +1,38 @@
 {
-  flake.nixosModules.core = {
-    config = {
-      # SSH server
-      services.openssh = {
-        enable = true;
-        settings = {
-          PasswordAuthentication = false;
-          PermitRootLogin = "no";
+  flake.nixosModules.core =
+    { config, ... }:
+    {
+      config = {
+        # SSH server
+        services.openssh = {
+          enable = true;
+          settings = {
+            PasswordAuthentication = false;
+            PermitRootLogin = "no";
+          };
+          # An ephemeral root wipes /etc every boot.
+          hostKeys =
+            let
+              dir = if config.my.persistence.enable then "${config.my.persistence.path}/etc/ssh" else "/etc/ssh";
+            in
+            [
+              {
+                path = "${dir}/ssh_host_ed25519_key";
+                type = "ed25519";
+              }
+            ];
         };
-        # Keep host keys on /persist so they survive @root wipes (impermanence).
-        hostKeys = [
-          {
-            path = "/persist/etc/ssh/ssh_host_ed25519_key";
-            type = "ed25519";
-          }
-          {
-            path = "/persist/etc/ssh/ssh_host_rsa_key";
-            type = "rsa";
-            bits = 4096;
-          }
+
+        # ET server - enable but no firewall setting, so not exposed on proxy servers
+        services.eternal-terminal.enable = true;
+
+        # Read directly by openssh (not bind-mounted); declare for audit.
+        my.persistence.externalPaths = [
+          "/etc/ssh/ssh_host_ed25519_key"
+          "/etc/ssh/ssh_host_ed25519_key.pub"
         ];
       };
-
-      # ET server - enable but no firewall setting, so not exposed on proxy servers
-      services.eternal-terminal.enable = true;
-
-      # Read directly by openssh (not bind-mounted); declare for audit.
-      my.persistence.externalPaths = [
-        "/etc/ssh/ssh_host_ed25519_key"
-        "/etc/ssh/ssh_host_ed25519_key.pub"
-        "/etc/ssh/ssh_host_rsa_key"
-        "/etc/ssh/ssh_host_rsa_key.pub"
-      ];
     };
-  };
 
   flake.darwinModules.core = {
     services.openssh = {
