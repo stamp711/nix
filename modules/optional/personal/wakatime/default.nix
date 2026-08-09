@@ -15,13 +15,21 @@
       home.file.".wakatime.cfg".text = /* ini */ ''
         [settings]
         api_key_vault_cmd = ${pkgs.coreutils}/bin/cat ${s.path}
+
         # agent notes, and the session state each AI tool keeps for itself
-        exclude =
-          /[.]slock/agents/
-          /[.]claude/projects/
-          /[.]codex/sessions/
-          /[.]pi/agent/sessions/
-          /[.]local/share/opencode/
+        ; exclude =
+        ;   /[.]slock/agents/
+        ;   /[.]claude/projects/
+        ;   /[.]codex/sessions/
+        ;   /[.]pi/agent/sessions/
+        ;   /[.]local/share/opencode/
+
+        # allowlist mode
+        exclude = true
+        include =
+          ^${ghqRoot}/
+          ^${home}/agents/
+
         # name the project after the repo, not after whoever edited it
         [projectmap]
         ^${ghqRoot}/[^/]+/[^/]+/([^/]+) = {0}
