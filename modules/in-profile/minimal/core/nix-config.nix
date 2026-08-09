@@ -6,9 +6,10 @@ let
       "flakes"
     ];
     extra-substituters = [
-      "https://cache.numtide.com"
-      "https://cache.nixos-cuda.org"
-      "https://nix-community.cachix.org"
+      # cache.nixos.org's priority is 40.
+      "https://cache.numtide.com?priority=45" # serves no priority => 0
+      "https://cache.nixos-cuda.org" # 50
+      "https://nix-community.cachix.org" # 41
     ];
     extra-trusted-public-keys = [
       "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
