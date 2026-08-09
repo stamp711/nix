@@ -1,4 +1,4 @@
-{ self, ... }:
+{ lib, self, ... }:
 {
   flake.darwinModules.mac-mini =
     { config, ... }:
@@ -18,6 +18,13 @@
         tokenFile = pat.path;
         ephemeral = true;
         replace = true;
+        serviceOverrides = {
+          KeepAlive = lib.mkForce {
+            Crashed = true;
+            SuccessfulExit = true;
+          };
+          ThrottleInterval = lib.mkForce 60;
+        };
       };
     };
 }
