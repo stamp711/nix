@@ -3,7 +3,7 @@
   flake.darwinModules.mac-mini =
     { config, ... }:
     let
-      # The launchd job reads the token itself, running as this user.
+      # nix-darwin's configure script reads the token unprivileged.
       pat = self.lib.mkAgeSecret config {
         rekeyFile = ./pat.age;
         owner = "_github-runner";
@@ -12,17 +12,15 @@
     {
       age.secrets = pat.ageSecret;
 
-      services.github-runners.nix = {
+      services.github-runners.mac-mini = {
         enable = true;
         url = "https://github.com/stamp711/nix";
         tokenFile = pat.path;
         ephemeral = true;
         replace = true;
         serviceOverrides = {
-          KeepAlive = lib.mkForce {
-            Crashed = true;
-            SuccessfulExit = true;
-          };
+          # A session conflict is a plain non-zero exit, which the dictionary form leaves dead.
+          KeepAlive = lib.mkForce true;
           ThrottleInterval = lib.mkForce 60;
         };
       };

@@ -6,7 +6,7 @@
       # PAT with this repository's Administration: Read and write.
       pat = self.lib.mkAgeSecret config {
         rekeyFile = ./pat.age;
-        # /run/github-runner is the service's own RuntimeDirectory.
+        # Beside the service's own RuntimeDirectory, /run/github-runner.
         path = "/run/github-runner-token/pat";
         # A plain file: agenix's symlink points into a per-activation generation.
         symlink = false;
@@ -25,9 +25,7 @@
         nixosModules = [
           self.profiles.nixos.minimal
           {
-            systemd.services.github-runner-nix.startLimitIntervalSec = 0;
-
-            services.github-runners.nix = {
+            services.github-runners.nuc = {
               enable = true;
               url = "https://github.com/stamp711/nix";
               tokenFile = pat.path;
@@ -41,6 +39,8 @@
               };
               replace = true;
             };
+            # StartLimitIntervalSec lives in [Unit], which serviceOverrides does not write.
+            systemd.services.github-runner-nuc.startLimitIntervalSec = 0;
           }
         ];
       };
