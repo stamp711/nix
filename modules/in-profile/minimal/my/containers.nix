@@ -31,39 +31,23 @@
       # Ensure bind sources exist. Redundant with the above wherever my.persistence is on.
       dirRules =
         cfg:
-        [
-          "d ${cfg.statePath} 0755 root root - -"
-          "d ${cfg.statePath}/home 0700 ${user} ${group} - -"
-          "d ${cfg.statePath}/persist 0755 root root - -"
-        ]
-        ++ map (d: "d ${d} 0755 ${user} ${group} - -") cfg.hostDirs;
+        [ "d ${cfg.statePath} 0755 root root - -" ]
+        ++ lib.mapAttrsToList (_: o: "d ${o.hostPath} ${o.mode} ${o.owner} ${o.group} - -") cfg.sharedDirs;
 
       mkContainer = name: cfg: {
         autoStart = true;
         ephemeral = true;
         privateNetwork = cfg.macvlan != null;
         macvlans = lib.optional (cfg.macvlan != null) cfg.macvlan;
-        bindMounts = lib.mkMerge [
-          {
-            "/home/${user}" = {
-              hostPath = "${cfg.statePath}/home";
-              isReadOnly = false;
-            };
-            "/persist" = {
-              hostPath = "${cfg.statePath}/persist";
-              isReadOnly = false;
-            };
-          }
-          (lib.listToAttrs (
-            map (
-              d:
-              lib.nameValuePair d {
-                hostPath = d;
-                isReadOnly = false;
-              }
-            ) cfg.hostDirs
-          ))
-        ];
+        # owner, group and mode are ours. The rest of an entry is upstream's.
+        bindMounts = lib.mapAttrs (
+          _: o:
+          removeAttrs o [
+            "owner"
+            "group"
+            "mode"
+          ]
+        ) cfg.sharedDirs;
 
         config.imports =
           # HM
@@ -117,12 +101,17 @@
             systemd.sockets.nix-daemon.enable = lib.mkForce false;
           }
 
-          ++ self.lib.nixosBaseModules { inherit system; }
+          ++ self.lib.nixosBaseModules {
+            inherit system;
+            rekey = cfg.hostPubkey != null;
+          }
           ++ cfg.nixosModules
-          ++ lib.singleton {
+          ++ lib.optional (cfg.hostPubkey != null) {
             # decrypts its own secrets; identity = the persisted ssh host key (age.identityPaths, from core)
-            age.rekey.hostPubkey = lib.mkIf (cfg.hostPubkey != null) cfg.hostPubkey;
+            age.rekey.hostPubkey = cfg.hostPubkey;
             age.rekey.localStorageDir = self.lib.rekeyDir "${hostName}-${name}";
+          }
+          ++ lib.singleton {
             my.primaryUser = user;
             users.users.${user}.openssh.authorizedKeys.keys = [ self.lib.sshPubKey ];
           };
@@ -134,7 +123,7 @@
         description = "Nixos-containers keyed by name; each gets /var/lib/<name> as its state root.";
         type = lib.types.attrsOf (
           lib.types.submodule (
-            { name, ... }:
+            { name, config, ... }:
             {
               options = {
                 statePath = lib.mkOption {
@@ -153,10 +142,56 @@
                   default = null;
                   description = "Container user's ~/.ssh/id_ed25519 pubkey for home-manager agenix-rekey.";
                 };
-                hostDirs = lib.mkOption {
-                  type = lib.types.listOf lib.types.path;
-                  default = [ ];
-                  description = "Host dirs bind-mounted rw into the container at the same path; created on the host if missing.";
+                sharedDirs = lib.mkOption {
+                  default = { };
+                  description = ''
+                    Dirs the container shares with the host, keyed by their mount point
+                    inside it. Each is created on the host with the owner, group and mode
+                    given here, then bind-mounted. Everything but those three reaches
+                    {option}`containers.<name>.bindMounts` as written.
+                  '';
+                  type = lib.types.attrsOf (
+                    lib.types.submodule (
+                      { name, ... }:
+                      {
+                        freeformType = lib.types.attrsOf lib.types.anything;
+                        options = {
+                          hostPath = lib.mkOption {
+                            type = lib.types.str;
+                            default = name;
+                            defaultText = lib.literalExpression "the mount point it is keyed by";
+                            description = "Where the dir lives on the host.";
+                          };
+                          isReadOnly = lib.mkOption {
+                            type = lib.types.bool;
+                            default = false;
+                            description = ''
+                              Whether the container may only read it. Upstream's own
+                              default is `true`, and a dir shared with a container is
+                              usually one it writes.
+                            '';
+                          };
+                          owner = lib.mkOption {
+                            type = lib.types.str;
+                            default = user;
+                            defaultText = lib.literalExpression "config.my.primaryUser";
+                            description = "Owner of the directory on the host.";
+                          };
+                          group = lib.mkOption {
+                            type = lib.types.str;
+                            default = group;
+                            defaultText = lib.literalExpression "the primary user's group";
+                            description = "Group of the directory on the host.";
+                          };
+                          mode = lib.mkOption {
+                            type = lib.types.str;
+                            default = "0755";
+                            description = "Mode of the directory on the host.";
+                          };
+                        };
+                      }
+                    )
+                  );
                 };
                 nixosModules = lib.mkOption {
                   type = lib.types.listOf lib.types.deferredModule;
@@ -172,6 +207,20 @@
                   type = lib.types.nullOr lib.types.str;
                   default = null;
                   description = "Host NIC to macvlan onto for the container; null keeps the shared host netns.";
+                };
+              };
+
+              # These two merge with whatever the caller writes. An option's default
+              # would be dropped whole as soon as the caller writes one entry.
+              config.sharedDirs = {
+                "/home/${user}" = {
+                  hostPath = "${config.statePath}/home";
+                  mode = "0700";
+                };
+                "/persist" = {
+                  hostPath = "${config.statePath}/persist";
+                  owner = "root";
+                  group = "root";
                 };
               };
             }

@@ -44,31 +44,35 @@ in
     nixosBaseModules =
       {
         system,
+        rekey,
         nixpkgsConfig ? { },
       }:
       [
         inputs.disko.nixosModules.disko
         inputs.agenix.nixosModules.default
-        inputs.agenix-rekey.nixosModules.default
-        rekeyConfig
         {
           nixpkgs.pkgs = self.lib.mkPkgs {
             inherit system;
             config = nixpkgsConfig;
           };
         }
+      ]
+      ++ lib.optionals rekey [
+        inputs.agenix-rekey.nixosModules.default
+        rekeyConfig
       ];
 
     # Create a NixOS system configuration.
     mkNixos =
       {
         system,
+        rekey ? true,
         nixpkgsConfig ? { },
         modules ? [ ],
       }:
       inputs.nixpkgs.lib.nixosSystem {
         inherit system;
-        modules = self.lib.nixosBaseModules { inherit system nixpkgsConfig; } ++ modules;
+        modules = self.lib.nixosBaseModules { inherit system nixpkgsConfig rekey; } ++ modules;
       };
 
     # Create a system-manager configuration (for non-NixOS Linux).

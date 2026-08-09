@@ -11,10 +11,10 @@
         hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHDWaJF4rGW5epZONjj0vio3aEMDUKDav+E2Y4Ud0+WM";
         userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIM9xfQ5oWVVe1AX9PJh0Dy5DJUZ8YMDbwTD9t1/c2K4f";
         # Share the owner's repo stores + agent jj workspaces at identical paths.
-        hostDirs = [
-          "${home}/code"
-          "${home}/agents"
-        ];
+        sharedDirs = {
+          "${home}/code" = { };
+          "${home}/agents" = { };
+        };
         nixosModules = [ self.profiles.nixos.headless ];
         homeModules = [
           self.profiles.homeManager.headless

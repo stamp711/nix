@@ -34,7 +34,7 @@ jobs:
       - uses: actions/download-artifact@v8
         with:
           name: flake-lock
-      - run: nix run github:Mic92/nix-fast-build -- --no-nom --skip-cached
+      - run: nix flake check
 
   commit:
     needs: check
