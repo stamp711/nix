@@ -31,9 +31,8 @@
       self.darwinModules.cli-programs
     ];
 
-    # TODO: impl darwinModules.my.maintenance
-    # my.maintenance.autoUpdate = lib.mkDefault true;
-    # my.maintenance.autoClean = lib.mkDefault true;
+    my.maintenance.autoUpdate = lib.mkDefault true;
+    my.maintenance.autoClean = lib.mkDefault true;
   };
 
   flake.profiles.systemManager.headless = {

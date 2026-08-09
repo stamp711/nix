@@ -23,9 +23,14 @@ in
 
       {
         my.primaryUser = username;
-        services.containerization.enable = true;
         age.rekey.hostPubkey = systemPubkey;
         age.rekey.localStorageDir = self.lib.rekeyDir hostname;
+
+        services.containerization.enable = true;
+
+        # Those are not in the minimal profile.
+        my.maintenance.autoClean = true;
+        my.maintenance.autoUpdate = true;
       }
 
       {
@@ -54,6 +59,9 @@ in
         my.primaryUser = username;
         age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJDMhZj1dTWzY57OW/HlEdBeChcmknv0GWWzfinhdeYu";
         age.rekey.localStorageDir = self.lib.rekeyDir "${hostname}-${username}";
+
+        my.maintenance.autoClean = true;
+        my.maintenance.autoUpdate = true;
       }
     ];
   };
