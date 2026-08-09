@@ -15,8 +15,13 @@
       home.file.".wakatime.cfg".text = /* ini */ ''
         [settings]
         api_key_vault_cmd = ${pkgs.coreutils}/bin/cat ${s.path}
-        # exclude raft.build agent notes
-        exclude = /[.]slock/agents/
+        # agent notes, and the session state each AI tool keeps for itself
+        exclude =
+          /[.]slock/agents/
+          /[.]claude/projects/
+          /[.]codex/sessions/
+          /[.]pi/agent/sessions/
+          /[.]local/share/opencode/
         # name the project after the repo, not after whoever edited it
         [projectmap]
         ^${ghqRoot}/[^/]+/[^/]+/([^/]+) = {0}
