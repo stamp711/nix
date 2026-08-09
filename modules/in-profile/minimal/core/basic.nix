@@ -1,12 +1,7 @@
 { lib, ... }: {
 
   flake.homeModules.core =
-    {
-      config,
-      options,
-      pkgs,
-      ...
-    }:
+    { config, pkgs, ... }:
     {
       home.stateVersion = "26.11";
       home.homeDirectory =
@@ -21,7 +16,6 @@
       };
 
       programs.nh.enable = true;
-      programs.nh.flake = lib.mkIf options.my.flake.isDefined config.my.flake;
       home.sessionVariables.NH_SHOW_ACTIVATION_LOGS = "1";
     };
 
@@ -30,13 +24,7 @@
   };
 
   flake.nixosModules.core =
-    {
-      config,
-      lib,
-      options,
-      pkgs,
-      ...
-    }:
+    { pkgs, ... }:
     {
       system.stateVersion = "26.05";
 
@@ -57,7 +45,6 @@
       programs.nix-ld.enable = true; # Run unpatched dynamic binaries on NixOS
 
       programs.nh.enable = true;
-      programs.nh.flake = lib.mkIf options.my.flake.isDefined config.my.flake;
 
       # System-core state that must survive @root wipes (impermanence).
       my.persistence.directories = [

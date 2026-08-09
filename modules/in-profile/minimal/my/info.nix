@@ -1,7 +1,7 @@
+{ lib, ... }:
 {
-
   flake.homeModules.my =
-    { lib, ... }:
+    { config, options, ... }:
     {
       options.my.primaryUser = lib.mkOption {
         type = lib.types.str;
@@ -11,10 +11,12 @@
         type = lib.types.str;
         description = "Flake reference for nh and maintenance";
       };
+
+      config.home.sessionVariables.NH_FLAKE = lib.mkIf options.my.flake.isDefined config.my.flake;
     };
 
   flake.nixosModules.my =
-    { lib, ... }:
+    { config, options, ... }:
     {
       options.my.primaryUser = lib.mkOption {
         type = lib.types.str;
@@ -24,10 +26,12 @@
         type = lib.types.str;
         description = "Flake reference for nh and maintenance";
       };
+
+      config.environment.variables.NH_FLAKE = lib.mkIf options.my.flake.isDefined config.my.flake;
     };
 
   flake.darwinModules.my =
-    { lib, ... }:
+    { config, options, ... }:
     {
       options.my.primaryUser = lib.mkOption {
         type = lib.types.str;
@@ -37,6 +41,7 @@
         type = lib.types.str;
         description = "Flake reference for nh and maintenance";
       };
-    };
 
+      config.environment.variables.NH_FLAKE = lib.mkIf options.my.flake.isDefined config.my.flake;
+    };
 }
