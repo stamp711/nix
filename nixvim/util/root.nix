@@ -9,7 +9,7 @@
 
       local function norm(path)
         if path:sub(1, 1) == "~" then
-          local home = vim.uv.os_homedir()
+          local home = assert(vim.uv.os_homedir())
           if home:sub(-1) == "/" then home = home:sub(1, -2) end
           path = home .. path:sub(2)
         end
@@ -132,7 +132,7 @@
         local ret = M.cache[buf]
         if not ret then
           local roots = M.detect({ all = false, buf = buf })
-          ret = roots[1] and roots[1].paths[1] or vim.uv.cwd()
+          ret = roots[1] and roots[1].paths[1] or assert(vim.uv.cwd())
           M.cache[buf] = ret
         end
         if opts.normalize then return ret end
