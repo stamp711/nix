@@ -3,7 +3,11 @@
   flake.darwinModules.mac-mini =
     { config, ... }:
     let
-      pat = self.lib.mkAgeSecret config { rekeyFile = ./pat.age; };
+      # The launchd job reads the token itself, running as this user.
+      pat = self.lib.mkAgeSecret config {
+        rekeyFile = ./pat.age;
+        owner = "_github-runner";
+      };
     in
     {
       age.secrets = pat.ageSecret;
