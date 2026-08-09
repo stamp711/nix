@@ -7,17 +7,20 @@
 let
   # Operator identity for agenix-rekey. Used on the workstation at rekey time;
   # hosts decrypt with their own key via age.identityPaths.
-  rekeyConfig = {
-    age.rekey = {
-      masterIdentities = [
-        {
-          identity = ./ssh-age.pub;
-          pubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHdOxmUp8REg9IBoipLV40VYmLNiD6+TUUHb/ofyor60 ssh-age";
-        }
-      ];
-      storageMode = "local";
+  rekeyConfig =
+    { pkgs, ... }:
+    {
+      age.rekey = {
+        masterIdentities = [
+          {
+            identity = ./ssh-age.pub;
+            pubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHdOxmUp8REg9IBoipLV40VYmLNiD6+TUUHb/ofyor60 ssh-age";
+          }
+        ];
+        agePlugins = [ pkgs.age-plugin-1p ]; # default is a yubikey plugin
+        storageMode = "local";
+      };
     };
-  };
 in
 {
   flake.lib = {
@@ -62,6 +65,25 @@ in
         rekeyConfig
       ];
 
+    darwinBaseModules =
+      { system, rekey }:
+      [
+        inputs.nix-homebrew.darwinModules.nix-homebrew
+        inputs.nix-apple-container.darwinModules.default
+        inputs.agenix.darwinModules.default
+        { nixpkgs.pkgs = self.lib.mkPkgs { inherit system; }; }
+      ]
+      ++ lib.optionals rekey [
+        inputs.agenix-rekey.darwinModules.default
+        rekeyConfig
+      ];
+
+    homeBaseModules = [
+      inputs.agenix.homeManagerModules.default
+      inputs.agenix-rekey.homeManagerModules.default
+      rekeyConfig
+    ];
+
     # Create a NixOS system configuration.
     mkNixos =
       {
@@ -73,6 +95,30 @@ in
       inputs.nixpkgs.lib.nixosSystem {
         inherit system;
         modules = self.lib.nixosBaseModules { inherit system nixpkgsConfig rekey; } ++ modules;
+      };
+
+    # Create a nix-darwin system configuration.
+    mkDarwin =
+      {
+        system,
+        # with no hostPubkey agenix-rekey warns with networking.hostName (default null) and errors
+        rekey ? false,
+        modules ? [ ],
+      }:
+      inputs.nix-darwin.lib.darwinSystem {
+        inherit system;
+        modules = self.lib.darwinBaseModules { inherit system rekey; } ++ modules;
+      };
+
+    # Create a home-manager configuration. Set my.primaryUser in modules.
+    mkHome =
+      {
+        system,
+        modules ? [ ],
+      }:
+      inputs.home-manager.lib.homeManagerConfiguration {
+        pkgs = self.lib.mkPkgs { inherit system; };
+        modules = self.lib.homeBaseModules ++ modules;
       };
 
     # Create a system-manager configuration (for non-NixOS Linux).
@@ -91,49 +137,6 @@ in
           }
         ]
         ++ modules;
-      };
-
-    darwinBaseModules =
-      { system, rekey }:
-      [
-        inputs.nix-homebrew.darwinModules.nix-homebrew
-        inputs.nix-apple-container.darwinModules.default
-        inputs.agenix.darwinModules.default
-        { nixpkgs.pkgs = self.lib.mkPkgs { inherit system; }; }
-      ]
-      ++ lib.optionals rekey [
-        inputs.agenix-rekey.darwinModules.default
-        rekeyConfig
-      ];
-
-    # Create a nix-darwin system configuration.
-    mkDarwin =
-      {
-        system,
-        # with no hostPubkey agenix-rekey warns with networking.hostName (default null) and errors
-        rekey ? false,
-        modules ? [ ],
-      }:
-      inputs.nix-darwin.lib.darwinSystem {
-        inherit system;
-        modules = self.lib.darwinBaseModules { inherit system rekey; } ++ modules;
-      };
-
-    homeBaseModules = [
-      inputs.agenix.homeManagerModules.default
-      inputs.agenix-rekey.homeManagerModules.default
-      rekeyConfig
-    ];
-
-    # Create a home-manager configuration. Set my.primaryUser in modules.
-    mkHome =
-      {
-        system,
-        modules ? [ ],
-      }:
-      inputs.home-manager.lib.homeManagerConfiguration {
-        pkgs = self.lib.mkPkgs { inherit system; };
-        modules = self.lib.homeBaseModules ++ modules;
       };
 
   };
