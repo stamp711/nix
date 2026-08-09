@@ -1,6 +1,6 @@
 # mihomo proxy router: stable local HTTP+SOCKS endpoint with domain-based routing + health-checked fallback.
 # Runs as a user service: systemd on Linux, launchd on macOS.
-{ lib, ... }:
+{ lib, self, ... }:
 {
   flake.homeModules.my =
     { config, pkgs, ... }:
@@ -102,7 +102,9 @@
       config = lib.mkIf cfg.enable (
         let
           # attrsOf submodule (keyed by name) -> mihomo's list-with-name form
-          named = lib.mapAttrsToList (name: v: { inherit name; } // removeAttrs v [ "_module" ]);
+          named = lib.mapAttrsToList (
+            name: v: lib.attrsets.unionOfDisjoint { inherit name; } (removeAttrs v [ "_module" ])
+          );
 
           # the two fixed routing groups -> mihomo proxy-group entries
           mkGroup = gname: {
@@ -111,26 +113,30 @@
             inherit (cfg.fallbackProxyGroups.${gname}) proxies url interval;
           };
 
-          settings = {
-            mixed-port = cfg.port;
-            mode = "rule";
-            log-level = "warning";
-            proxies = named cfg.proxies;
-            proxy-groups = [
-              (mkGroup "native")
-              (mkGroup "auto")
-            ];
-            rules =
-              (map (
-                c: "${if lib.hasInfix ":" c then "IP-CIDR6" else "IP-CIDR"},${c},DIRECT,no-resolve"
-              ) cfg.directIPs)
-              ++ (map (d: "DOMAIN-SUFFIX,${d},DIRECT") cfg.directDomains)
-              ++ (map (d: "DOMAIN-SUFFIX,${d},native") cfg.nativeDomains)
-              ++ [ "MATCH,auto" ];
-          }
-          // lib.optionalAttrs (cfg.externalController != null) {
-            external-controller = cfg.externalController;
-          };
+          settings = self.lib.mergeDisjoint [
+            {
+              mixed-port = cfg.port;
+              mode = "rule";
+              log-level = "warning";
+            }
+            (lib.optionalAttrs (cfg.externalController != null) {
+              external-controller = cfg.externalController;
+            })
+            {
+              proxies = named cfg.proxies;
+              proxy-groups = [
+                (mkGroup "native")
+                (mkGroup "auto")
+              ];
+              rules =
+                (map (
+                  c: "${if lib.hasInfix ":" c then "IP-CIDR6" else "IP-CIDR"},${c},DIRECT,no-resolve"
+                ) cfg.directIPs)
+                ++ (map (d: "DOMAIN-SUFFIX,${d},DIRECT") cfg.directDomains)
+                ++ (map (d: "DOMAIN-SUFFIX,${d},native") cfg.nativeDomains)
+                ++ [ "MATCH,auto" ];
+            }
+          ];
 
           mihomoConfig = (pkgs.formats.yaml { }).generate "mihomo.yaml" settings;
 

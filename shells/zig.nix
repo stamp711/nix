@@ -32,7 +32,7 @@
       zig =
         if useNightly then
           # hook stub: zig-env's mkShell dereferences zig.hook, zig-flake pkgs lack it
-          inputs.zig-flake.packages.${system}.nightly // { hook = null; }
+          lib.attrsets.unionOfDisjoint inputs.zig-flake.packages.${system}.nightly { hook = null; }
         else
           zigs."zig-${v}";
 

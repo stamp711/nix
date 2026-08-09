@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, self, ... }:
 {
   flake.homeModules.my =
     { config, ... }:
@@ -32,6 +32,9 @@
       };
 
       # Codex, Pi, and OpenCode use .agents; Claude and OpenCode use .claude.
-      config.home.file = skillFiles ".agents/skills" // skillFiles ".claude/skills";
+      config.home.file = self.lib.mergeDisjoint [
+        (skillFiles ".agents/skills")
+        (skillFiles ".claude/skills")
+      ];
     };
 }

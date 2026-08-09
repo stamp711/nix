@@ -1,7 +1,10 @@
-{ self, inputs, ... }:
+{
+  inputs,
+  lib,
+  self,
+  ...
+}:
 let
-  inherit (inputs.nixpkgs) lib;
-
   # Operator identity for agenix-rekey. Used on the workstation at rekey time;
   # hosts decrypt with their own key via age.identityPaths.
   rekeyConfig = {
@@ -34,10 +37,7 @@ in
       }:
       import inputs.nixpkgs {
         inherit system;
-        config = {
-          allowUnfree = true;
-        }
-        // config;
+        config = lib.attrsets.unionOfDisjoint config { allowUnfree = true; };
         overlays = self.lib.allOverlays;
       };
 
@@ -66,7 +66,7 @@ in
         nixpkgsConfig ? { },
         modules ? [ ],
       }:
-      lib.nixosSystem {
+      inputs.nixpkgs.lib.nixosSystem {
         inherit system;
         modules = self.lib.nixosBaseModules { inherit system nixpkgsConfig; } ++ modules;
       };

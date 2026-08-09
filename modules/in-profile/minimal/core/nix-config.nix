@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ inputs, lib, ... }:
 let
   nixConfig = {
     experimental-features = [
@@ -20,7 +20,7 @@ in
 {
 
   flake.homeModules.core =
-    { lib, pkgs, ... }:
+    { pkgs, ... }:
     {
       nix.package = lib.mkDefault pkgs.nix; # HM nixos integration also sets it
       nix.registry.nixpkgs.flake = inputs.nixpkgs;
@@ -32,7 +32,7 @@ in
 
   flake.darwinModules.core = {
     nix.registry.nixpkgs.flake = inputs.nixpkgs;
-    nix.settings = nixConfig // {
+    nix.settings = lib.attrsets.unionOfDisjoint nixConfig {
       auto-optimise-store = true;
       trusted-users = [
         "root"
@@ -44,7 +44,7 @@ in
   flake.nixosModules.core = {
     nix.channel.enable = false;
     nix.registry.nixpkgs.flake = inputs.nixpkgs;
-    nix.settings = nixConfig // {
+    nix.settings = lib.attrsets.unionOfDisjoint nixConfig {
       auto-optimise-store = true;
       trusted-users = [
         "root"
@@ -58,7 +58,7 @@ in
       inputs.system-manager.packages.${pkgs.stdenv.hostPlatform.system}.default
     ];
     nix.enable = true;
-    nix.settings = nixConfig // {
+    nix.settings = lib.attrsets.unionOfDisjoint nixConfig {
       auto-optimise-store = true;
       trusted-users = [
         "root"

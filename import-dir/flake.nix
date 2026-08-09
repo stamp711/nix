@@ -91,7 +91,7 @@
             else
               [ ];
         in
-        attrs // lib.optionalAttrs collect { ${collectAttr} = allEntries; };
+        lib.attrsets.unionOfDisjoint attrs (lib.optionalAttrs collect { ${collectAttr} = allEntries; });
     in
     {
       lib.importDir = importDir;

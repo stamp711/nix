@@ -55,20 +55,22 @@
                 )
               );
         in
-        {
-          statix = pkgs.runCommand "statix" { } ''
-            ${pkgs.statix}/bin/statix check ${self} -c ${self}/statix.toml
-            touch $out
-          '';
-          deadnix = pkgs.runCommand "deadnix" { } ''
-            ${pkgs.deadnix}/bin/deadnix --fail ${self}
-            touch $out
-          '';
-        }
-        // homeChecks
-        // darwinChecks
-        // nixosChecks
-        // systemChecks;
+        self.lib.mergeDisjoint [
+          homeChecks
+          darwinChecks
+          nixosChecks
+          systemChecks
+          {
+            statix = pkgs.runCommand "statix" { } ''
+              ${pkgs.statix}/bin/statix check ${self} -c ${self}/statix.toml
+              touch $out
+            '';
+            deadnix = pkgs.runCommand "deadnix" { } ''
+              ${pkgs.deadnix}/bin/deadnix --fail ${self}
+              touch $out
+            '';
+          }
+        ];
 
       apps = {
         update-inputs = {
