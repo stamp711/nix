@@ -16,6 +16,8 @@ let
       "cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
     ];
+    # Build from source when substitution fails, and stop asking a failing cache for a minute.
+    fallback = true;
   };
 in
 {
@@ -32,6 +34,7 @@ in
     };
 
   flake.darwinModules.core = {
+    nix.channel.enable = false;
     nix.registry.nixpkgs.flake = inputs.nixpkgs;
     nix.settings = lib.attrsets.unionOfDisjoint nixConfig {
       auto-optimise-store = true;
