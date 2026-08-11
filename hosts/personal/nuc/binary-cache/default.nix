@@ -1,7 +1,7 @@
 let
   cache = {
     host = "nuc.boar-char.ts.net";
-    keyName = "nuc-cache";
+    keyName = "nuc";
     secretKeyFile = ./key.age;
   };
 in

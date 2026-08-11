@@ -1,7 +1,7 @@
 let
   cache = {
     host = "lius-mac-mini.boar-char.ts.net";
-    keyName = "mac-mini-cache";
+    keyName = "mac-mini";
     secretKeyFile = ./key.age;
   };
 in
