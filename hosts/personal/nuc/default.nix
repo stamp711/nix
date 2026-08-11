@@ -50,12 +50,6 @@ in
 
       # builder
       {
-        # Accept GPD's and Surface's host keys for remote build offload.
-        users.users.${username}.openssh.authorizedKeys.keys = [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGTQLBSo+0ienoQG9TV4XyNt3vbN60uS10OD4TUDB1an" # GPD
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH5Pi9art3cmYnc8yuldBqGvtLWWwSK5zjnRKF0l2MyG" # Surface
-        ];
-
         # A live output holds its .drv, and a live .drv holds its outputs.
         nix.settings.keep-outputs = true;
         nix.settings.keep-derivations = true;

@@ -12,13 +12,13 @@ let
   userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMcqFJen/UmBUeC70rkomrV3IGez6ceovQQpCWjs9WGm";
 in
 {
+
   flake.nixosConfigurations.${hostname} = self.lib.mkNixos {
     inherit system;
     modules = [
       inputs.nixos-wsl.nixosModules.default
       self.profiles.nixos.headless
       self.nixosModules.personal
-      self.nixosModules.use-build-machine
       {
         my.primaryUser = username;
         networking.hostName = hostname;
@@ -45,4 +45,5 @@ in
       }
     ];
   };
+
 }

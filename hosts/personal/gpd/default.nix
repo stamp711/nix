@@ -17,7 +17,6 @@ in
       self.nixosModules.linux-gaming
       self.nixosModules.personal
       self.nixosModules.gpd
-      self.nixosModules.use-build-machine
       {
         my.primaryUser = username;
         networking.hostName = hostname;
