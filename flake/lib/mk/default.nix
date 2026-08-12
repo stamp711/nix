@@ -30,6 +30,7 @@ in
       inputs.agenix-rekey.overlays.default
       inputs.brew-nix.overlays.default
       inputs.nix-alien.overlays.default
+      inputs.nur.overlays.default
     ];
 
     # Create a nixpkgs instance with our standard configuration.

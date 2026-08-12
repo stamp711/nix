@@ -762,11 +762,11 @@
     "multica": {
       "flake": false,
       "locked": {
-        "lastModified": 1785553450,
-        "narHash": "sha256-XkA5DAC7e47Hj9j2/mAUtSgv0lAi/rlVj+v2Xf0cCAM=",
+        "lastModified": 1786530160,
+        "narHash": "sha256-GC+Xr3L1fzc85ZC+Tv1iugdapYFl4s2lCG28LvT66LY=",
         "owner": "multica-ai",
         "repo": "multica",
-        "rev": "37f3bb7dd9c0fe665051ce26dadab03b090dc1af",
+        "rev": "13706d60d03d62bac07faf7d552985046b0d5c1a",
         "type": "github"
       },
       "original": {
@@ -1008,6 +1008,29 @@
         "type": "github"
       }
     },
+    "nur": {
+      "inputs": {
+        "flake-parts": [
+          "flake-parts"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1786553836,
+        "narHash": "sha256-NrHI2JbgHkMN5sPN123eFHcWC0j1eJcNDEBPee7Q9Dw=",
+        "owner": "nix-community",
+        "repo": "NUR",
+        "rev": "da6e88a4571063e526fc23694f0c780dcfa1b2c1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "NUR",
+        "type": "github"
+      }
+    },
     "nvim-99": {
       "flake": false,
       "locked": {
@@ -1197,6 +1220,7 @@
         "nixos-wsl": "nixos-wsl",
         "nixpkgs": "nixpkgs_3",
         "nixvim": "nixvim",
+        "nur": "nur",
         "nvim-99": "nvim-99",
         "opencode-wakatime": "opencode-wakatime",
         "oyui": "oyui",
