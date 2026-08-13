@@ -36,9 +36,15 @@
       '';
     });
 
-    # Let `attach --config` re-bind keys.
     zellij-unwrapped = prev.zellij-unwrapped.overrideAttrs (old: {
-      patches = (old.patches or [ ]) ++ [ ./zellij-attach-keybinds.patch ];
+      patches = (old.patches or [ ]) ++ [
+        # Let `attach --config` re-bind keys.
+        ./zellij-attach-keybinds.patch
+
+        # Keep a wide character's background on the padding cell when it is erased.
+        # https://github.com/zellij-org/zellij/pull/5180
+        ./zellij-wide-char-padding.patch
+      ];
     });
 
     vimPlugins = prev.vimPlugins.extend (
