@@ -13,7 +13,8 @@
       proxyKeys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDuNXgUoOwCVdvkegE+FGP77qdyWEQFqcRgIY0d6lKeh" # 1Password
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGGfAr2tMhcrbtdxi2RjGCaXCTQGWB3dBlTEXN6/DUxE" # dev
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKGQExhqqGO/PPQqYHhyJDgn0x4wviM9K4mtQKOKzKu7" # 1
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKGQExhqqGO/PPQqYHhyJDgn0x4wviM9K4mtQKOKzKu7" # Q1
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBi32xgqbAcDg0jxe4k2XyLNgCBa5m2zJUGt+fjXY+lT" # dev-b
       ];
 
       sshPort = 58023; # external (passt) -> guest sshd
