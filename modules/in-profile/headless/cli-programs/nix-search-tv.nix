@@ -62,7 +62,6 @@
           impermanence = mkOpts inputs.impermanence inputs.impermanence.nixosModules.impermanence;
           microvm = mkOpts inputs.microvm inputs.microvm.nixosModules.microvm;
           nixvirt = mkOpts inputs.NixVirt inputs.NixVirt.nixosModules.default;
-          solaar = mkOpts inputs.solaar inputs.solaar.nixosModules.solaar;
           hermes-agent = mkOptsRaw inputs.hermes-agent.nixosModules.default;
           hermes-webui = mkOptsRaw inputs.hermes-webui.nixosModules.default;
           nixos-wsl = mkOptsRaw inputs.nixos-wsl.nixosModules.default;
