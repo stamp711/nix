@@ -4,7 +4,7 @@
   },
   "grants": [
     {
-      "src": ["autogroup:owner", "tag:surge"],
+      "src": ["autogroup:owner"],
       "dst": ["*"],
       "ip": ["*"],
     },
