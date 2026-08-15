@@ -180,21 +180,7 @@ in
         let
           template = config.my.age-template.files.${templateName};
           # Upstream's default config file location.
-          configFile = "${config.xdg.configHome}/oixcloud-external-proxy-program/config.json";
-          start = pkgs.writeShellApplication {
-            name = "oixcloud-start";
-            runtimeInputs = [ self.packages.${pkgs.stdenv.hostPlatform.system}.oixcloud ];
-            # Rendered here because launchd cannot order us after the age-template
-            # agent. Rendering twice costs nothing.
-            text = ''
-              ${template.renderScript}
-              exec oixcloud-external-proxy-program \
-                --serve --mode map \
-                --listen 0.0.0.0:${toString cfg.port} \
-                --bind 0.0.0.0 \
-                --config ${configFile}
-            '';
-          };
+          configName = "oixcloud-external-proxy-program/config.json";
         in
         {
           # This home module builds upstream's macOS binary; elsewhere it is a mistake.
@@ -206,17 +192,35 @@ in
           ];
 
           my.age-template.files.${templateName} = templateFile cfg;
-
-          xdg.configFile."oixcloud-external-proxy-program/config.json".source =
-            config.lib.file.mkOutOfStoreSymlink template.path;
+          xdg.configFile.${configName}.source = config.lib.file.mkOutOfStoreSymlink template.path;
 
           launchd.agents.oixcloud = {
             enable = true;
-            config = {
-              ProgramArguments = [ "${start}/bin/oixcloud-start" ];
+            config = rec {
+              ProgramArguments =
+                let
+                  start = pkgs.writeShellApplication {
+                    name = "oixcloud-start";
+                    runtimeInputs = [ self.packages.${pkgs.stdenv.hostPlatform.system}.oixcloud ];
+                    # Rendered here because launchd cannot order us after the age-template
+                    # agent. Rendering twice costs nothing.
+                    text = ''
+                      ${template.renderScript}
+                      exec oixcloud-external-proxy-program \
+                        --serve --mode map \
+                        --listen 0.0.0.0:${toString cfg.port} \
+                        --bind 0.0.0.0 \
+                        --config ${config.xdg.configHome}/${configName}
+                    '';
+                  };
+                in
+                [ "${start}/bin/oixcloud-start" ];
               WorkingDirectory = config.home.homeDirectory; # launchd defaults to "/"
               KeepAlive = true;
               RunAtLoad = true;
+              # launchd sends both streams to /dev/null without these.
+              StandardOutPath = "${config.home.homeDirectory}/Library/Logs/oixcloud.log";
+              StandardErrorPath = StandardOutPath;
             };
           };
         }
