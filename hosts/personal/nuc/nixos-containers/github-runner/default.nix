@@ -16,6 +16,8 @@
       age.secrets = pat.ageSecret;
 
       my.containers.github-runner = {
+        macvlan = "enp4s0";
+
         sharedDirs."/run/github-runner-token" = {
           owner = "root";
           group = "root";
