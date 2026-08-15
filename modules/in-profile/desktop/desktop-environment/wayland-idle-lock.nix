@@ -42,7 +42,7 @@
   flake.homeModules.desktop-environment =
     { lib, pkgs, ... }:
     {
-      config = lib.mkIf pkgs.stdenv.isLinux {
+      config = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
         # Handle ext-idle-notify-v1, emit logind Lock signal after idle.
         services.swayidle = {
           enable = true;

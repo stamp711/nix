@@ -4,8 +4,12 @@
     { config, pkgs, ... }:
     {
       home.stateVersion = "26.11";
-      home.homeDirectory =
-        if pkgs.stdenv.isDarwin then "/Users/${config.home.username}" else "/home/${config.home.username}";
+      home.homeDirectory = lib.mkDefault (
+        if pkgs.stdenv.hostPlatform.isDarwin then
+          "/Users/${config.home.username}"
+        else
+          "/home/${config.home.username}"
+      );
       xdg.enable = true;
       programs.home-manager.enable = true;
 

@@ -4,7 +4,7 @@
   flake.homeModules.cli-programs =
     { lib, pkgs, ... }:
     let
-      ghqRoot = if pkgs.stdenv.isDarwin then "~/Developer" else "~/code";
+      ghqRoot = if pkgs.stdenv.hostPlatform.isDarwin then "~/Developer" else "~/code";
 
       oyui = inputs.oyui.packages.${pkgs.stdenv.hostPlatform.system}.default;
     in

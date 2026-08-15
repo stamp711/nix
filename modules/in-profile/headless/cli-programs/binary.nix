@@ -21,7 +21,7 @@
           # Reverse engineering
           rizin # RE framework: disassembler, debugger, hex editor (modern radare2 fork)
         ]
-        ++ lib.optionals pkgs.stdenv.isLinux [
+        ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
           # ELF inspection
           elfutils # eu-readelf, eu-objdump, eu-nm - better DWARF support than binutils
 

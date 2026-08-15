@@ -9,10 +9,10 @@
     {
       programs.obsidian = {
         enable = true;
-        package = lib.mkIf pkgs.stdenv.isDarwin null;
+        package = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin null;
         cli.enable = true;
       };
-      home.sessionPath = lib.mkIf pkgs.stdenv.isDarwin [
+      home.sessionPath = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin [
         "/Applications/Obsidian.app/Contents/MacOS"
       ];
     };

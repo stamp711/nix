@@ -16,7 +16,7 @@
           hyperfine # CLI benchmark runner - compare command execution times
           sysbench # system performance benchmark suite
         ]
-        ++ lib.optionals pkgs.stdenv.isLinux [
+        ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
           sysstat
 
           # Profiling (Linux)

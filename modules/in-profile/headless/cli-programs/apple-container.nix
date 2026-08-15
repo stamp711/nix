@@ -1,8 +1,8 @@
 {
   flake.homeModules.cli-programs =
     { lib, pkgs, ... }:
-    lib.mkIf pkgs.stdenv.isDarwin {
-      # xdg.configFile."container/config.toml" = lib.mkIf pkgs.stdenv.isDarwin {
+    lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
+      # xdg.configFile."container/config.toml" = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
       #   source = (pkgs.formats.toml { }).generate "container-config.toml" {
       #     machine.homeMount = "none";
       #     dns.domain = "container";

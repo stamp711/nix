@@ -196,7 +196,7 @@
             '';
           })
 
-          (lib.mkIf pkgs.stdenv.isLinux {
+          (lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
             systemd.user.services.mihomo = {
               Unit = {
                 Description = "mihomo proxy router";
@@ -211,7 +211,7 @@
             };
           })
 
-          (lib.mkIf pkgs.stdenv.isDarwin {
+          (lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
             launchd.agents.mihomo = {
               enable = true;
               config = {
