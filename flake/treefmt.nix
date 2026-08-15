@@ -11,6 +11,7 @@
         programs.stylua.enable = true;
         programs.prettier.enable = true;
         programs.clang-format.enable = true;
+        programs.ruff-format.enable = true;
         settings.formatter.gersemi = {
           command = "${pkgs.gersemi}/bin/gersemi";
           options = [ "-i" ];
