@@ -11,40 +11,21 @@ concurrency:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   update:
-    runs-on: [self-hosted, linux]
-    steps:
-      - uses: actions/checkout@v7
-      - run: nix run .#update-inputs
-      - uses: actions/upload-artifact@v7
-        with:
-          name: flake-lock
-          path: flake.lock
-
-  check:
-    needs: update
-    strategy:
-      matrix:
-        platform: [linux, macos]
-    runs-on: [self-hosted, "${{ matrix.platform }}"]
-    steps:
-      - uses: actions/checkout@v7
-      - uses: actions/download-artifact@v8
-        with:
-          name: flake-lock
-      - run: nix flake check
-
-  commit:
-    needs: check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/download-artifact@v8
+      - uses: DeterminateSystems/nix-installer-action@v22
         with:
-          name: flake-lock
-      - uses: stefanzweifel/git-auto-commit-action@v7
+          determinate: false
+      - run: nix run .#update-inputs
+      - uses: peter-evans/create-pull-request@v8
         with:
-          commit_message: "update inputs"
-          file_pattern: flake.lock
+          branch: update-inputs
+          delete-branch: true
+          title: "flake: update inputs"
+          commit-message: "flake: update inputs"
+          add-paths: flake.lock
