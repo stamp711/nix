@@ -4,6 +4,6 @@
   };
 
   flake.darwinModules.desktop-programs = {
-    homebrew.casks = [ "logi-options+" ];
+    # homebrew.casks = [ "logi-options+" ];
   };
 }
