@@ -7,6 +7,17 @@
       ghqRoot = if pkgs.stdenv.hostPlatform.isDarwin then "~/Developer" else "~/code";
 
       oyui = inputs.oyui.packages.${pkgs.stdenv.hostPlatform.system}.default;
+
+      editorIfTty = pkgs.writeShellApplication {
+        name = "editor-if-tty";
+        text = ''
+          if [ ! -t 0 ]; then
+            echo 'This session is not interactive.' >&2
+            exit 1
+          fi
+          eval "exec ''${VISUAL:-$EDITOR} \"\$@\""
+        '';
+      };
     in
     {
       programs.git.enable = true;
@@ -18,6 +29,7 @@
         push.autoSetupRemote = true;
         ghq.root = ghqRoot;
         aliases.cl = "!git clean -xdf -e .jj";
+        core.editor = lib.getExe editorIfTty;
       };
 
       # Diff viewers
@@ -79,6 +91,7 @@
 
       programs.jujutsu.enable = true;
       programs.jujutsu.settings.ui.default-command = [ "log" ];
+      programs.jujutsu.settings.ui.editor = lib.getExe editorIfTty;
       programs.jujutsu.settings.ui.show-cryptographic-signatures = true;
 
       # oyui interactive diff editor
