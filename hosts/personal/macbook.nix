@@ -7,11 +7,15 @@ in
 {
   flake.darwinConfigurations.${hostname} = self.lib.mkDarwin {
     inherit system;
+    rekey = true;
     modules = [
       self.profiles.darwin.desktop
       self.darwinModules.personal
       {
         my.primaryUser = username;
+        # The host key mac-mini authorizes as a build client.
+        age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL4XlaStwoxbXApazEStdePP0BpKLH29smaFK/VSTsVC";
+        age.rekey.localStorageDir = self.lib.rekeyDir hostname;
       }
     ];
   };

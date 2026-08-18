@@ -1,6 +1,5 @@
 { self, ... }:
 let
-  # Every personal machine sees this entry.
   builder = {
     host = "nuc.boar-char.ts.net";
     # Tailscale SSH answers port 22 on the tailnet, so this is its key, not /etc/ssh's.
@@ -13,6 +12,7 @@ let
   };
 in
 {
+  # Every personal machine sees this entry.
   flake.nixosModules.personal.my.nix.build-machine.nuc = builder;
   flake.darwinModules.personal.my.nix.build-machine.nuc = builder;
 
