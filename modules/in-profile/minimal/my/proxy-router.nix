@@ -37,7 +37,7 @@
           };
           interval = lib.mkOption {
             type = lib.types.int;
-            default = 30;
+            default = 20;
             description = "Health-check interval in seconds.";
           };
         };
