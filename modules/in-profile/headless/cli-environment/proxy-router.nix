@@ -29,11 +29,6 @@
           server = "172.20.10.1";
           port = 6153;
         };
-        charon = {
-          type = "http";
-          server = "127.0.0.1";
-          port = 6150;
-        };
       };
 
       fallbackProxyGroups.auto = {
@@ -56,7 +51,6 @@
           "surge-hotspot"
           "surge-aprixnet"
           "surge-ts"
-          "charon"
         ];
         url = "http://www.google.com/generate_204";
         interval = 60;
