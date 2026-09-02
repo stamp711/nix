@@ -5,6 +5,7 @@
       KeyRepeat = 1;
       InitialKeyRepeat = 15;
       AppleKeyboardUIMode = 2;
+      ApplePressAndHoldEnabled = false;
     };
   };
 
