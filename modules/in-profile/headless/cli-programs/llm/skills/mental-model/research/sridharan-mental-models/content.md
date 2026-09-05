@@ -1,6 +1,6 @@
 # Effective Mental Models for Code and Systems
 
-_As always, I’m greatly indebted to **Fred Hebert **for reviewing a draft of this post and offering some invaluable insights._
+_As always, I’m greatly indebted to \*\*Fred Hebert \*\*for reviewing a draft of this post and offering some invaluable insights._
 
 A little over a month ago, Carmen Andoh gave a talk at a meetup in Copenhagen about visualizations, though it really was a talk on mental models. In her talk, Carmen described a mental model as:
 
