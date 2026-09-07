@@ -167,7 +167,7 @@
           nix.enable = false;
 
           # guest logs surface in host journalctl -u microvm@ariadne
-          services.journald.extraConfig = "ForwardToConsole=yes";
+          services.journald.settings.Journal.ForwardToConsole = true;
 
           security.protectKernelImage = true; # no kexec
           boot.kernel.sysctl."kernel.kptr_restrict" = 2;
