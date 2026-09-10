@@ -79,7 +79,7 @@
         ];
 
         fillchars = {
-          diff = "╱";
+          diff = " "; # bg-only filler; i don't like the default ╱ hatch
           eob = " ";
         };
       };
