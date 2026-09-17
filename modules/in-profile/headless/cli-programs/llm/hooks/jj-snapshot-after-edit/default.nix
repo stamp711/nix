@@ -21,7 +21,7 @@ let
     { pkgs, ... }:
     {
       my.codex.managedHooks.jj-snapshot-after-edit = {
-        event = "PostToolUse";
+        events = [ "PostToolUse" ];
         matcher = "apply_patch";
         command = snapshot pkgs ../codex-edited-path.jq;
       };

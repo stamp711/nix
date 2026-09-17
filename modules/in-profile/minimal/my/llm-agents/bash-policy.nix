@@ -130,7 +130,7 @@ let
     { config, pkgs, ... }:
     lib.mkIf (config.my.llm-agents.bash-policy.rules != { }) {
       my.codex.managedHooks.bash-policy = {
-        event = "PreToolUse";
+        events = [ "PreToolUse" ];
         # In a hook payload codex calls all of its shell tools `Bash`, code mode included.
         matcher = "Bash";
         command = hook { inherit config pkgs; };

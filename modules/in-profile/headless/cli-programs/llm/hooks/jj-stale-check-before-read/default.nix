@@ -31,7 +31,7 @@ let
     { pkgs, ... }:
     {
       my.codex.managedHooks.jj-stale-check-before-read = {
-        event = "PreToolUse";
+        events = [ "PreToolUse" ];
         matcher = "apply_patch";
         command = pkgs.writeShellScript "jj-stale-check-before-read-codex" ''
           ${detect pkgs ../codex-edited-path.jq}

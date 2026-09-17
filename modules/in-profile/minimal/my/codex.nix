@@ -13,21 +13,23 @@ let
         type = lib.types.attrsOf (
           lib.types.submodule {
             options = {
-              event = lib.mkOption {
-                type = lib.types.enum [
-                  "PreToolUse"
-                  "PostToolUse"
-                  "PermissionRequest"
-                  "PreCompact"
-                  "PostCompact"
-                  "SessionStart"
-                  "SessionEnd"
-                  "SubagentStart"
-                  "SubagentStop"
-                  "Stop"
-                  "UserPromptSubmit"
-                ];
-                description = "Codex hook event to fire on.";
+              events = lib.mkOption {
+                type = lib.types.listOf (
+                  lib.types.enum [
+                    "PreToolUse"
+                    "PostToolUse"
+                    "PermissionRequest"
+                    "PreCompact"
+                    "PostCompact"
+                    "SessionStart"
+                    "SessionEnd"
+                    "SubagentStart"
+                    "SubagentStop"
+                    "Stop"
+                    "UserPromptSubmit"
+                  ]
+                );
+                description = "Codex hook events to fire on.";
               };
               matcher = lib.mkOption {
                 type = lib.types.str;
@@ -47,18 +49,20 @@ let
           # codex only runs commands living under managed_dir
           managedDir = "/etc/codex/hooks";
           # The hooks grouped by event, the shape requirements.toml wants.
-          byEvent = lib.mapAttrs (
-            _:
-            lib.map (name: {
-              inherit (cfg.${name}) matcher;
-              hooks = [
-                {
-                  type = "command";
-                  command = "${managedDir}/${name}";
-                }
-              ];
-            })
-          ) (lib.groupBy (name: cfg.${name}.event) (lib.attrNames cfg));
+          byEvent = lib.zipAttrs (
+            lib.mapAttrsToList (
+              name: hook:
+              lib.genAttrs hook.events (_: {
+                inherit (hook) matcher;
+                hooks = [
+                  {
+                    type = "command";
+                    command = "${managedDir}/${name}";
+                  }
+                ];
+              })
+            ) cfg
+          );
         in
         {
           environment.etc = self.lib.mergeDisjoint [
