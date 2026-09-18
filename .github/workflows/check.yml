@@ -14,7 +14,7 @@ permissions:
   contents: read
 
 jobs:
-  check:
+  flake-check:
     if: ${{ !github.event.pull_request.head.repo.fork }} # not for forks
     strategy:
       matrix:
@@ -23,3 +23,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - run: nix flake check
+
+  check: # single stable name for the branch ruleset
+    if: ${{ always() }}
+    needs: flake-check
+    runs-on: ubuntu-latest
+    steps:
+      - run: '[ "${{ needs.flake-check.result }}" = success ]'
