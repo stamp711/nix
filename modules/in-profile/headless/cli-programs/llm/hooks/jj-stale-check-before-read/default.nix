@@ -18,7 +18,7 @@ let
     esac
   '';
 
-  # opencode and pi run hooks in-process, so they take a plugin rather than a script
+  # pi runs hooks in-process, so it takes a plugin rather than a script
   plugin =
     pkgs: src:
     pkgs.replaceVars src {
@@ -70,8 +70,7 @@ in
         }
       ];
 
-      # TODO: validate those, and add omp
-      home.file.".opencode/plugin/jj-stale-check-before-read.js".source = plugin pkgs ./opencode.js;
+      # TODO: validate this, and add omp
       home.file.".pi/agent/extensions/jj-stale-check-before-read.ts".source = plugin pkgs ./pi.ts;
     };
 

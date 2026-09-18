@@ -22,7 +22,6 @@
         ;   /[.]claude/projects/
         ;   /[.]codex/sessions/
         ;   /[.]pi/agent/sessions/
-        ;   /[.]local/share/opencode/
 
         # allowlist mode
         exclude = true

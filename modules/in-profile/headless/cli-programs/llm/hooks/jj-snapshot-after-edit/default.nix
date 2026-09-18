@@ -14,7 +14,7 @@ let
       ${pkgs.lib.getExe pkgs.jujutsu} status >/dev/null 2>&1 || true
     '';
 
-  # opencode and pi run hooks in-process, so they take a plugin rather than a script
+  # pi runs hooks in-process, so it takes a plugin rather than a script
   plugin = pkgs: src: pkgs.replaceVars src { jj = pkgs.lib.getExe pkgs.jujutsu; };
 
   codexHook =
@@ -43,8 +43,7 @@ in
         }
       ];
 
-      # TODO: validate those, and add omp
-      home.file.".opencode/plugin/jj-snapshot-after-edit.js".source = plugin pkgs ./opencode.js;
+      # TODO: validate this, and add omp
       home.file.".pi/agent/extensions/jj-snapshot-after-edit.ts".source = plugin pkgs ./pi.ts;
     };
 

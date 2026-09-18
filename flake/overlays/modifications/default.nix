@@ -5,7 +5,6 @@
     inherit (inputs.llm-agents.packages.${prev.stdenv.hostPlatform.system})
       claude-code
       codex
-      opencode
       ;
 
     # Default clang-format to --fallback-style=none so it no-ops when no
