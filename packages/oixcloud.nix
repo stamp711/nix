@@ -2,11 +2,11 @@
 # only inside their OCI image.
 { lib, ... }:
 let
-  version = "v0.0.29";
+  version = "v0.0.32";
   # The value in the release's own SHA256SUMS.
-  sha256 = "7bacde236d551a38ec6596b74fc77ea824e7e488fb8e5a3b1f03247c4b1581ff";
-  # The Linux build, for hosts that run it as a container. NOTE: Still v0.0.28.
-  imageDigest = "sha256:f1f219733cc19a502a59d4e27435e42475f66c4f19a3cdf986f3deac054ca329";
+  sha256 = "0aab7496e9fc89c2fbff92ba5058ec0b342dff5065f4b802e3961e5e5ee39e3f";
+  # The Linux build, for hosts that run it as a container.
+  imageDigest = "sha256:1a118d10d4acd1768a2b3903683631210d313b0273e296330a8b671badb7903a";
 in
 {
   flake.lib.oixcloudImage = "ghcr.io/pickrui/oixcloud-external-proxy-program@${imageDigest}";

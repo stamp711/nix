@@ -10,6 +10,8 @@
       my.oixcloud = {
         enable = true;
         tokenFile = token.path;
+        udpAdvertiseAddress = "10.0.10.10";
+        udpPortCount = 1000;
       };
     };
 }
