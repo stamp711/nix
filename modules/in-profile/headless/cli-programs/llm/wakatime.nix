@@ -50,7 +50,6 @@
             --replace-fail 'const globalPath = whichSync(binaryName);' \
               'const globalPath = "${pkgs.wakatime-cli}/bin/wakatime-cli";'
         '';
-        # hashes come from package-lock.json, so bumping the input needs no manual update
         npmDeps = pkgs.importNpmLock { npmRoot = inputs.opencode-wakatime; };
         npmConfigHook = pkgs.importNpmLock.npmConfigHook;
         npmFlags = [ "--ignore-scripts" ]; # husky
@@ -63,7 +62,8 @@
     in
     {
       programs.claude-code.plugins.${claude-wakatime-plugin-name} = claude-wakatime;
-      programs.codex.plugins = [ codex-wakatime ];
+      # Read the built manifest's name/version instead of derivation metadata (0.0.0).
+      programs.codex.plugins = [ "${codex-wakatime}" ];
       # opencode 1.18.5 only loads plugins from here, not from settings.plugin or XDG.
       home.file.".opencode/plugin/wakatime.js".source = "${opencode-wakatime}/wakatime.js";
 
