@@ -14,9 +14,6 @@ let
       ${pkgs.lib.getExe pkgs.jujutsu} status >/dev/null 2>&1 || true
     '';
 
-  # pi runs hooks in-process, so it takes a plugin rather than a script
-  plugin = pkgs: src: pkgs.replaceVars src { jj = pkgs.lib.getExe pkgs.jujutsu; };
-
   codexHook =
     { pkgs, ... }:
     {
@@ -42,9 +39,6 @@ in
           ];
         }
       ];
-
-      # TODO: validate this, and add omp
-      home.file.".pi/agent/extensions/jj-snapshot-after-edit.ts".source = plugin pkgs ./pi.ts;
     };
 
   flake.nixosModules.cli-programs = codexHook;

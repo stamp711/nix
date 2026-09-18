@@ -21,7 +21,6 @@
         ;   /[.]slock/agents/
         ;   /[.]claude/projects/
         ;   /[.]codex/sessions/
-        ;   /[.]pi/agent/sessions/
 
         # allowlist mode
         exclude = true

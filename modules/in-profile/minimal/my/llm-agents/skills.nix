@@ -31,7 +31,7 @@
         '';
       };
 
-      # Codex and Pi use .agents; Claude uses .claude.
+      # Codex uses .agents; Claude uses .claude.
       config.home.file = self.lib.mergeDisjoint [
         (skillFiles ".agents/skills")
         (skillFiles ".claude/skills")

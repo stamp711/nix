@@ -18,14 +18,6 @@ let
     esac
   '';
 
-  # pi runs hooks in-process, so it takes a plugin rather than a script
-  plugin =
-    pkgs: src:
-    pkgs.replaceVars src {
-      inherit reason;
-      jj = pkgs.lib.getExe pkgs.jujutsu;
-    };
-
   # codex blocks on exit 2 and relays stderr to the model
   codexHook =
     { pkgs, ... }:
@@ -69,9 +61,6 @@ in
           ];
         }
       ];
-
-      # TODO: validate this, and add omp
-      home.file.".pi/agent/extensions/jj-stale-check-before-read.ts".source = plugin pkgs ./pi.ts;
     };
 
   flake.nixosModules.cli-programs = codexHook;

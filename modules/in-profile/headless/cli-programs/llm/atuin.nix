@@ -21,7 +21,7 @@ in
   flake.darwinModules.cli-programs = codexHookModule;
 
   flake.homeModules.cli-programs =
-    { config, pkgs, ... }:
+    { config, ... }:
     let
       atuin = lib.getExe config.programs.atuin.package;
     in
@@ -49,13 +49,6 @@ in
           "mcp__atuin__atuin_output"
         ];
       };
-
-      # atuin carries pi's extension inside its binary
-      home.file.".pi/agent/extensions/atuin.ts".source = pkgs.runCommand "atuin-pi-extension" { } ''
-        export HOME=$PWD
-        ${atuin} hook install pi
-        cp $HOME/.pi/agent/extensions/atuin.ts $out
-      '';
 
       programs.mcp.servers.atuin = {
         command = atuin;

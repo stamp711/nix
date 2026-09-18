@@ -61,8 +61,6 @@ in
       # Let codex own this file, since it really wants to mutate it at runtime.
       home.file.".codex/config.toml".enable = false;
 
-      programs.pi-coding-agent.enable = true;
-
       programs.mcp.enable = true;
       programs.mcp.servers = { };
     };
