@@ -1,0 +1,22 @@
+# Menu: HEADER
+# FORMAT: 4
+# ARCH: amd64 arm64
+# FLAVOUR: arm64-nvidia arm64-nvidia-64k
+# FLAVOUR_DEP: {'arm64-nvidia': 'arm64-generic', 'arm64-nvidia-64k': 'arm64-generic-64k'}
+
+include "./base"
+
+CONFIG_ARCH_OVERRIDE policy<{'arm64': 'm'}>
+CONFIG_FLAVOUR_OVERRIDE policy<{'arm64': 'n', 'arm64-nvidia': 'y'}>
+CONFIG_POLICY_ORDER policy<{'arm64-nvidia': 'y', 'arm64': 'n'}>
+CONFIG_UNDEFINED policy<{'arm64': '-'}>
+CONFIG_DISABLED policy<{'arm64': 'n'}>
+CONFIG_NUMBER policy<{'arm64': '128'}>
+CONFIG_HEX policy<{'arm64': '0x1000'}>
+CONFIG_STRING policy<{'arm64': '"hello world"'}>
+CONFIG_EMPTY policy<{'arm64': '""'}>
+CONFIG_QUOTES policy<{'arm64': '"it\'s \\"quoted\\""'}>
+CONFIG_DOLLAR policy<{'arm64': '"${literal}"'}>
+CONFIG_DOUBLE_QUOTED policy<{"arm64": "\"quoted\""}>
+CONFIG_DISABLED note<'Notes do not change policy'>
+CONFIG_BACKSLASHES policy<{'arm64': '"path\\\\name\\\\\\"quoted\\""'}>

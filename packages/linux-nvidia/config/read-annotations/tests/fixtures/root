@@ -1,0 +1,10 @@
+# Menu: HEADER
+# FORMAT: 4
+# ARCH: amd64 arm64
+# FLAVOUR: arm64-nvidia arm64-nvidia-64k
+# FLAVOUR_DEP: {'arm64-nvidia': 'arm64-generic', 'arm64-nvidia-64k': 'arm64-generic-64k'}
+
+include "./vendor"
+
+CONFIG_LATE_OVERRIDE policy<{'arm64': 'n'}>
+CONFIG_LATE_OVERRIDE policy<{'arm64-nvidia': 'y'}>

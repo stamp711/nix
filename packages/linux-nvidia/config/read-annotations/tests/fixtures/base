@@ -1,0 +1,13 @@
+# Menu: HEADER
+# FORMAT: 4
+# ARCH: amd64 arm64
+# FLAVOUR: amd64-generic arm64-generic arm64-generic-64k
+
+CONFIG_INHERITED policy<{'amd64': 'n', 'arm64': 'y'}>
+CONFIG_FLAVOUR policy<{'arm64': 'n', 'arm64-generic': 'm', 'arm64-generic-64k': 'y'}>
+CONFIG_ARCH_OVERRIDE policy<{'arm64': 'n', 'arm64-generic': 'y', 'arm64-nvidia': 'y'}>
+CONFIG_UNDEFINED policy<{'arm64': 'y'}>
+CONFIG_OTHER_ARCH policy<{'amd64': 'y'}>
+CONFIG_BLK_DEV_DM policy<{'arm64': 'y'}>
+CONFIG_GCC_VERSION policy<{'arm64': '130300'}>
+CONFIG_SYSTEM_TRUSTED_KEYS policy<{'arm64': '"debian/canonical-certs.pem"'}>

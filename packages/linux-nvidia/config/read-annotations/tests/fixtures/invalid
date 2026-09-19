@@ -1,0 +1,6 @@
+# Menu: HEADER
+# FORMAT: 4
+# ARCH: arm64
+# FLAVOUR: arm64-nvidia
+
+CONFIG_MISSPELLED polcy<{'arm64': 'y'}>
