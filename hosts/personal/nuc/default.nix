@@ -8,6 +8,9 @@ let
   username = "stamp";
   hostname = "NUC";
   system = "x86_64-linux";
+  nixpkgsConfig = {
+    cudaSupport = true;
+  };
   hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIClC3VLrypgdZbvJPhufSe6BeWcijyTrnl4JqBs/r566";
   userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDbNYaZnOCmlfKtRpPEq12Ot3iaVjq0AFj7vsB3DcjQ+";
 in
@@ -16,8 +19,7 @@ in
   imports = (inputs.import-dir ./. { collect = true; })._all;
 
   flake.nixosConfigurations.${hostname} = self.lib.mkNixos {
-    inherit system;
-    nixpkgsConfig.cudaSupport = true;
+    inherit system nixpkgsConfig;
     modules = [
       self.profiles.nixos.desktop
       self.nixosModules.linux-gaming
@@ -63,8 +65,7 @@ in
   };
 
   flake.homeConfigurations."${username}@${hostname}" = self.lib.mkHome {
-    inherit system;
-    nixpkgsConfig.cudaSupport = true;
+    inherit system nixpkgsConfig;
     modules = [
       self.profiles.homeManager.desktop
       self.homeModules.linux-gaming
