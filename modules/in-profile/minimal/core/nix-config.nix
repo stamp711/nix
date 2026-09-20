@@ -8,13 +8,15 @@ let
     extra-substituters = [
       # cache.nixos.org's priority is 40.
       "https://cache.numtide.com?priority=45" # serves no priority => 0
-      "https://cache.nixos-cuda.org" # 50
       "https://nix-community.cachix.org" # 41
+      "https://cache.flox.dev" # 41
+      "https://cache.nixos-cuda.org" # 50
     ];
     extra-trusted-public-keys = [
       "niks3.numtide.com-1:DTx8wZduET09hRmMtKdQDxNNthLQETkc/yaX7M4qK0g="
-      "cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "flox-cache-public-1:7F4OyH7ZCnFhcze3fJdfyXYLQw/aV7GEed86nQ7IsOs="
+      "cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M="
     ];
     # Build from source when substitution fails, and stop asking a failing cache for a minute.
     fallback = true;
