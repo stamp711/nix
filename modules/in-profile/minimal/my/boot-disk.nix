@@ -1,7 +1,12 @@
 { lib, ... }:
 {
   flake.nixosModules.my =
-    { config, pkgs, ... }:
+    {
+      config,
+      pkgs,
+      utils,
+      ...
+    }:
     let
       cfg = config.my.boot-disk;
     in
@@ -34,7 +39,7 @@
           ];
           description = ''
             btrfs subvolumes to wipe on each boot by rolling back to @blank
-            in initrd. Only effective on a luks+btrfs layout. Empty list
+            in initrd. Applies to both Btrfs layouts. Empty list
             disables the rollback (staging mode); my.persistence bind mounts
             still apply.
 
@@ -59,6 +64,17 @@
           };
 
           luksName = "cryptroot";
+          isBtrfs = lib.elem cfg.layout [
+            "efi-btrfs"
+            "efi-luks-btrfs"
+          ];
+          isEncrypted = cfg.layout == "efi-luks-btrfs";
+          rootDevice = config.fileSystems."/".device;
+          rollbackDependency =
+            if isEncrypted then
+              "systemd-cryptsetup@${luksName}.service"
+            else
+              "${utils.escapeSystemdPath rootDevice}.device";
 
           btrfsContent = {
             type = "btrfs";
@@ -91,7 +107,7 @@
             fi
 
             mkdir -p /btrfs_tmp
-            ${pkgs.util-linux.mount}/bin/mount -t btrfs -o subvol=/ /dev/mapper/${luksName} /btrfs_tmp
+            ${pkgs.util-linux.mount}/bin/mount -t btrfs -o subvol=/ ${lib.escapeShellArg rootDevice} /btrfs_tmp
             trap '${pkgs.util-linux.mount}/bin/umount /btrfs_tmp 2>/dev/null || true' EXIT
 
             # Refuse to wipe if @blank is missing
@@ -111,28 +127,9 @@
         in
         lib.mkMerge [
 
-          # efi-btrfs layout
-          # TODO: unused; revisit if a non-luks host appears, or drop.
-          (lib.mkIf (cfg.layout == "efi-btrfs") {
-            boot.loader.systemd-boot.enable = true;
-            boot.loader.efi.canTouchEfiVariables = true;
-            disko.devices.disk.main = {
-              inherit (cfg) device;
-              type = "disk";
-              content = {
-                type = "gpt";
-                partitions.ESP = espPartition;
-                partitions.root = {
-                  size = "100%";
-                  content = btrfsContent;
-                };
-              };
-            };
-          })
-
-          # efi-luks-btrfs layout: subvolumes always include @blank/@persist;
+          # Both Btrfs layouts share persistence and initrd rollback.
           # listing any subvol in wipeTargets gives impermanence for that subvol.
-          (lib.mkIf (cfg.layout == "efi-luks-btrfs") (
+          (lib.mkIf isBtrfs (
             lib.mkMerge [
               {
                 my.persistence.enable = true;
@@ -150,12 +147,16 @@
                     partitions.ESP = espPartition;
                     partitions.root = {
                       size = "100%";
-                      content = {
-                        type = "luks";
-                        name = luksName;
-                        settings.allowDiscards = true;
-                        content = btrfsContent;
-                      };
+                      content =
+                        if isEncrypted then
+                          {
+                            type = "luks";
+                            name = luksName;
+                            settings.allowDiscards = true;
+                            content = btrfsContent;
+                          }
+                        else
+                          btrfsContent;
                     };
                   };
                 };
@@ -174,8 +175,8 @@
                 boot.initrd.systemd.services.rollback-subvols = {
                   description = "Wipe btrfs subvolumes: ${lib.concatStringsSep " " cfg.wipeTargets}";
                   requiredBy = [ "initrd.target" ];
-                  requires = [ "systemd-cryptsetup@${luksName}.service" ];
-                  after = [ "systemd-cryptsetup@${luksName}.service" ];
+                  requires = [ rollbackDependency ];
+                  after = [ rollbackDependency ];
                   before = [ "sysroot.mount" ];
                   unitConfig.DefaultDependencies = false;
                   serviceConfig = {
