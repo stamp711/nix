@@ -115,10 +115,14 @@ in
     mkHome =
       {
         system,
+        nixpkgsConfig ? { },
         modules ? [ ],
       }:
       inputs.home-manager.lib.homeManagerConfiguration {
-        pkgs = self.lib.mkPkgs { inherit system; };
+        pkgs = self.lib.mkPkgs {
+          inherit system;
+          config = nixpkgsConfig;
+        };
         modules = self.lib.homeBaseModules ++ modules;
       };
 

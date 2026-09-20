@@ -64,6 +64,7 @@ in
 
   flake.homeConfigurations."${username}@${hostname}" = self.lib.mkHome {
     inherit system;
+    nixpkgsConfig.cudaSupport = true;
     modules = [
       self.profiles.homeManager.desktop
       self.homeModules.linux-gaming
