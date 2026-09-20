@@ -42,8 +42,7 @@ let
 
           my.boot-disk = {
             enable = true;
-            layout = "mbr-ext4";
-            device = "/dev/sda";
+            layout.mbr-ext4.device = "/dev/sda";
           };
 
           networking.firewall.enable = true;

@@ -24,9 +24,11 @@ in
         age.rekey.localStorageDir = self.lib.rekeyDir hostname;
         my.boot-disk = {
           enable = true;
-          layout = "efi-luks-btrfs";
-          device = "/dev/nvme0n1";
-          swapSize = "32G";
+          layout.efi-btrfs = {
+            device = "/dev/nvme0n1";
+            luks = true;
+            swapSize = "32G";
+          };
         };
       }
     ];

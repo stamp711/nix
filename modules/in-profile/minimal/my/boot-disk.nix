@@ -9,74 +9,92 @@
     }:
     let
       cfg = config.my.boot-disk;
+      diskDevice = lib.mkOption {
+        type = lib.types.str;
+        description = "Disk to partition. Prefer a stable /dev/disk/by-id path.";
+      };
+      luksEnable = lib.mkOption {
+        type = lib.types.bool;
+        description = "Encrypt the root partition with LUKS.";
+      };
+      btrfsSwapSize = lib.mkOption {
+        type = lib.types.str;
+        default = "16G";
+        description = "Size of the btrfs swapfile.";
+      };
+      btrfsWipeTargets = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ "@root" ];
+        example = [
+          "@root"
+          "@home"
+        ];
+        description = ''
+          btrfs subvolumes to wipe on each boot by rolling back to @blank
+          in initrd. Empty list disables the rollback (staging mode);
+          my.persistence bind mounts still apply.
+
+          Pre-populate /persist/... (via my.persistence.* declarations)
+          with anything in a wipe target that you need to survive — wiped
+          state with no persistence is lost.
+        '';
+      };
     in
     {
       options.my.boot-disk = {
         enable = lib.mkEnableOption "declarative disk layout via disko";
         layout = lib.mkOption {
-          type = lib.types.enum [
-            "efi-btrfs"
-            "efi-luks-btrfs"
-            "mbr-ext4"
-          ];
-          description = "Partition scheme to lay down on {option}`device`.";
-        };
-        device = lib.mkOption {
-          type = lib.types.str;
-          description = "Disk to partition. Prefer a stable /dev/disk/by-id path.";
-        };
-        swapSize = lib.mkOption {
-          type = lib.types.str;
-          default = "16G";
-          description = "Size of the btrfs swapfile. Unused by the mbr-ext4 layout.";
-        };
-        wipeTargets = lib.mkOption {
-          type = lib.types.listOf lib.types.str;
-          default = [ "@root" ];
-          example = [
-            "@root"
-            "@home"
-          ];
-          description = ''
-            btrfs subvolumes to wipe on each boot by rolling back to @blank
-            in initrd. Applies to both Btrfs layouts. Empty list
-            disables the rollback (staging mode); my.persistence bind mounts
-            still apply.
-
-            Pre-populate /persist/... (via my.persistence.* declarations)
-            with anything in a wipe target that you need to survive — wiped
-            state with no persistence is lost.
-          '';
+          description = "Disk layout to apply. Exactly one variant, carrying only its own settings.";
+          type = lib.types.attrTag {
+            efi-btrfs = lib.mkOption {
+              description = "Whole disk: ESP plus a Btrfs root, optionally LUKS-encrypted.";
+              type = lib.types.submodule {
+                options = {
+                  device = diskDevice;
+                  luks = luksEnable;
+                  swapSize = btrfsSwapSize;
+                  wipeTargets = btrfsWipeTargets;
+                };
+              };
+            };
+            mbr-ext4 = lib.mkOption {
+              description = "Whole disk: BIOS boot partition plus an ext4 root.";
+              type = lib.types.submodule { options.device = diskDevice; };
+            };
+            efi-btrfs-dual-boot = lib.mkOption {
+              description = ''
+                Adopt partitions on a disk another OS owns. Nothing here writes
+                a partition table; create the partitions before installing.
+              '';
+              type = lib.types.submodule {
+                options = {
+                  esp = lib.mkOption {
+                    type = lib.types.str;
+                    description = "ESP the other OS created, shared with it. Mounted at /efi, never formatted.";
+                  };
+                  boot = lib.mkOption {
+                    type = lib.types.str;
+                    description = "XBOOTLDR partition (type EA00) holding kernels, mounted at /boot.";
+                  };
+                  root = lib.mkOption {
+                    type = lib.types.str;
+                    description = "Partition holding the Btrfs root.";
+                  };
+                  luks = luksEnable;
+                  swapSize = btrfsSwapSize;
+                  wipeTargets = btrfsWipeTargets;
+                };
+              };
+            };
+          };
         };
       };
 
       config = lib.mkIf cfg.enable (
         let
-          espPartition = {
-            size = "1G";
-            type = "EF00";
-            content = {
-              type = "filesystem";
-              format = "vfat";
-              mountpoint = "/boot";
-              mountOptions = [ "umask=0077" ];
-            };
-          };
-
           luksName = "cryptroot";
-          isBtrfs = lib.elem cfg.layout [
-            "efi-btrfs"
-            "efi-luks-btrfs"
-          ];
-          isEncrypted = cfg.layout == "efi-luks-btrfs";
-          rootDevice = config.fileSystems."/".device;
-          rollbackDependency =
-            if isEncrypted then
-              "systemd-cryptsetup@${luksName}.service"
-            else
-              "${utils.escapeSystemdPath rootDevice}.device";
 
-          btrfsContent = {
+          btrfsContent = v: {
             type = "btrfs";
             mountOptions = [
               "noatime"
@@ -91,45 +109,63 @@
               "@nix".mountpoint = "/nix";
               "@home".mountpoint = "/home";
               "@swap".mountpoint = "/.swap";
-              "@swap".swap.swapfile.size = cfg.swapSize;
+              "@swap".swap.swapfile.size = v.swapSize;
 
               "@blank" = { };
               "@persist".mountpoint = config.my.persistence.path;
             };
           };
 
-          rollbackScript = pkgs.writeShellScriptBin "rollback-subvols" /* bash */ ''
-            set -eu
+          rootContent =
+            v:
+            if v.luks then
+              {
+                type = "luks";
+                name = luksName;
+                settings.allowDiscards = true;
+                content = btrfsContent v;
+              }
+            else
+              btrfsContent v;
 
-            if [ "$#" -eq 0 ]; then
-              echo "usage: rollback-subvols <subvolume>..."
-              exit 1
-            fi
+          # What a Btrfs root needs beyond its own partitions.
+          btrfsRoot =
+            v:
+            let
+              rootDevice = config.fileSystems."/".device;
+              rollbackDependency =
+                if v.luks then
+                  "systemd-cryptsetup@${luksName}.service"
+                else
+                  "${utils.escapeSystemdPath rootDevice}.device";
 
-            mkdir -p /btrfs_tmp
-            ${pkgs.util-linux.mount}/bin/mount -t btrfs -o subvol=/ ${lib.escapeShellArg rootDevice} /btrfs_tmp
-            trap '${pkgs.util-linux.mount}/bin/umount /btrfs_tmp 2>/dev/null || true' EXIT
+              rollbackScript = pkgs.writeShellScriptBin "rollback-subvols" /* bash */ ''
+                set -eu
 
-            # Refuse to wipe if @blank is missing
-            if ! [ -e /btrfs_tmp/@blank ]; then
-              echo "rollback-subvols: @blank missing, aborting"
-              exit 1
-            fi
+                if [ "$#" -eq 0 ]; then
+                  echo "usage: rollback-subvols <subvolume>..."
+                  exit 1
+                fi
 
-            # -R handles any nested subvolumes created at runtime (podman, snapper, etc.).
-            for target in "$@"; do
-              if [ -e "/btrfs_tmp/$target" ]; then
-                ${pkgs.btrfs-progs}/bin/btrfs subvolume delete -R "/btrfs_tmp/$target"
-              fi
-              ${pkgs.btrfs-progs}/bin/btrfs subvolume snapshot /btrfs_tmp/@blank "/btrfs_tmp/$target"
-            done
-          '';
-        in
-        lib.mkMerge [
+                mkdir -p /btrfs_tmp
+                ${pkgs.util-linux.mount}/bin/mount -t btrfs -o subvol=/ ${lib.escapeShellArg rootDevice} /btrfs_tmp
+                trap '${pkgs.util-linux.mount}/bin/umount /btrfs_tmp 2>/dev/null || true' EXIT
 
-          # Both Btrfs layouts share persistence and initrd rollback.
-          # listing any subvol in wipeTargets gives impermanence for that subvol.
-          (lib.mkIf isBtrfs (
+                # Refuse to wipe if @blank is missing
+                if ! [ -e /btrfs_tmp/@blank ]; then
+                  echo "rollback-subvols: @blank missing, aborting"
+                  exit 1
+                fi
+
+                # -R handles any nested subvolumes created at runtime (podman, snapper, etc.).
+                for target in "$@"; do
+                  if [ -e "/btrfs_tmp/$target" ]; then
+                    ${pkgs.btrfs-progs}/bin/btrfs subvolume delete -R "/btrfs_tmp/$target"
+                  fi
+                  ${pkgs.btrfs-progs}/bin/btrfs subvolume snapshot /btrfs_tmp/@blank "/btrfs_tmp/$target"
+                done
+              '';
+            in
             lib.mkMerge [
               {
                 my.persistence.enable = true;
@@ -139,29 +175,10 @@
                 boot.loader.systemd-boot.enable = true;
                 boot.loader.efi.canTouchEfiVariables = true;
                 boot.initrd.systemd.enable = true;
-                disko.devices.disk.main = {
-                  inherit (cfg) device;
-                  type = "disk";
-                  content = {
-                    type = "gpt";
-                    partitions.ESP = espPartition;
-                    partitions.root = {
-                      size = "100%";
-                      content =
-                        if isEncrypted then
-                          {
-                            type = "luks";
-                            name = luksName;
-                            settings.allowDiscards = true;
-                            content = btrfsContent;
-                          }
-                        else
-                          btrfsContent;
-                    };
-                  };
-                };
               }
-              (lib.mkIf (cfg.wipeTargets != [ ]) {
+
+              # Listing any subvol in wipeTargets gives impermanence for it.
+              (lib.mkIf (v.wipeTargets != [ ]) {
                 # Drop to an initrd shell if rollback fails
                 boot.initrd.systemd.emergencyAccess = true;
                 boot.initrd.systemd.initrdBin = [ rollbackScript ];
@@ -173,7 +190,7 @@
                   pkgs.btrfs-progs
                 ];
                 boot.initrd.systemd.services.rollback-subvols = {
-                  description = "Wipe btrfs subvolumes: ${lib.concatStringsSep " " cfg.wipeTargets}";
+                  description = "Wipe btrfs subvolumes: ${lib.concatStringsSep " " v.wipeTargets}";
                   requiredBy = [ "initrd.target" ];
                   requires = [ rollbackDependency ];
                   after = [ rollbackDependency ];
@@ -181,18 +198,87 @@
                   unitConfig.DefaultDependencies = false;
                   serviceConfig = {
                     Type = "oneshot";
-                    ExecStart = "${lib.getExe rollbackScript} ${lib.concatStringsSep " " cfg.wipeTargets}";
+                    ExecStart = "${lib.getExe rollbackScript} ${lib.concatStringsSep " " v.wipeTargets}";
                   };
                 };
               })
+            ];
+        in
+        lib.mkMerge [
+
+          (lib.mkIf (cfg.layout ? efi-btrfs) (
+            let
+              v = cfg.layout.efi-btrfs;
+            in
+            lib.mkMerge [
+              (btrfsRoot v)
+              {
+                disko.devices.disk.main = {
+                  inherit (v) device;
+                  type = "disk";
+                  content = {
+                    type = "gpt";
+                    partitions.ESP = {
+                      size = "1G";
+                      type = "EF00";
+                      content = {
+                        type = "filesystem";
+                        format = "vfat";
+                        mountpoint = "/boot";
+                        mountOptions = [ "umask=0077" ];
+                      };
+                    };
+                    partitions.root = {
+                      size = "100%";
+                      content = rootContent v;
+                    };
+                  };
+                };
+              }
             ]
           ))
 
-          # mbr-ext4 layout
-          (lib.mkIf (cfg.layout == "mbr-ext4") {
+          # The other OS owns the ESP, so it is mounted but never formatted,
+          # and kernels live on our own XBOOTLDR partition instead.
+          (lib.mkIf (cfg.layout ? efi-btrfs-dual-boot) (
+            let
+              v = cfg.layout.efi-btrfs-dual-boot;
+            in
+            lib.mkMerge [
+              (btrfsRoot v)
+              {
+                boot.loader.efi.efiSysMountPoint = "/efi";
+                boot.loader.systemd-boot.xbootldrMountPoint = "/boot";
+                fileSystems."/efi" = {
+                  device = v.esp;
+                  fsType = "vfat";
+                  options = [ "umask=0077" ];
+                };
+                disko.devices.disk = {
+                  boot = {
+                    device = v.boot;
+                    type = "disk";
+                    content = {
+                      type = "filesystem";
+                      format = "vfat";
+                      mountpoint = "/boot";
+                      mountOptions = [ "umask=0077" ];
+                    };
+                  };
+                  root = {
+                    device = v.root;
+                    type = "disk";
+                    content = rootContent v;
+                  };
+                };
+              }
+            ]
+          ))
+
+          (lib.mkIf (cfg.layout ? mbr-ext4) {
             boot.loader.grub.enable = true;
             disko.devices.disk.main = {
-              inherit (cfg) device;
+              device = cfg.layout.mbr-ext4.device;
               type = "disk";
               content = {
                 type = "gpt";
