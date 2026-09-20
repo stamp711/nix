@@ -6,7 +6,7 @@
 }:
 let
   username = "stamp";
-  hostname = "Surface";
+  hostname = "Surface-WSL";
   system = "x86_64-linux";
   hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH5Pi9art3cmYnc8yuldBqGvtLWWwSK5zjnRKF0l2MyG";
   userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMcqFJen/UmBUeC70rkomrV3IGez6ceovQQpCWjs9WGm";
