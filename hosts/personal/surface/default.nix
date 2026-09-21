@@ -25,9 +25,8 @@ in
         age.rekey.localStorageDir = self.lib.rekeyDir hostname;
         my.boot-disk = {
           enable = true;
-          layout.efi-btrfs-dual-boot = {
-            esp = "${disk}-part1";
-            boot = "${disk}-part4";
+          layout.efi-btrfs-partitions = {
+            esp = "${disk}-part4";
             root = "${disk}-part5";
             luks = true;
             swapSize = "32G";

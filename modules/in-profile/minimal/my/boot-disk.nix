@@ -61,20 +61,17 @@
               description = "Whole disk: BIOS boot partition plus an ext4 root.";
               type = lib.types.submodule { options.device = diskDevice; };
             };
-            efi-btrfs-dual-boot = lib.mkOption {
+            efi-btrfs-partitions = lib.mkOption {
               description = ''
-                Adopt partitions on a disk another OS owns. Nothing here writes
-                a partition table; create the partitions before installing.
+                Like efi-btrfs, but on partitions that already exist. Nothing
+                here writes a partition table, so the disk may belong to
+                another OS; create the partitions before installing.
               '';
               type = lib.types.submodule {
                 options = {
                   esp = lib.mkOption {
                     type = lib.types.str;
-                    description = "ESP the other OS created, shared with it. Mounted at /efi, never formatted.";
-                  };
-                  boot = lib.mkOption {
-                    type = lib.types.str;
-                    description = "XBOOTLDR partition (type EA00) holding kernels, mounted at /boot.";
+                    description = "Our own ESP (type EF00), formatted and mounted at /boot.";
                   };
                   root = lib.mkOption {
                     type = lib.types.str;
@@ -238,25 +235,16 @@
             ]
           ))
 
-          # The other OS owns the ESP, so it is mounted but never formatted,
-          # and kernels live on our own XBOOTLDR partition instead.
-          (lib.mkIf (cfg.layout ? efi-btrfs-dual-boot) (
+          (lib.mkIf (cfg.layout ? efi-btrfs-partitions) (
             let
-              v = cfg.layout.efi-btrfs-dual-boot;
+              v = cfg.layout.efi-btrfs-partitions;
             in
             lib.mkMerge [
               (btrfsRoot v)
               {
-                boot.loader.efi.efiSysMountPoint = "/efi";
-                boot.loader.systemd-boot.xbootldrMountPoint = "/boot";
-                fileSystems."/efi" = {
-                  device = v.esp;
-                  fsType = "vfat";
-                  options = [ "umask=0077" ];
-                };
                 disko.devices.disk = {
-                  boot = {
-                    device = v.boot;
+                  esp = {
+                    device = v.esp;
                     type = "disk";
                     content = {
                       type = "filesystem";
