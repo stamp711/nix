@@ -31,17 +31,15 @@
               enable = true;
               url = "https://github.com/stamp711/nix";
               tokenFile = pat.path;
-              ephemeral = true;
               serviceOverrides = {
                 MemoryMax = "24G";
-                # A restart does not deregister, and GitHub holds the session
-                # past the runner's own retries.
+                # A restart does not deregister, and needs a few retries to register.
                 Restart = lib.mkForce "always";
                 RestartSec = 60;
               };
               replace = true;
             };
-            # StartLimitIntervalSec lives in [Unit], which serviceOverrides does not write.
+            # StartLimitIntervalSec lives in [Unit], which above serviceOverrides does not write.
             systemd.services.github-runner-nuc.startLimitIntervalSec = 0;
           }
         ];

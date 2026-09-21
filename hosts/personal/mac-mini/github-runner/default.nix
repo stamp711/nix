@@ -16,11 +16,10 @@
         enable = true;
         url = "https://github.com/stamp711/nix";
         tokenFile = pat.path;
-        ephemeral = true;
         replace = true;
         serviceOverrides = {
-          # A session conflict is a plain non-zero exit, which the dictionary form leaves dead.
-          KeepAlive = lib.mkForce true;
+          # Session conflict is a non-zero exit and needs restart.
+          KeepAlive = true;
           ThrottleInterval = lib.mkForce 60;
         };
       };
