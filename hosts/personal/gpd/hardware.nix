@@ -4,6 +4,15 @@
   flake.nixosModules.gpd = {
     imports = [ inputs.nixos-hardware.nixosModules.gpd-pocket-4 ];
 
+    my.boot-disk = {
+      enable = true;
+      layout.efi-btrfs = {
+        device = "/dev/nvme0n1";
+        luks = true;
+        swapSize = "32G";
+      };
+    };
+
     # Force 10bpc to work around Apple Studio Display tile mismatch on Strix Point.
     # One tile reports 12bpc+DSC, the other 10bpc only - forcing 10bpc makes them match.
     # ref: https://gitlab.freedesktop.org/drm/amd/-/issues/4734

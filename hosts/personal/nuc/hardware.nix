@@ -7,6 +7,15 @@
       inputs.nixos-hardware.nixosModules.common-pc-ssd
     ];
 
+    my.boot-disk = {
+      enable = true;
+      layout.efi-btrfs = {
+        device = "/dev/disk/by-id/nvme-Samsung_SSD_990_PRO_1TB_S6Z1NJ0W395410E";
+        luks = true;
+        swapSize = "16G";
+      };
+    };
+
     hardware.cpu.intel.updateMicrocode = true;
 
     # Set intel_pstate EPP value to 64 (default 128)
@@ -66,15 +75,6 @@
     services.udev.extraRules = ''
       ACTION=="add", SUBSYSTEM=="net", DRIVERS=="igc", RUN+="${pkgs.ethtool}/bin/ethtool --set-eee $name eee off"
     '';
-
-    my.boot-disk = {
-      enable = true;
-      layout.efi-btrfs = {
-        device = "/dev/disk/by-id/nvme-Samsung_SSD_990_PRO_1TB_S6Z1NJ0W395410E";
-        luks = true;
-        swapSize = "16G";
-      };
-    };
 
     boot.loader.systemd-boot.windows."11" = {
       title = "Windows 11";

@@ -21,15 +21,6 @@ in
         networking.hostName = hostname;
         age.rekey.hostPubkey = hostPubkey;
         age.rekey.localStorageDir = self.lib.rekeyDir hostname;
-        my.boot-disk = {
-          enable = true;
-          layout.efi-btrfs-partitions = {
-            esp = "/dev/disk/by-partlabel/NIXOS-ESP";
-            root = "/dev/disk/by-partlabel/cryptroot";
-            luks = true;
-            swapSize = "32G";
-          };
-        };
       }
     ];
   };

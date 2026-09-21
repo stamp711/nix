@@ -5,6 +5,16 @@
   flake.nixosModules.surface =
     { lib, pkgs, ... }:
     {
+      my.boot-disk = {
+        enable = true;
+        layout.efi-btrfs-partitions = {
+          esp = "/dev/disk/by-partlabel/NIXOS-ESP";
+          root = "/dev/disk/by-partlabel/cryptroot";
+          luks = true;
+          swapSize = "32G";
+        };
+      };
+
       # The Type Cover talks over the Surface Aggregator Module, so unlocking LUKS needs it.
       # https://github.com/linux-surface/linux-surface/wiki/Disk-Encryption
       boot.initrd.availableKernelModules = [

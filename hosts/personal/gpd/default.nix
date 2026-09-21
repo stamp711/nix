@@ -22,14 +22,6 @@ in
         networking.hostName = hostname;
         age.rekey.hostPubkey = hostPubkey;
         age.rekey.localStorageDir = self.lib.rekeyDir hostname;
-        my.boot-disk = {
-          enable = true;
-          layout.efi-btrfs = {
-            device = "/dev/nvme0n1";
-            luks = true;
-            swapSize = "32G";
-          };
-        };
       }
     ];
   };
