@@ -3,8 +3,8 @@ let
   username = "stamp";
   hostname = "Surface";
   system = "x86_64-linux";
-  hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICKh+qpRKfNjIsDNLsdLBu5B+4WVmxtBpFMI8vXUwBW0"; # temp
-  userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIGuCEleqbxt6Yg6TzWiKo6hTqTT6/qvZ4iAuwmftXcV"; # temp
+  hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICs2RltLRA4CA6dDs+5JSLD8ZpwN/Gri0xF7gTuvXQw5";
+  userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEGZXnOG9jUeJd44DbF3pFnN+mVu2N2ALnlOawkl9hST";
 in
 {
 
