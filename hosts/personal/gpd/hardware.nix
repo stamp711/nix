@@ -14,7 +14,7 @@
     };
 
     # Force 10bpc to work around Apple Studio Display tile mismatch on Strix Point.
-    # One tile reports 12bpc+DSC, the other 10bpc only - forcing 10bpc makes them match.
+    # SD reports one tile 12bpc+DSC, the other 10bpc.
     # ref: https://gitlab.freedesktop.org/drm/amd/-/issues/4734
     boot.kernelPatches = [
       {
@@ -24,14 +24,6 @@
     ];
   };
 
-  flake.homeModules.gpd = {
-    # Panel is mounted portrait; rotate 270° CW to display landscape.
-    wayland.windowManager.hyprland.settings.monitor = [
-      {
-        output = "eDP-1";
-        transform = 3;
-      }
-    ];
-  };
+  flake.homeModules.gpd = { };
 
 }
