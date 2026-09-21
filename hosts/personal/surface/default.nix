@@ -3,10 +3,8 @@ let
   username = "stamp";
   hostname = "Surface";
   system = "x86_64-linux";
-  # Placeholders until the machine exists.
-  hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFjg9qa+d5Vv/kOmLDnV452p4HGauGEfHFprsktFKRuP";
-  userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIGuCEleqbxt6Yg6TzWiKo6hTqTT6/qvZ4iAuwmftXcV";
-  disk = "/dev/disk/by-id/nvme-PLACEHOLDER";
+  hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICKh+qpRKfNjIsDNLsdLBu5B+4WVmxtBpFMI8vXUwBW0"; # temp
+  userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIGuCEleqbxt6Yg6TzWiKo6hTqTT6/qvZ4iAuwmftXcV"; # temp
 in
 {
 
@@ -26,8 +24,8 @@ in
         my.boot-disk = {
           enable = true;
           layout.efi-btrfs-partitions = {
-            esp = "${disk}-part4";
-            root = "${disk}-part5";
+            esp = "/dev/disk/by-partlabel/NIXOS-ESP";
+            root = "/dev/disk/by-partlabel/cryptroot";
             luks = true;
             swapSize = "32G";
           };
