@@ -116,10 +116,6 @@
       url = "github:nesquena/hermes-webui";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    multica = {
-      url = "github:multica-ai/multica";
-      flake = false;
-    };
     jj-starship = {
       url = "github:dmmulroy/jj-starship";
       inputs.nixpkgs.follows = "nixpkgs";
