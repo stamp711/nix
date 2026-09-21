@@ -5,6 +5,20 @@
   flake.nixosModules.surface =
     { lib, pkgs, ... }:
     {
+      # The Type Cover talks over the Surface Aggregator Module, so unlocking LUKS needs it.
+      # https://github.com/linux-surface/linux-surface/wiki/Disk-Encryption
+      boot.initrd.availableKernelModules = [
+        "intel_lpss"
+        "intel_lpss_pci"
+        "pinctrl_intel_platform"
+        "8250_dw"
+        "surface_aggregator"
+        "surface_aggregator_registry"
+        "surface_aggregator_hub"
+        "surface_hid_core"
+        "surface_hid"
+      ];
+
       # Firmware declares the one RT1320 twice; the ghost stops sof_sdw registering.
       boot.kernelPatches = [
         {
