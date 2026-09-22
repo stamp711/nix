@@ -58,7 +58,6 @@
       ];
       my.persistence.files = [
         "/etc/machine-id" # systemd machine identity / journald
-        "/etc/adjtime" # hwclock drift correction
       ];
     };
 
