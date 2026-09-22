@@ -1,10 +1,9 @@
-# Wifi PSKs stay in agenix; nm-file-secret-agent serves them to NetworkManager on demand.
 { self, ... }:
 {
   flake.nixosModules.personal =
     { config, lib, ... }:
     let
-      psk = self.lib.mkAgeSecret config { rekeyFile = ./psk.age; };
+      psk = self.lib.mkAgeSecret config { rekeyFile = ./psk.env.age; };
 
       ssids = [
         "Aprixnet"
@@ -22,23 +21,17 @@
           wifi.ssid = ssid;
           wifi-security = {
             key-mgmt = "wpa-psk";
-            psk-flags = 1; # agent-owned
+            psk = "$PERSONAL_WIFI_PSK";
           };
         };
-      };
-
-      mkSecretEntry = ssid: {
-        matchId = ssid;
-        key = "psk";
-        file = psk.path;
       };
     in
     {
       age.secrets = psk.ageSecret;
 
       networking.networkmanager.ensureProfiles = {
+        environmentFiles = [ psk.path ];
         profiles = lib.listToAttrs (map mkProfile ssids);
-        secrets.entries = map mkSecretEntry ssids;
       };
     };
 }
