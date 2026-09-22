@@ -10,9 +10,9 @@
         };
       };
 
+      # Fully declarative network config, no /etc/NetworkManager/system-connection here.
       my.persistence.directories = lib.optionals config.networking.networkmanager.enable [
-        "/etc/NetworkManager/system-connections" # credentials
-        "/var/lib/NetworkManager" # secret_key for the credentials
+        "/var/lib/NetworkManager" # secret_key seeds stable-privacy IPv6, cloned MAC, DHCP client id
       ];
     };
 }
