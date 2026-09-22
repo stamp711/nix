@@ -22,19 +22,19 @@ in
         age.rekey.hostPubkey = hostPubkey;
         age.rekey.localStorageDir = self.lib.rekeyDir hostname;
       }
-    ];
-  };
-
-  flake.homeConfigurations."${username}@${hostname}" = self.lib.mkHome {
-    inherit system;
-    modules = [
-      self.profiles.homeManager.desktop
-      self.homeModules.personal
-      {
-        my.primaryUser = username;
-        age.rekey.hostPubkey = userPubkey;
-        age.rekey.localStorageDir = self.lib.rekeyDir "${hostname}-${username}";
-      }
+      (self.lib.mkHomeModule {
+        class = "nixos";
+        inherit username;
+        modules = [
+          self.profiles.homeManager.desktop
+          self.homeModules.personal
+          {
+            my.primaryUser = username;
+            age.rekey.hostPubkey = userPubkey;
+            age.rekey.localStorageDir = self.lib.rekeyDir "${hostname}-${username}";
+          }
+        ];
+      })
     ];
   };
 

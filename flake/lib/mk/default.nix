@@ -126,6 +126,29 @@ in
         modules = self.lib.homeBaseModules ++ modules;
       };
 
+    # Home-manager embedded in a NixOS or nix-darwin system, as a module for it.
+    mkHomeModule =
+      {
+        class, # "nixos" or "darwin"
+        username,
+        modules ? [ ],
+      }:
+      {
+        imports = [
+          {
+            nixos = inputs.home-manager.nixosModules.home-manager;
+            darwin = inputs.home-manager.darwinModules.home-manager;
+          }
+          .${class}
+        ];
+
+        home-manager = {
+          useGlobalPkgs = true;
+          useUserPackages = true;
+          users.${username}.imports = self.lib.homeBaseModules ++ modules;
+        };
+      };
+
     # Create a system-manager configuration (for non-NixOS Linux).
     mkSystem =
       {

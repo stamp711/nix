@@ -1,15 +1,20 @@
 { lib, self, ... }:
 {
-  flake.profiles.homeManager.headless = {
-    imports = [
-      self.profiles.homeManager.minimal
-      self.homeModules.cli-environment
-      self.homeModules.cli-programs
-    ];
+  flake.profiles.homeManager.headless =
+    { config, ... }:
+    {
+      imports = [
+        self.profiles.homeManager.minimal
+        self.homeModules.cli-environment
+        self.homeModules.cli-programs
+      ];
 
-    my.maintenance.autoUpdate = lib.mkDefault true;
-    my.maintenance.autoClean = lib.mkDefault true;
-  };
+      # NOTE: When embedded in a host, the host's own maintenance covers those.
+      my.maintenance = lib.mkIf (!config.submoduleSupport.enable) {
+        autoUpdate = lib.mkDefault true;
+        autoClean = lib.mkDefault true;
+      };
+    };
 
   flake.profiles.nixos.headless = {
     imports = [

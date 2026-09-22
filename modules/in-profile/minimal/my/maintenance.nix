@@ -232,7 +232,15 @@ in
       options.my.maintenance = maintenanceOptions;
 
       config = lib.mkMerge [
-        { assertions = darwinIntervalAssertions pkgs cfg; }
+        {
+          assertions = darwinIntervalAssertions pkgs cfg ++ [
+            {
+              # `nh home switch` needs a standalone configuration; embedded, the host updates it.
+              assertion = !(config.submoduleSupport.enable && (cfg.autoUpdate || cfg.autoClean));
+              message = "my.maintenance is set on an embedded home-manager; set it on the host instead.";
+            }
+          ];
+        }
 
         # Auto-update
         (lib.mkIf cfg.autoUpdate {
