@@ -1,4 +1,4 @@
-{ self, ... }:
+{ lib, self, ... }:
 let
   builder = {
     host = "nuc.boar-char.ts.net";
@@ -16,5 +16,16 @@ in
   flake.nixosModules.personal.my.nix.build-machine.nuc = builder;
   flake.darwinModules.personal.my.nix.build-machine.nuc = builder;
 
-  flake.nixosModules.nuc.my.nix.build-machine.nuc.serve = true;
+  flake.nixosModules.nuc = {
+    my.nix.build-machine.nuc.serve = true;
+
+    # A live output holds its .drv, and a live .drv holds its outputs.
+    nix.settings.keep-outputs = true;
+    nix.settings.keep-derivations = true;
+
+    # Every check on this system but this host's own, carried in its closure.
+    system.extraDependencies = lib.attrValues (
+      lib.filterAttrs (name: _: name != "nixos-NUC") self.checks.x86_64-linux
+    );
+  };
 }

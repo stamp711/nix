@@ -21,5 +21,19 @@ in
   flake.nixosModules.personal.my.nix.build-machine.mac-mini = builder;
   flake.darwinModules.personal.my.nix.build-machine.mac-mini = builder;
 
-  flake.darwinModules.mac-mini.my.nix.build-machine.mac-mini.serve = true;
+  flake.darwinModules.mac-mini = {
+    my.nix.build-machine.mac-mini.serve = true;
+
+    nix.settings.keep-outputs = true;
+    nix.settings.keep-derivations = true;
+
+    # Every check on this system but this host's own, carried in its closure.
+    # nix-darwin has no `system.extraDependencies` to do it with like in nixos.
+    system.systemBuilderArgs.extraDependencies = lib.attrValues (
+      lib.filterAttrs (name: _: name != "darwin-${hostname}") self.checks.aarch64-darwin
+    );
+    system.systemBuilderCommands = ''
+      echo -n "$extraDependencies" > $out/extra-dependencies
+    '';
+  };
 }

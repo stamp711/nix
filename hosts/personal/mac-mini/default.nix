@@ -1,9 +1,4 @@
-{
-  inputs,
-  lib,
-  self,
-  ...
-}:
+{ inputs, self, ... }:
 let
   username = "stamp";
   hostname = "Lius-Mac-mini";
@@ -31,20 +26,6 @@ in
         # Those are not in the minimal profile.
         my.maintenance.autoClean = true;
         my.maintenance.autoUpdate = true;
-      }
-
-      {
-        nix.settings.keep-outputs = true;
-        nix.settings.keep-derivations = true;
-
-        # Every check on this system but this host's own, carried in its closure.
-        # nix-darwin has no `system.extraDependencies` to do it with.
-        system.systemBuilderArgs.extraDependencies = lib.attrValues (
-          lib.filterAttrs (name: _: name != "darwin-${hostname}") self.checks.${system}
-        );
-        system.systemBuilderCommands = ''
-          echo -n "$extraDependencies" > $out/extra-dependencies
-        '';
       }
     ];
   };

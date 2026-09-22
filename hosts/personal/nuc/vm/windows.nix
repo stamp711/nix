@@ -1,12 +1,8 @@
 # Windows 11 VM with VFIO GPU passthrough (NixVirt declarative domain)
-{ inputs, ... }: {
-  flake.nixosModules.nuc =
-    {
-      lib,
-      config,
-      pkgs,
-      ...
-    }:
+{ inputs, lib, ... }:
+let
+  module =
+    { config, pkgs, ... }:
     let
       cfg = config.my.win11-vm;
 
@@ -402,4 +398,18 @@
         (lib.mkIf cfg.enable vmConfig)
       ];
     };
+
+in
+{
+  flake.nixosModules.nuc = lib.mkMerge [
+    module
+
+    # A specialisation that turns this on.
+    {
+      specialisation.vm.configuration = {
+        system.nixos.tags = [ "vm" ];
+        my.win11-vm.enable = true;
+      };
+    }
+  ];
 }

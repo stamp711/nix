@@ -32,6 +32,12 @@
       services.power-profiles-daemon.enable = false;
       boot.kernel.sysfs.devices.system.cpu."cpu[0-9]*".cpufreq.energy_performance_preference = 64;
 
+      # Disable all sleep states.
+      systemd.targets.sleep.enable = false;
+      systemd.targets.suspend.enable = false;
+      systemd.targets.hibernate.enable = false;
+      systemd.targets.hybrid-sleep.enable = false;
+
       # Disable Energy Efficient Ethernet on igc NIC to prevent link flapping
       services.udev.extraRules = ''
         ACTION=="add", SUBSYSTEM=="net", DRIVERS=="igc", RUN+="${pkgs.ethtool}/bin/ethtool --set-eee $name eee off"

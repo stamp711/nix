@@ -1,9 +1,4 @@
-{
-  inputs,
-  lib,
-  self,
-  ...
-}:
+{ inputs, self, ... }:
 let
   username = "stamp";
   hostname = "NUC";
@@ -34,65 +29,26 @@ in
       }
 
       {
-        # Disable all sleep states.
-        systemd.targets.sleep.enable = false;
-        systemd.targets.suspend.enable = false;
-        systemd.targets.hibernate.enable = false;
-        systemd.targets.hybrid-sleep.enable = false;
-
-        specialisation.vm.configuration = {
-          system.nixos.tags = [ "vm" ];
-          my.win11-vm.enable = true;
-        };
-
         # Stationary host, so writing back to the NAS is fine here.
         my.smbMounts.nas.shares.Dropbox.rw = true;
         my.smbMounts.nas.shares.Z = { };
       }
 
-      # builder
-      {
-        # A live output holds its .drv, and a live .drv holds its outputs.
-        nix.settings.keep-outputs = true;
-        nix.settings.keep-derivations = true;
-
-        # Every check on this system but this host's own, carried in its closure.
-        system.extraDependencies = lib.attrValues (
-          lib.filterAttrs (name: _: name != "nixos-${hostname}") self.checks.${system}
-        );
-      }
+      (self.lib.mkHomeModule {
+        class = "nixos";
+        inherit username;
+        modules = [
+          self.profiles.homeManager.desktop
+          self.homeModules.linux-gaming
+          self.homeModules.personal
+          {
+            my.primaryUser = username;
+            age.rekey.hostPubkey = userPubkey;
+            age.rekey.localStorageDir = self.lib.rekeyDir "${hostname}-${username}";
+          }
+        ];
+      })
     ];
-  };
-
-  flake.homeConfigurations."${username}@${hostname}" = self.lib.mkHome {
-    inherit system nixpkgsConfig;
-    modules = [
-      self.profiles.homeManager.desktop
-      self.homeModules.linux-gaming
-      self.homeModules.personal
-      {
-        my.primaryUser = username;
-        age.rekey.hostPubkey = userPubkey;
-        age.rekey.localStorageDir = self.lib.rekeyDir "${hostname}-${username}";
-      }
-    ];
-  };
-
-  flake.deploy.nodes.${hostname} = {
-    hostname = "NUC.home";
-    remoteBuild = true;
-    profiles = {
-      home-manager = {
-        user = username;
-        path =
-          inputs.deploy-rs.lib.${system}.activate.home-manager
-            self.homeConfigurations."${username}@${hostname}";
-      };
-      system = {
-        user = "root";
-        path = inputs.deploy-rs.lib.${system}.activate.nixos self.nixosConfigurations.${hostname};
-      };
-    };
   };
 
 }
