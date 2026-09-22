@@ -13,29 +13,34 @@
       # Touchpad / touchscreen
       services.libinput.enable = true;
 
-      # Only install GNOME shell, not the bundled apps
-      services.gnome.core-apps.enable = false;
+      services.gnome.core-apps.enable = false; # the bundled apps
       environment.systemPackages = with pkgs; [
         nautilus
-        gnomeExtensions.kimpanel
+        gnomeExtensions.kimpanel # for fcitx5
       ];
 
-      # System-wide keyboard repeat settings
       programs.dconf.profiles.user.databases = [
         {
           settings = {
+            "org/gnome/desktop/background" = {
+              picture-options = "none";
+              primary-color = "#000000";
+            };
             "org/gnome/desktop/peripherals/keyboard" = {
               delay = lib.gvariant.mkUint32 225;
               repeat-interval = lib.gvariant.mkUint32 15;
             };
-            "org/gnome/shell".enabled-extensions = [ "kimpanel@kde.org" ];
+            "org/gnome/shell".enabled-extensions = [ "kimpanel@kde.org" ]; # for fcitx5
           };
+          locks = [
+            "/org/gnome/desktop/background/picture-options"
+            "/org/gnome/desktop/background/primary-color"
+          ];
         }
       ];
 
       # GNOME-adjacent runtime state.
-      # Per-entry user/group are fresh-install safety nets (no-op on migration,
-      # since impermanence doesn't chmod/chown existing dirs).
+      # NOTE: impermanence doesn't chmod/chown existing dirs.
       my.persistence.directories = [
         "/var/lib/AccountsService" # avatars, last-session, language per user
         {
