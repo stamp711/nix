@@ -1,6 +1,6 @@
 {
   flake.nixosModules.networking =
-    { config, lib, ... }:
+    { lib, ... }:
     {
       networking = {
         firewall.enable = lib.mkDefault false;
@@ -10,9 +10,7 @@
         };
       };
 
-      # Fully declarative network config, no /etc/NetworkManager/system-connection here.
-      my.persistence.directories = lib.optionals config.networking.networkmanager.enable [
-        "/var/lib/NetworkManager" # secret_key seeds stable-privacy IPv6, cloned MAC, DHCP client id
-      ];
+      # Fully declarative network config; nothing NetworkManager writes is persisted.
+      # NOTE: /var/lib/NetworkManager is not persisted, so IPv6 IID will rotate after reboot.
     };
 }
