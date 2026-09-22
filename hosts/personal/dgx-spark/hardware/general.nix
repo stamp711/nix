@@ -1,18 +1,9 @@
-# DGX Spark kernel, GPU, CPU performance, Ethernet, and ConnectX-7 hardware.
 { lib, self, ... }:
 {
   flake.nixosModules.dgx-spark =
     { config, pkgs, ... }:
     {
       imports = [ self.nixosModules.dgx-spark-mlnx-hotplug ];
-
-      my.boot-disk = {
-        enable = true;
-        layout.efi-btrfs = {
-          device = "/dev/disk/by-id/nvme-SAMSUNG_MZALC4T0HBL1-00B07_S8C2NG0Y912984";
-          luks = false;
-        };
-      };
 
       boot.kernelPackages = pkgs.linuxPackagesFor pkgs.my.linux_nvidia;
 

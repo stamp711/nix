@@ -10,6 +10,9 @@ in
 
   imports = (inputs.import-dir ./. { collect = true; })._all;
 
+  flake.nixosModules.gpd = { };
+  flake.homeModules.gpd = { };
+
   flake.nixosConfigurations.${hostname} = self.lib.mkNixos {
     inherit system;
     modules = [

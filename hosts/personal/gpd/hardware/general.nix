@@ -1,17 +1,9 @@
 # GPD Pocket 4 hardware (AMD Ryzen AI HX 370)
-{ inputs, ... }: {
+{ inputs, ... }:
+{
 
   flake.nixosModules.gpd = {
     imports = [ inputs.nixos-hardware.nixosModules.gpd-pocket-4 ];
-
-    my.boot-disk = {
-      enable = true;
-      layout.efi-btrfs = {
-        device = "/dev/nvme0n1";
-        luks = true;
-        swapSize = "32G";
-      };
-    };
 
     # Force 10bpc to work around Apple Studio Display tile mismatch on Strix Point.
     # SD reports one tile 12bpc+DSC, the other 10bpc.
@@ -23,7 +15,5 @@
       }
     ];
   };
-
-  flake.homeModules.gpd = { };
 
 }
