@@ -3,6 +3,8 @@ let
   username = "stamp";
   hostname = "Lius-MacBook";
   system = "aarch64-darwin";
+  hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL4XlaStwoxbXApazEStdePP0BpKLH29smaFK/VSTsVC";
+  userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOPY4NM06jrH6RsmcDvJaV0qzCLjQofmCDET89fIzyBK";
 in
 {
   flake.darwinConfigurations.${hostname} = self.lib.mkDarwin {
@@ -13,23 +15,23 @@ in
       self.darwinModules.personal
       {
         my.primaryUser = username;
-        # The host key mac-mini authorizes as a build client.
-        age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL4XlaStwoxbXApazEStdePP0BpKLH29smaFK/VSTsVC";
+        age.rekey.hostPubkey = hostPubkey;
         age.rekey.localStorageDir = self.lib.rekeyDir hostname;
       }
-    ];
-  };
 
-  flake.homeConfigurations."${username}@${hostname}" = self.lib.mkHome {
-    inherit system;
-    modules = [
-      self.profiles.homeManager.desktop
-      self.homeModules.personal
-      {
-        my.primaryUser = username;
-        age.rekey.hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOPY4NM06jrH6RsmcDvJaV0qzCLjQofmCDET89fIzyBK";
-        age.rekey.localStorageDir = self.lib.rekeyDir "${hostname}-${username}";
-      }
+      (self.lib.mkHomeModule {
+        class = "darwin";
+        inherit username;
+        modules = [
+          self.profiles.homeManager.desktop
+          self.homeModules.personal
+          {
+            my.primaryUser = username;
+            age.rekey.hostPubkey = userPubkey;
+            age.rekey.localStorageDir = self.lib.rekeyDir "${hostname}-${username}";
+          }
+        ];
+      })
     ];
   };
 }
