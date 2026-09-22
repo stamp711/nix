@@ -6,7 +6,7 @@ let
     host = "lius-mac-mini.boar-char.ts.net";
     # Its own sshd answers the tailnet address, so this is /etc/ssh's key.
     hostPubkey = self.darwinConfigurations.${hostname}.config.age.rekey.hostPubkey;
-    # Every Mac's declared host key. A Mac that does not rekey declares none.
+    # Every Mac's declared host key from agenix-rekey.
     clientPubkeys = lib.remove null (
       lib.mapAttrsToList (_: c: c.config.age.rekey.hostPubkey or null) self.darwinConfigurations
     );
