@@ -26,11 +26,6 @@
       url = "path:./flake.systems.nix";
       flake = false;
     };
-    # Generates options.json from arbitrary modules for nix-search-tv
-    unf = {
-      url = "git+https://git.atagen.co/atagen/unf";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     nixvim = {
       url = "github:nix-community/nixvim";
       inputs.nixpkgs.follows = "nixpkgs";

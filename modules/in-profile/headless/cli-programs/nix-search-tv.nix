@@ -3,15 +3,6 @@
   flake.homeModules.cli-programs =
     { lib, pkgs, ... }:
     let
-      # NOTE: unf's `args.pkgs = mkForce …` misses a `lib.`, bites when the module reads pkgs.
-      # TODO: fork and fix unf, then fold mkOptsRaw back into mkOpts.
-      mkOpts =
-        self: module:
-        "${inputs.unf.lib.json {
-          inherit self pkgs;
-          modules = [ module ];
-        }}";
-
       # Get the path a declaration sits at, below the store path holding it.
       # Ours sit below a store path of the flake.
       # Without this, any edit to the flake rebuilds the document.
@@ -22,8 +13,33 @@
         in
         if below == null then toString declaration else lib.head below;
 
-      # For modules unf chokes on.
-      mkOptsRaw =
+      # Verbatim from nixos/modules/misc/documentation.nix.
+      inherit (lib)
+        mapAttrs
+        warn
+        isAttrs
+        optionalAttrs
+        isDerivation
+        ;
+      scrubDerivations =
+        namePrefix: pkgSet:
+        mapAttrs (
+          name: value:
+          let
+            wholeName = "${namePrefix}.${name}";
+            guard = warn "Attempt to evaluate package ${wholeName} in option documentation; this is not supported and will eventually be an error. Use `mkPackageOption{,MD}` or `literalExpression` instead.";
+          in
+          if isAttrs value then
+            scrubDerivations wholeName value
+            // optionalAttrs (isDerivation value) {
+              outPath = guard "\${${wholeName}}";
+              drvPath = guard value.drvPath;
+            }
+          else
+            value
+        ) pkgSet;
+
+      mkOpts =
         module:
         let
           eval = lib.evalModules {
@@ -31,7 +47,7 @@
               module
               {
                 _module.check = false;
-                _module.args.pkgs = pkgs;
+                _module.args.pkgs = scrubDerivations "pkgs" pkgs;
               }
             ];
           };
@@ -58,15 +74,15 @@
           nixvim = "${
             inputs.nixvim.packages.${pkgs.stdenv.hostPlatform.system}.options-json
           }/share/doc/nixos/options.json";
-          agenix = mkOpts inputs.agenix inputs.agenix.nixosModules.default;
-          impermanence = mkOpts inputs.impermanence inputs.impermanence.nixosModules.impermanence;
-          microvm = mkOpts inputs.microvm inputs.microvm.nixosModules.microvm;
-          nixvirt = mkOpts inputs.NixVirt inputs.NixVirt.nixosModules.default;
-          hermes-agent = mkOptsRaw inputs.hermes-agent.nixosModules.default;
-          hermes-webui = mkOptsRaw inputs.hermes-webui.nixosModules.default;
-          nixos-wsl = mkOptsRaw inputs.nixos-wsl.nixosModules.default;
+          agenix = mkOpts inputs.agenix.nixosModules.default;
+          impermanence = mkOpts inputs.impermanence.nixosModules.impermanence;
+          microvm = mkOpts inputs.microvm.nixosModules.microvm;
+          nixvirt = mkOpts inputs.NixVirt.nixosModules.default;
+          hermes-agent = mkOpts inputs.hermes-agent.nixosModules.default;
+          hermes-webui = mkOpts inputs.hermes-webui.nixosModules.default;
+          nixos-wsl = mkOpts inputs.nixos-wsl.nixosModules.default;
           # Its whole option surface is one type from its own lib, as upstream's doc.nix does it.
-          disko = mkOptsRaw {
+          disko = mkOpts {
             options.disko.devices = lib.mkOption {
               type = inputs.disko.lib.toplevel;
               default = { };
@@ -127,7 +143,7 @@
             "${
               (pkgs.nixosOptionsDoc { options = eval.options.services; }).optionsJSON
             }/share/doc/nixos/options.json";
-          nix-homebrew = mkOptsRaw inputs.nix-homebrew.darwinModules.nix-homebrew;
+          nix-homebrew = mkOpts inputs.nix-homebrew.darwinModules.nix-homebrew;
           # It only adds comma on top of home-manager's own nix-index options, and reads their
           # enable, so stub that and render just its own tree.
           nix-index-database =
@@ -157,9 +173,9 @@
           system-manager = "${
             inputs.system-manager.docs.${pkgs.stdenv.hostPlatform.system}.optionsJSON
           }/share/doc/nixos/options.json";
-          my-home = mkOpts inputs.self inputs.self.homeModules.my;
-          my-nixos = mkOptsRaw inputs.self.nixosModules.my;
-          my-darwin = mkOpts inputs.self inputs.self.darwinModules.my;
+          my-home = mkOpts inputs.self.homeModules.my;
+          my-nixos = mkOpts inputs.self.nixosModules.my;
+          my-darwin = mkOpts inputs.self.darwinModules.my;
         };
       };
     };
