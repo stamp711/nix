@@ -3,7 +3,8 @@
   flake.nixosModules.personal =
     { config, lib, ... }:
     let
-      psk = self.lib.mkAgeSecret config { rekeyFile = ./psk.env.age; };
+      psk = self.lib.mkAgeSecret config { rekeyFile = ./psk.age; };
+      env = config.my.age-template.files."nm-wifi.env";
 
       ssids = [
         "Aprixnet"
@@ -29,9 +30,16 @@
     {
       age.secrets = psk.ageSecret;
 
+      my.age-template.files."nm-wifi.env" = {
+        placeholders.psk = psk.path;
+        content = "PERSONAL_WIFI_PSK=$psk";
+      };
+
       networking.networkmanager.ensureProfiles = {
-        environmentFiles = [ psk.path ];
+        environmentFiles = [ env.path ];
         profiles = lib.listToAttrs (map mkProfile ssids);
       };
+
+      systemd.services.NetworkManager-ensure-profiles.restartTriggers = [ env.renderedFileHash ];
     };
 }
