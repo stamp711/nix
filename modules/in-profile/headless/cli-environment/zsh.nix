@@ -6,8 +6,8 @@
     {
       users.defaultUserShell = pkgs.zsh;
       programs.zsh.enable = true;
-      # Handled by user zsh config
-      programs.zsh.enableCompletion = false;
+      # compinit runs deferred from the user zsh config.
+      programs.zsh.enableGlobalCompInit = false;
       programs.zsh.enableBashCompletion = false;
       programs.zsh.promptInit = "";
     };
