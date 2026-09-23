@@ -5,6 +5,8 @@ let
   system = "aarch64-linux";
   nixpkgsConfig = {
     cudaSupport = true;
+    cudaCapabilities = [ "12.1" ]; # GB10 only
+    cudaForwardCompat = false;
   };
   hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKvc/EVZSLvKJSJPNYKT2+CovXPGhJpyAbDuTLVhJrG0";
   userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAp+lIKku2LR90lnmhvV4aPHCfwDcvGMg0fQa9dW8lGl";
@@ -30,6 +32,7 @@ in
         modules = [
           self.profiles.homeManager.headless
           self.homeModules.personal
+          self.homeModules.dgx-spark
           {
             my.primaryUser = username;
             age.rekey.hostPubkey = userPubkey;
