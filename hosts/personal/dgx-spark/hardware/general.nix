@@ -11,6 +11,7 @@
       boot.kernelParams = [ "cppc_cpufreq.auto_sel_mode=1" ];
 
       services.xserver.videoDrivers = [ "nvidia" ];
+      hardware.graphics.enable = true; # /run/opengl-driver/lib/libcuda.so.1
       hardware.nvidia =
         let
           # NVIDIA modules built against linux_nvidia retain kernel.dev paths.
