@@ -44,6 +44,7 @@
         };
       };
       # Upstream hides /home from the unit; expose only the HF cache, read-only.
+      # NOTE: need to restart this service if dir gets a new inode.
       systemd.services.llama-swap.serviceConfig = {
         ProtectHome = lib.mkForce "tmpfs";
         BindReadOnlyPaths = [ hf ];
