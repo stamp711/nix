@@ -9,7 +9,6 @@
       # NVIDIA proprietary driver with open kernel module
       services.xserver.videoDrivers = [ "nvidia" ];
       hardware.nvidia.open = true;
-      hardware.nvidia.modesetting.enable = true;
 
       # Turn off NVIDIA GPU's on-card LED
       systemd.services.gpu-led-off = {

@@ -32,13 +32,16 @@
         in
         {
           open = true;
-          modesetting.enable = true;
+          nvidiaPersistenced = true;
           package = lib.overrideExisting nvidiaPackage {
             open = scrubKernelDevRefs nvidiaPackage.open;
             mod = scrubKernelDevRefs nvidiaPackage.mod;
           };
         };
 
+      hardware.nvidia-container-toolkit.enable = true;
+
       services.fwupd.enable = true;
+      environment.systemPackages = [ pkgs.nvtopPackages.nvidia ];
     };
 }
