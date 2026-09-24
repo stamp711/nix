@@ -39,9 +39,16 @@
           };
         };
 
+      boot.extraModprobeConfig = "options nvidia NVreg_RestrictProfilingToAdminUsers=0"; # for nsys
+
       hardware.nvidia-container-toolkit.enable = true;
 
       services.fwupd.enable = true;
-      environment.systemPackages = [ pkgs.nvtopPackages.nvidia ];
+
+      environment.systemPackages = [
+        pkgs.nvtopPackages.nvidia
+        pkgs.cudaPackages.nsight_systems
+        pkgs.cudaPackages.nsight_compute
+      ];
     };
 }
