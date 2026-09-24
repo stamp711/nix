@@ -1,12 +1,33 @@
 # llama-swap in front of llama.cpp.
 { lib, ... }:
+let
+  # GGUF paths are relative to hfdownloader's <owner>/<repo> tree.
+  #   hfdownloader download unsloth/Qwen3.8-Flash-Next-GGUF -F UD-Q4_K_XL,mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf -E imatrix --verify sha256
+  #   hfdownloader download unsloth/Qwen3.6-35B-A3B-GGUF -F UD-Q6_K_XL -E imatrix,mmproj --verify sha256
+  models = {
+    "Qwen3.8-Flash-Next-UD-Q4_K_XL" = {
+      model = "unsloth/Qwen3.8-Flash-Next-GGUF/UD-Q4_K_XL/Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf";
+      draft = "unsloth/Qwen3.8-Flash-Next-GGUF/MTP/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf";
+      args = [
+        "--spec-type draft-mtp --spec-draft-n-max 4"
+        "--ctx-size 262144 --cache-type-k q8_0 --cache-type-v q8_0"
+        "--batch-size 2048 --ubatch-size 2048" # ubatch-size default 2048; 398 -> 528 tok/s prefill at 34K, +6.5 GB
+      ];
+    };
+    "Qwen3.6-35B-A3B-UD-Q6_K_XL" = {
+      model = "unsloth/Qwen3.6-35B-A3B-GGUF/Qwen3.6-35B-A3B-UD-Q6_K_XL.gguf";
+      args = [ "--ctx-size 131072" ];
+    };
+  };
+  default = "Qwen3.8-Flash-Next-UD-Q4_K_XL";
+in
 {
 
   flake.nixosModules.dgx-spark =
     { config, pkgs, ... }:
     let
-      hf = "${config.users.users.${config.my.primaryUser}.home}/.cache/huggingface";
-      models = "${hf}/models"; # hfdownloader's <owner>/<repo> tree, symlinks into hf/hub
+      hfDir = "${config.users.users.${config.my.primaryUser}.home}/.cache/huggingface";
+      modelsDir = "${hfDir}/models"; # symlinks into hf/hub
 
       # danielhanchen/llama.cpp qwen4exp/mtp: MTP drafting for Qwen3.8-Flash-Next,
       # pending ggml-org/llama.cpp#28243.
@@ -33,34 +54,23 @@
           enable = true;
           settings = {
             healthCheckTimeout = 600; # cold load of ~100 GiB from NVMe
-            models = {
-              #   hfdownloader download unsloth/Qwen3.8-Flash-Next-GGUF -F UD-Q4_K_XL,mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf -E imatrix --verify sha256
-              #   hfdownloader download unsloth/Qwen3.6-35B-A3B-GGUF -F UD-Q6_K_XL -E imatrix,mmproj --verify sha256
-              "Qwen3.8-Flash-Next-UD-Q4_K_XL" = {
-                cmd = lib.concatStringsSep " " [
+            models = lib.mapAttrs (_: m: {
+              cmd = lib.concatStringsSep " " (
+                [
                   server
-                  "--model       ${models}/unsloth/Qwen3.8-Flash-Next-GGUF/UD-Q4_K_XL/Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf"
-                  "--model-draft ${models}/unsloth/Qwen3.8-Flash-Next-GGUF/MTP/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf"
-                  "--spec-type draft-mtp --spec-draft-n-max 4"
-                  "--ctx-size 262144 --cache-type-k q8_0 --cache-type-v q8_0"
-                  "--batch-size 2048 --ubatch-size 2048" # ubatch-size default 2048; 398 -> 528 tok/s prefill at 34K, +6.5 GB
-                ];
-              };
-              "Qwen3.6-35B-A3B-UD-Q6_K_XL" = {
-                cmd = lib.concatStringsSep " " [
-                  server
-                  "--model ${models}/unsloth/Qwen3.6-35B-A3B-GGUF/Qwen3.6-35B-A3B-UD-Q6_K_XL.gguf"
-                  "--ctx-size 131072"
-                ];
-              };
-            };
+                  "--model ${modelsDir}/${m.model}"
+                ]
+                ++ lib.optional (m ? draft) "--model-draft ${modelsDir}/${m.draft}"
+                ++ m.args
+              );
+            }) models;
           };
         };
       # Upstream hides /home from the unit; expose only the HF cache, read-only.
       # NOTE: need to restart this service if dir gets a new inode.
       systemd.services.llama-swap.serviceConfig = {
         ProtectHome = lib.mkForce "tmpfs";
-        BindReadOnlyPaths = [ hf ];
+        BindReadOnlyPaths = [ hfDir ];
       };
 
       environment.systemPackages = [ llama-cpp ];
@@ -79,16 +89,13 @@
       programs.aichat = {
         enable = true;
         settings = {
-          model = "spark:Qwen3.8-Flash-Next-UD-Q4_K_XL";
+          model = "spark:${default}";
           clients = [
             {
               type = "openai-compatible";
               name = "spark";
               api_base = "http://127.0.0.1:8080/v1";
-              models = [
-                { name = "Qwen3.8-Flash-Next-UD-Q4_K_XL"; }
-                { name = "Qwen3.6-35B-A3B-UD-Q6_K_XL"; }
-              ];
+              models = map (name: { inherit name; }) (builtins.attrNames models);
             }
           ];
         };
