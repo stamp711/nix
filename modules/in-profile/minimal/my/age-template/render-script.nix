@@ -84,7 +84,10 @@ in
 lib.getExe (
   pkgs.writeShellApplication {
     name = "age-template-${name}";
-    runtimeInputs = [ pkgs.coreutils ];
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.diffutils # cmp
+    ];
     text = ''
       ${dirScript}
 
