@@ -1,9 +1,8 @@
 diff --git a/src/steamcompmgr.cpp b/src/steamcompmgr.cpp
-index dff50b6..d486db3 100644
 --- a/src/steamcompmgr.cpp
 +++ b/src/steamcompmgr.cpp
-@@ -885,11 +885,15 @@ global_focus_t *GetCurrentMouseFocus()
- 	return GetCurrentFocus();
+@@ -1095,12 +1095,16 @@
+ 	return nullptr;
  }
  
 +extern uint32_t	g_nDRMFormat;
@@ -13,12 +12,13 @@ index dff50b6..d486db3 100644
  int 			currentOutputRefresh;
  uint32_t		currentOutputRotation = 0;
  bool			currentHDROutput = false;
+ bool			currentHDRCapable = false;
  bool			currentHDRForce = false;
 +uint32_t		currentDRMFormat = 0, currentDRMFormatOverlay = 0;
  
  std::vector< uint32_t > vecFocuscontrolAppIDs;
  
-@@ -8979,14 +8983,19 @@ steamcompmgr_main(int argc, char **argv)
+@@ -10230,15 +10234,20 @@
  		// Pick our width/height for this potential frame, regardless of how it might change later
  		// At some point we might even add proper locking so we get real updates atomically instead
  		// of whatever jumble of races the below might cause over a couple of frames
@@ -27,26 +27,27 @@ index dff50b6..d486db3 100644
 -			 currentOutputRefresh != g_nOutputRefresh ||
 -			 currentOutputRotation != g_uOutputRotation ||
 -			 currentHDROutput != g_bOutputHDREnabled ||
+-			 currentHDRCapable != bOutputHDRCapable ||
 -			 currentHDRForce != g_bForceHDRSupportDebug )
--		{
--			if ( g_nXWaylandCount > 1 )
 +		const bool bDimensionsChanged   = currentOutputWidth    != g_nOutputWidth ||
 +		                                  currentOutputHeight   != g_nOutputHeight;
 +		const bool bRefreshChanged      = currentOutputRefresh  != g_nOutputRefresh;
 +		const bool bRotationChanged     = currentOutputRotation != g_uOutputRotation;
 +		const bool bHDRStateChanged     = currentHDROutput      != g_bOutputHDREnabled ||
++		                                  currentHDRCapable     != bOutputHDRCapable ||
 +		                                  currentHDRForce       != g_bForceHDRSupportDebug;
 +		const bool bOutputFormatChanged = currentDRMFormat        != g_nDRMFormat ||
 +		                                  currentDRMFormatOverlay != g_nDRMFormatOverlay;
 +
 +		if ( bDimensionsChanged || bRefreshChanged || bRotationChanged || bHDRStateChanged || bOutputFormatChanged )
-+		{
+ 		{
+-			if ( g_nXWaylandCount > 1 )
 +			// Propagate mode to nested Xwayland only when dimensions or refresh change
 +			if ( (bDimensionsChanged || bRefreshChanged) && g_nXWaylandCount > 1 )
  			{
  				g_nNestedHeight = ( g_nNestedWidth * g_nOutputHeight ) / g_nOutputWidth;
  				wlserver_lock();
-@@ -8995,15 +9004,26 @@ steamcompmgr_main(int argc, char **argv)
+@@ -10247,15 +10256,26 @@
  				wlserver_unlock();
  			}
  
@@ -78,9 +79,9 @@ index dff50b6..d486db3 100644
  			{
  				vulkan_remake_output_images();
  			}
-@@ -9036,6 +9056,8 @@ steamcompmgr_main(int argc, char **argv)
- 			currentOutputRotation = g_uOutputRotation;
+@@ -10289,6 +10309,8 @@
  			currentHDROutput = g_bOutputHDREnabled;
+ 			currentHDRCapable = bOutputHDRCapable;
  			currentHDRForce = g_bForceHDRSupportDebug;
 +			currentDRMFormat = g_nDRMFormat;
 +			currentDRMFormatOverlay = g_nDRMFormatOverlay;
