@@ -116,18 +116,26 @@ in
           Service = {
             # codex won't resolve the socket under a missing CODEX_HOME.
             ExecStartPre = "${pkgs.coreutils}/bin/mkdir -p %h/.codex";
-            # The default is stdio://.
-            ExecStart = lib.escapeShellArgs (
-              [
-                (lib.getExe config.programs.codex.package)
-                "app-server"
-              ]
-              ++ lib.optional cfg.remoteControl "--remote-control"
-              ++ [
-                "--listen"
-                "unix://"
-              ]
-            );
+            # Load the shell environment before replacing zsh with the daemon.
+            ExecStart = lib.escapeShellArgs [
+              "${pkgs.zsh}/bin/zsh"
+              "-lic"
+              (
+                "exec "
+                + lib.escapeShellArgs (
+                  [
+                    (lib.getExe config.programs.codex.package)
+                    "app-server"
+                  ]
+                  ++ lib.optional cfg.remoteControl "--remote-control"
+                  ++ [
+                    "--listen"
+                    "unix://"
+                  ]
+                )
+              )
+            ];
+            WorkingDirectory = "%h";
             # Remote-control failures are silent at the default level.
             Environment = [
               "RUST_LOG=codex_app_server_transport=info"
