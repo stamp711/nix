@@ -8,6 +8,9 @@
       # To switch: comment out greetd below, uncomment gdm.
       services.displayManager.gdm.enable = true;
 
+      # Some nixpkgs modules mkDefault on this.
+      services.displayManager.defaultSession = null;
+
       services.greetd = {
         enable = false;
         useTextGreeter = true;
