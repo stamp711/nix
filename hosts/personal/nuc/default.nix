@@ -46,6 +46,9 @@ in
             age.rekey.hostPubkey = userPubkey;
             age.rekey.localStorageDir = self.lib.rekeyDir "${hostname}-${username}";
           }
+          {
+            my.codex.appServer.enable = true;
+          }
         ];
       })
     ];
