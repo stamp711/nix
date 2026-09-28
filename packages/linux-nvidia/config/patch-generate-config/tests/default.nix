@@ -2,7 +2,9 @@
 { pkgs }:
 let
   patchGenerateConfig = import ../. { inherit (pkgs) lib writeText; };
-  generateConfig = patchGenerateConfig "${pkgs.path}/pkgs/os-specific/linux/kernel/generate-config.pl";
+  generateConfig = patchGenerateConfig (
+    pkgs.path + "/pkgs/os-specific/linux/kernel/generate-config.pl"
+  );
   fakeMake = pkgs.writeShellScriptBin "make" ''
     cp "$fixtureConfig" "$BUILD_ROOT/.config"
   '';
