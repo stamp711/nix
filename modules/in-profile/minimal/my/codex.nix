@@ -140,7 +140,16 @@ in
             Environment = [
               "RUST_LOG=codex_app_server_transport=info"
             ]
-            ++ lib.mapAttrsToList (name: value: "${name}=${value}") cfg.environment;
+            ++ lib.mapAttrsToList (name: value: "${name}=${value}") (
+              self.lib.mergeDisjoint [
+                cfg.environment
+                {
+                  # Match upstream's disabled-start marker; omitting --remote-control restores persisted state.
+                  # https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/app-server-daemon/src/backend/pid.rs#L405-L415
+                  CODEX_INTERNAL_APP_SERVER_REMOTE_CONTROL_DISABLED = if cfg.remoteControl then "0" else "1";
+                }
+              ]
+            );
             Restart = "on-failure";
           };
         };

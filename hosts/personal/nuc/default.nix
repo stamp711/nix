@@ -47,7 +47,10 @@ in
             age.rekey.localStorageDir = self.lib.rekeyDir "${hostname}-${username}";
           }
           {
-            my.codex.appServer.enable = true;
+            my.codex.appServer = {
+              enable = true;
+              remoteControl = true;
+            };
           }
         ];
       })
