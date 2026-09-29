@@ -18,6 +18,7 @@ let
           }
         ];
         agePlugins = [ pkgs.age-plugin-1p ]; # default is a yubikey plugin
+        # NOTE: agenix-rekey's local mode makes `nix flake check --no-build` fail.
         storageMode = "local";
       };
     };
