@@ -4,16 +4,31 @@ let
   # GGUF paths are relative to hfdownloader's <owner>/<repo> tree.
   #   hfdownloader download unsloth/Qwen3.8-Flash-Next-GGUF -F UD-Q4_K_XL,mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf -E imatrix --verify sha256
   #   hfdownloader download unsloth/Qwen3.6-35B-A3B-GGUF -F UD-Q6_K_XL -E imatrix,mmproj --verify sha256
-  models = {
-    "Qwen3.8-Flash-Next-UD-Q4_K_XL" = {
-      model = "unsloth/Qwen3.8-Flash-Next-GGUF/UD-Q4_K_XL/Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf";
-      draft = "unsloth/Qwen3.8-Flash-Next-GGUF/MTP/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf";
-      args = [
-        "--spec-type draft-mtp --spec-draft-n-max 4"
-        "--ctx-size 262144 --cache-type-k q8_0 --cache-type-v q8_0"
-        "--batch-size 2048 --ubatch-size 2048" # ubatch-size default 2048; 398 -> 528 tok/s prefill at 34K, +6.5 GB
-      ];
-    };
+  models = pkgs: {
+    "Qwen3.8-Flash-Next-UD-Q4_K_XL" =
+      let
+        # This revision's template matches the deployed GGUF byte for byte.
+        upstreamTemplate = pkgs.fetchurl {
+          url = "https://huggingface.co/unsloth/Qwen3.8-Flash-Next/resolve/5b22c46dda7b9ca1cb454aa32ae608646dd4ea48/chat_template.jinja";
+          hash = "sha256-EoJ/JLdC6k6AzcEtvPliIicFa595clKjFJJj1Pmqrc4=";
+        };
+        # Render later system/developer messages in place for Codex review reuse
+        # and permission updates; preserve the existing leading-message merge.
+        # https://github.com/ggml-org/llama.cpp/issues/27367#issuecomment-5351663042
+        chatTemplate = pkgs.runCommand "qwen3.8-flash-next.jinja" { } ''
+          ${lib.getExe pkgs.patch} --output="$out" ${upstreamTemplate} < ${./qwen3.8-flash-next.patch}
+        '';
+      in
+      {
+        model = "unsloth/Qwen3.8-Flash-Next-GGUF/UD-Q4_K_XL/Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf";
+        draft = "unsloth/Qwen3.8-Flash-Next-GGUF/MTP/mtp-Qwen3.8-Flash-Next-shared-Q8_0.gguf";
+        args = [
+          "--chat-template-file ${chatTemplate}"
+          "--spec-type draft-mtp --spec-draft-n-max 4"
+          "--ctx-size 262144 --cache-type-k q8_0 --cache-type-v q8_0"
+          "--batch-size 2048 --ubatch-size 2048" # ubatch-size default 2048; 398 -> 528 tok/s prefill at 34K, +6.5 GB
+        ];
+      };
     "Qwen3.6-35B-A3B-UD-Q6_K_XL" = {
       model = "unsloth/Qwen3.6-35B-A3B-GGUF/Qwen3.6-35B-A3B-UD-Q6_K_XL.gguf";
       args = [ "--ctx-size 131072" ];
@@ -65,7 +80,7 @@ in
                 ++ lib.optional (m ? draft) "--model-draft ${modelsDir}/${m.draft}"
                 ++ m.args
               );
-            }) models;
+            }) (models pkgs);
           };
         };
       # Upstream hides /home from the unit; expose only the HF cache, read-only.
@@ -100,7 +115,7 @@ in
               type = "openai-compatible";
               name = "spark";
               api_base = "http://127.0.0.1:8080/v1";
-              models = map (name: { inherit name; }) (builtins.attrNames models);
+              models = map (name: { inherit name; }) (builtins.attrNames (models pkgs));
             }
           ];
         };
