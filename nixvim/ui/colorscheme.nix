@@ -11,6 +11,20 @@
       # We pick the active colorscheme ourselves (below), so suppress nixvim's auto-apply.
       colorscheme = lib.mkForce null;
 
+      extraPlugins = [
+        pkgs.vimPlugins.auto-dark-mode-nvim
+        pkgs.vimPlugins.night-owl-nvim
+      ];
+
+      colorschemes.kanagawa = {
+        enable = true;
+        settings = {
+          theme = "wave";
+          commentStyle.italic = false;
+          keywordStyle.italic = false;
+        };
+      };
+
       # dark
       colorschemes.base16 = {
         enable = true;
@@ -46,7 +60,7 @@
         };
       };
 
-      # Base16 doesn't ship Night Blue; expose it to :colorscheme and the picker.
+      # our own base16-tomorrow-night-blue
       extraFiles."colors/base16-tomorrow-night-blue.lua".text = ''
         vim.cmd("highlight clear")
         vim.g.colors_name = "base16-tomorrow-night-blue"
@@ -56,16 +70,24 @@
         )
       '';
 
-      colorschemes.kanagawa = {
-        enable = true;
-        settings = {
-          theme = "wave";
-          commentStyle.italic = false;
-          keywordStyle.italic = false;
-        };
-      };
+      # customized night-owl; the different name avoids runtime-path collision.
+      extraFiles."colors/night-owl-custom.lua".text = ''
+        require("night-owl").setup({ italics = false })
+        dofile("${pkgs.vimPlugins.night-owl-nvim}/colors/night-owl.lua")
+        vim.g.colors_name = "night-owl-custom"
 
-      extraPlugins = [ pkgs.vimPlugins.auto-dark-mode-nvim ];
+        -- Muted diff backgrounds; preserve syntax foregrounds.
+        local c = require("night-owl.palette")
+        local blend = require("snacks.util").blend
+        for group, bg in pairs({
+          DiffAdd = blend(c.sign_add, c.bg, 0.08),
+          DiffDelete = blend(c.sign_delete, c.bg, 0.08),
+          DiffChange = blend(c.sign_change, c.bg, 0.08),
+          DiffText = blend(c.sign_change, c.bg, 0.15),
+        }) do
+          vim.api.nvim_set_hl(0, group, { bg = bg })
+        end
+      '';
 
       # light
       colorschemes.modus = {
@@ -102,7 +124,7 @@
 
       extraConfigLua = ''
         require("auto-dark-mode").setup() -- defaults to set `background` to dark/light from the OS
-        vim.cmd.colorscheme(vim.o.background == "light" and "modus_operandi" or "base16-tomorrow-night-blue")
+        vim.cmd.colorscheme(vim.o.background == "light" and "modus_operandi" or "night-owl-custom")
       '';
 
       # When background is changed, apply the theme.
@@ -117,7 +139,7 @@
               if vim.v.option_old ~= vim.v.option_new then
                 -- defer the colorscheme switch until after nvim's internal background handling
                 vim.schedule(function()
-                  vim.cmd.colorscheme(vim.o.background == "light" and "modus_operandi" or "base16-tomorrow-night-blue")
+                  vim.cmd.colorscheme(vim.o.background == "light" and "modus_operandi" or "night-owl-custom")
                 end)
               end
             end
