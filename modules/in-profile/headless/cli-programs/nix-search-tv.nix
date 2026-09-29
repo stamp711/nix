@@ -169,9 +169,12 @@
                 options = { inherit (eval.options.programs) nix-index-database; };
               }).optionsJSON
             }/share/doc/nixos/options.json";
-          # NOTE: Its docs.nix imports out of pkgs.path, which breaks `nix flake check --no-build`.
+          # Its docs interpolate pkgs.path; keep the flake's store-path string to avoid
+          # copying the source again during `nix flake check --no-build`.
           system-manager = "${
-            inputs.system-manager.docs.${pkgs.stdenv.hostPlatform.system}.optionsJSON
+            (import (inputs.system-manager + "/docs/options.nix") {
+              pkgs = pkgs.extend (_: _: { path = inputs.nixpkgs.outPath; });
+            }).optionsJSON
           }/share/doc/nixos/options.json";
           my-home = mkOpts inputs.self.homeModules.my;
           my-nixos = mkOpts inputs.self.nixosModules.my;
