@@ -1,18 +1,5 @@
 {
 
-  flake.nixosModules.desktop-linux =
-    { config, lib, ... }:
-    {
-      programs._1password.enable = true;
-      programs._1password-gui = {
-        enable = true;
-        polkitPolicyOwners = builtins.attrNames (lib.filterAttrs (_: u: u.isNormalUser) config.users.users);
-      };
-
-      # Point SSH_AUTH_SOCK to 1Password SSH agent
-      environment.sessionVariables.SSH_AUTH_SOCK = "\${HOME}/.1password/agent.sock";
-    };
-
   # Symlink 1Password SSH agent socket over the system SSH agent socket on macOS
   flake.darwinModules.desktop-darwin =
     { config, ... }:
@@ -33,5 +20,29 @@
         };
       };
     };
+
+  flake.nixosModules.desktop-linux =
+    { config, lib, ... }:
+    {
+      programs._1password.enable = true;
+      programs._1password-gui = {
+        enable = true;
+        polkitPolicyOwners = builtins.attrNames (lib.filterAttrs (_: u: u.isNormalUser) config.users.users);
+      };
+
+      # Point SSH_AUTH_SOCK to 1Password SSH agent
+      environment.sessionVariables.SSH_AUTH_SOCK = "\${HOME}/.1password/agent.sock";
+    };
+
+  flake.homeModules.desktop-linux = {
+    wayland.windowManager.niri.settings._children = [
+      {
+        window-rule = {
+          match._props.app-id = "^com[.]onepassword[.]OnePassword$";
+          open-floating = true;
+        };
+      }
+    ];
+  };
 
 }
