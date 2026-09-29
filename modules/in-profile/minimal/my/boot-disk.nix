@@ -1,12 +1,7 @@
 { lib, ... }:
 {
   flake.nixosModules.my =
-    {
-      config,
-      pkgs,
-      utils,
-      ...
-    }:
+    { config, pkgs, ... }:
     let
       cfg = config.my.boot-disk;
       diskDevice = lib.mkOption {
@@ -130,11 +125,6 @@
             v:
             let
               rootDevice = config.fileSystems."/".device;
-              rollbackDependency =
-                if v.luks then
-                  "systemd-cryptsetup@${luksName}.service"
-                else
-                  "${utils.escapeSystemdPath rootDevice}.device";
 
               rollbackScript = pkgs.writeShellScriptBin "rollback-subvols" /* bash */ ''
                 set -eu
@@ -189,8 +179,12 @@
                 boot.initrd.systemd.services.rollback-subvols = {
                   description = "Wipe btrfs subvolumes: ${lib.concatStringsSep " " v.wipeTargets}";
                   requiredBy = [ "initrd.target" ];
-                  requires = [ rollbackDependency ];
-                  after = [ rollbackDependency ];
+                  requires = [ "initrd-root-device.target" ];
+                  # Hibernation resume is ordered before local-fs-pre.target.
+                  after = [
+                    "initrd-root-device.target"
+                    "local-fs-pre.target"
+                  ];
                   before = [ "sysroot.mount" ];
                   unitConfig.DefaultDependencies = false;
                   serviceConfig = {
