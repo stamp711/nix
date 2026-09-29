@@ -11,6 +11,9 @@
       portalPackage = null;
 
       enableDefaultConfig = true;
+      settings = {
+        prefer-no-csd = { };
+      };
     };
   };
 }

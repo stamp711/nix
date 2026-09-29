@@ -1,6 +1,6 @@
 {
   flake.nixosModules.desktop-linux =
-    { lib, pkgs, ... }:
+    { pkgs, ... }:
     {
       services.desktopManager.gnome.enable = true;
 
@@ -25,10 +25,6 @@
             "org/gnome/desktop/background" = {
               picture-options = "none";
               primary-color = "#000000";
-            };
-            "org/gnome/desktop/peripherals/keyboard" = {
-              delay = lib.gvariant.mkUint32 225;
-              repeat-interval = lib.gvariant.mkUint32 15;
             };
             "org/gnome/shell".enabled-extensions = [ "kimpanel@kde.org" ]; # for fcitx5
           };
