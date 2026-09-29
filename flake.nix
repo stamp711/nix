@@ -70,14 +70,6 @@
       url = "github:microvm-nix/microvm.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # Open-source FocalTech FT9362 match-on-host fingerprint driver for the GPD
-    # Pocket 4 (2808:0752). See hosts/personal/gpd/fingerprint.nix.
-    # Upstream MR: https://gitlab.freedesktop.org/libfprint/libfprint/-/merge_requests/588
-    # Drop this input once the driver (with 0752) lands in nixpkgs' libfprint.
-    # libfprint-focaltech = {
-    #   url = "git+https://gitlab.freedesktop.org/dtrunk90/libfprint.git?ref=focaltech-moh";
-    #   flake = false;
-    # };
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -85,8 +77,6 @@
     agenix = {
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
-      inputs.systems.follows = "systems";
     };
     agenix-rekey = {
       url = "github:oddlama/agenix-rekey";
