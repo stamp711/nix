@@ -1,0 +1,7 @@
+# FORMAT: 4
+# ARCH: arm64
+# FLAVOUR: arm64-nvidia
+
+include "./base"
+CONFIG_INHERITED policy<{'arm64': 'n'}>
+include "./base"

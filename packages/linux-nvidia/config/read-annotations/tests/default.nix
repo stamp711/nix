@@ -1,4 +1,4 @@
-# Tests config/read-annotations/default.nix: fixtures and comparison with NVIDIA's parser.
+# Test the pure parser, file loader and agreement with NVIDIA's parser.
 { pkgs, kernelSource }:
 let
   readAnnotations = import ../. { inherit (pkgs) lib; };
@@ -11,7 +11,8 @@ let
   );
   nixConfigs = pkgs.writeText "nix-configs.json" (builtins.toJSON configsByArch);
 in
-assert import ./cases.nix { inherit (pkgs) lib; };
+assert import ./parse.nix { inherit (pkgs) lib; };
+assert import ./files.nix { inherit (pkgs) lib; };
 pkgs.runCommand "linux-nvidia-read-annotations-test"
   {
     nativeBuildInputs = [ pkgs.python3 ];

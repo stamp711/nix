@@ -4,7 +4,7 @@
 # FLAVOUR: arm64-nvidia arm64-nvidia-64k
 # FLAVOUR_DEP: {'arm64-nvidia': 'arm64-generic', 'arm64-nvidia-64k': 'arm64-generic-64k'}
 
-include "./base"
+include "../base"
 
 CONFIG_ARCH_OVERRIDE policy<{'arm64': 'm'}>
 CONFIG_FLAVOUR_OVERRIDE policy<{'arm64': 'n', 'arm64-nvidia': 'y'}>
