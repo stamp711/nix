@@ -1,4 +1,9 @@
-{ self, inputs, ... }:
+{
+  config,
+  inputs,
+  self,
+  ...
+}:
 {
   systems = import inputs.systems;
 
@@ -73,6 +78,31 @@
         ];
 
       apps = {
+        check = {
+          type = "app";
+          meta.description = "Evaluate all flake outputs without building checks";
+          program = toString (
+            pkgs.writeShellScript "flake-check" ''
+              set -euo pipefail
+
+              # agenix-rekey's builtins.path needs these copies before flake check
+              # enters read-only store mode. This adds files without building anything.
+              for directory in ${lib.escapeShellArg config.agenix-rekey.rekeyRoot}/*; do
+                if [[ -d "$directory" ]]; then
+                  nix store add-path "$directory" > /dev/null
+                fi
+              done
+
+              # Use the caller's Nix and the same source snapshot as this app.
+              exec nix flake check "$@" \
+                --no-build --all-systems \
+                --option allow-import-from-derivation false \
+                --no-write-lock-file \
+                ${lib.escapeShellArg "path:${self}"}
+            ''
+          );
+        };
+
         update-inputs = {
           type = "app";
           meta.description = "Update nixpkgs to latest Hydra-cached revision and other inputs to newest";
