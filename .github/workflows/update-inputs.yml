@@ -21,7 +21,7 @@ jobs:
       - uses: DeterminateSystems/nix-installer-action@v22
         with:
           determinate: false
-      - run: nix run .#update-inputs
+      - run: nix run --accept-flake-config .#update-inputs
       - uses: peter-evans/create-pull-request@v8
         with:
           branch: update-inputs
