@@ -1,5 +1,5 @@
 {
-  flake.darwinModules.desktop-programs = {
+  flake.darwinModules.desktop-darwin = {
     homebrew.casks = [
       "bartender"
       "dash"

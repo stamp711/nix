@@ -1,5 +1,5 @@
 {
-  flake.nixosModules.desktop-environment = {
+  flake.nixosModules.desktop-linux = {
     services.pipewire = {
       enable = true;
       alsa.enable = true;

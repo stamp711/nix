@@ -16,7 +16,7 @@ in
   flake.nixosConfigurations.${hostname} = self.lib.mkNixos {
     inherit system nixpkgsConfig;
     modules = [
-      self.profiles.nixos.desktop
+      self.profiles.nixos.desktop-linux
       self.nixosModules.linux-gaming
       self.nixosModules.personal
       self.nixosModules.nuc
@@ -38,7 +38,7 @@ in
         class = "nixos";
         inherit username;
         modules = [
-          self.profiles.homeManager.desktop
+          self.profiles.homeManager.desktop-linux
           self.homeModules.linux-gaming
           self.homeModules.personal
           {

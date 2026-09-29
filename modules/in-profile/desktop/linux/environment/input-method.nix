@@ -1,5 +1,5 @@
 {
-  flake.nixosModules.desktop-environment =
+  flake.nixosModules.desktop-linux =
     { pkgs, ... }:
     {
       i18n.inputMethod = {

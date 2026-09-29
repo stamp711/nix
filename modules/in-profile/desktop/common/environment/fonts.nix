@@ -1,7 +1,7 @@
 # Fonts including Nerd Font for terminal icons
 { inputs, ... }:
 {
-  flake.homeModules.desktop-environment =
+  flake.homeModules.desktop =
     { pkgs, ... }:
     let
       monaco = pkgs.stdenv.mkDerivation {
@@ -38,7 +38,7 @@
       ];
     };
 
-  flake.nixosModules.desktop-environment =
+  flake.nixosModules.desktop-linux =
     { pkgs, ... }:
     {
       fonts.packages = with pkgs; [

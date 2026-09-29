@@ -1,5 +1,5 @@
 {
-  flake.nixosModules.desktop-environment =
+  flake.nixosModules.desktop-linux =
     { pkgs, ... }:
     {
       # https://git.sr.ht/~whynothugo/systemd-lock-handler
@@ -39,10 +39,10 @@
       security.pam.services.swaylock = { };
     };
 
-  flake.homeModules.desktop-environment =
-    { lib, pkgs, ... }:
+  flake.homeModules.desktop-linux =
+    { lib, ... }:
     {
-      config = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
+      config = {
         # Handle ext-idle-notify-v1, emit logind Lock signal after idle.
         services.swayidle = {
           enable = true;

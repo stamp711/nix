@@ -13,7 +13,7 @@ in
   flake.nixosConfigurations.${hostname} = self.lib.mkNixos {
     inherit system;
     modules = [
-      self.profiles.nixos.desktop
+      self.profiles.nixos.desktop-linux
       self.nixosModules.personal
       self.nixosModules.surface
       {
@@ -26,7 +26,7 @@ in
         class = "nixos";
         inherit username;
         modules = [
-          self.profiles.homeManager.desktop
+          self.profiles.homeManager.desktop-linux
           self.homeModules.personal
           {
             my.primaryUser = username;

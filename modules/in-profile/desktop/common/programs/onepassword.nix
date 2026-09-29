@@ -1,5 +1,6 @@
 {
-  flake.nixosModules.desktop-programs =
+
+  flake.nixosModules.desktop-linux =
     { config, lib, ... }:
     {
       programs._1password.enable = true;
@@ -13,7 +14,7 @@
     };
 
   # Symlink 1Password SSH agent socket over the system SSH agent socket on macOS
-  flake.darwinModules.desktop-programs =
+  flake.darwinModules.desktop-darwin =
     { config, ... }:
     {
       homebrew.casks = [
@@ -32,4 +33,5 @@
         };
       };
     };
+
 }

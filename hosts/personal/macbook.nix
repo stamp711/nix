@@ -11,7 +11,7 @@ in
     inherit system;
     rekey = true;
     modules = [
-      self.profiles.darwin.desktop
+      self.profiles.darwin.desktop-darwin
       self.darwinModules.personal
       {
         my.primaryUser = username;
@@ -23,7 +23,7 @@ in
         class = "darwin";
         inherit username;
         modules = [
-          self.profiles.homeManager.desktop
+          self.profiles.homeManager.desktop-darwin
           self.homeModules.personal
           {
             my.primaryUser = username;

@@ -1,5 +1,5 @@
 {
-  flake.darwinModules.desktop-environment = {
+  flake.darwinModules.desktop-darwin = {
     system.defaults.NSGlobalDomain = {
       AppleICUForce24HourTime = true;
       AppleMeasurementUnits = "Centimeters";

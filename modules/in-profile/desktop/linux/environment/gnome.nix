@@ -1,5 +1,5 @@
 {
-  flake.nixosModules.desktop-environment =
+  flake.nixosModules.desktop-linux =
     { lib, pkgs, ... }:
     {
       services.desktopManager.gnome.enable = true;
