@@ -84,6 +84,11 @@ in
       inputs.agenix.homeManagerModules.default
       inputs.agenix-rekey.homeManagerModules.default
       rekeyConfig
+      {
+        # https://github.com/nix-community/home-manager/pull/10000
+        disabledModules = [ "programs/codex" ];
+        imports = [ "${inputs.hm-codex-pr}/modules/programs/codex" ];
+      }
     ];
 
     # Create a NixOS system configuration.

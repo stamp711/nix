@@ -9,7 +9,6 @@ let
 in
 {
   flake.homeModules.cli-programs =
-    _:
     let
       skills = importSkills ./skills;
     in
@@ -57,9 +56,9 @@ in
       programs.codex = {
         enable = true;
         enableMcpIntegration = true;
+        # Merge declared settings while allowing Codex to save runtime changes.
+        mutableSettings = true;
       };
-      # Let codex own this file, since it really wants to mutate it at runtime.
-      home.file.".codex/config.toml".enable = false;
 
       programs.mcp.enable = true;
       programs.mcp.servers = { };

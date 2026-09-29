@@ -42,6 +42,12 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Codex mutable settings; remove this module backport once the PR lands in our HM input.
+    # https://github.com/nix-community/home-manager/pull/10000
+    hm-codex-pr = {
+      url = "github:alyraffauf/home-manager/codex-mutable-settings";
+      flake = false;
+    };
     vicinae-extensions = {
       url = "github:vicinaehq/extensions";
       inputs.nixpkgs.follows = "nixpkgs";
