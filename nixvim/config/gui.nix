@@ -13,7 +13,8 @@
     };
 
     extraConfigLua = ''
-      vim.opt.guicursor:append("a:blinkon0")
+      -- Use the theme's cursor colors instead of inverting faint indent guides.
+      vim.opt.guicursor:append("a:blinkon0-Cursor")
 
       -- Cmd+C/V on macOS
       if vim.g.neovide then

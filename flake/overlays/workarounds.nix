@@ -41,5 +41,19 @@
       }
     );
 
+    # 2026-09-29
+    # Forward pane cursor colors (OSC 12/112) so Neovim can use its themed cursor.
+    # TODO: remove once nixpkgs includes https://github.com/zellij-org/zellij/pull/5457.
+    zellij-unwrapped = prev.zellij-unwrapped.overrideAttrs (old: {
+      patches = (old.patches or [ ]) ++ [
+        (prev.fetchpatch {
+          url = "https://github.com/zellij-org/zellij/commit/5b598e1f62aa3afc88231d537290d825c9a49806.patch";
+          # 0.45.1 lacks this field; remove its context line from the reset hunk.
+          decode = "(sed '/^         self\\.osc7_payload = None;$/d' | recountdiff)";
+          hash = "sha256-Q54JqdDAiHKaGvGltFRdLfofT/YvOtrD9/pvgBhMUAM=";
+        })
+      ];
+    });
+
   };
 }
