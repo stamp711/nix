@@ -52,6 +52,8 @@ in
         in
         {
           enable = true;
+          listenAddress = "0.0.0.0"; # LAN and Tailscale clients
+          openFirewall = true;
           settings = {
             healthCheckTimeout = 600; # cold load of ~100 GiB from NVMe
             models = lib.mapAttrs (_: m: {
