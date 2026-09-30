@@ -111,7 +111,13 @@ in
         ];
 
         systemd.user.services.codex-app-server = {
-          Unit.Description = "Codex app-server daemon";
+          Unit = {
+            Description = "Codex app-server daemon";
+            # Restart the daemon when its declarative settings change.
+            X-Restart-Triggers = [
+              ((pkgs.formats.toml { }).generate "codex-app-server-config.toml" config.programs.codex.settings)
+            ];
+          };
           Install.WantedBy = [ "default.target" ];
           Service = {
             # codex won't resolve the socket under a missing CODEX_HOME.

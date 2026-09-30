@@ -4,6 +4,7 @@
 
     inherit (inputs.llm-agents.packages.${prev.stdenv.hostPlatform.system})
       claude-code
+      cli-proxy-api
       codex
       ;
 

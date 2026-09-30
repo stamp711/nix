@@ -11,7 +11,8 @@
         ++ (inputs.import-dir ./nixvim { collect = true; })._all
         ++ (inputs.import-dir ./packages { collect = true; })._all
         ++ (inputs.import-dir ./profiles { collect = true; })._all
-        ++ (inputs.import-dir ./shells { collect = true; })._all;
+        ++ (inputs.import-dir ./shells { collect = true; })._all
+        ++ (inputs.import-dir ./services { collect = true; })._all;
     };
 
   inputs = {

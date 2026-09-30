@@ -21,6 +21,7 @@ Personal Nix setup.
 ├── hosts/
 │   ├── personal/
 │   └── proxy-servers/
+├── services/              # deployments, exposed service data and client integration
 ├── nixvim/                # neovim config
 ├── packages/
 └── shells/
