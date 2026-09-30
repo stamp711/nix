@@ -20,6 +20,15 @@
         };
       };
 
+      # Let libinput pair keyd's virtual keyboard with internal touchpads for DWT.
+      # https://github.com/rvaiya/keyd#why-is-my-trackpad-is-interfering-with-input-after-enabling-keyd
+      environment.etc."libinput/local-overrides.quirks".text = ''
+        [keyd virtual keyboard]
+        MatchUdevType=keyboard
+        MatchName=keyd*keyboard
+        AttrKeyboardIntegration=internal
+      '';
+
       programs.dconf.profiles.user.databases = [
         {
           settings."org/gnome/desktop/peripherals/keyboard" = {
