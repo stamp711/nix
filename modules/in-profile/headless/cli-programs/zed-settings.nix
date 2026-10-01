@@ -4,6 +4,11 @@
     {
       programs.git.ignores = [ ".zed/*" ];
 
+      stylix.targets.zed = {
+        enable = true;
+        colors.enable = false; # managed below
+      };
+
       programs.zed-editor = {
         enable = true;
         package = lib.mkDefault null; # this is the headless profile
@@ -76,10 +81,6 @@
           project_panel.dock = "left";
 
           # Appearance
-          ui_font_family = "Monaco Nerd Font";
-          ui_font_size = 15;
-          buffer_font_family = "Monaco Nerd Font";
-          buffer_font_size = 14;
           theme = {
             mode = "system";
             light = "Modus Operandi Tinted";

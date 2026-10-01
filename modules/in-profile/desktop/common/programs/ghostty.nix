@@ -1,12 +1,21 @@
 {
 
-  flake.homeModules.desktop = {
+  flake.homeModules.desktop = { config, ... }: {
+
+    stylix.targets.ghostty.enable = true;
+
     programs.ghostty = {
       enable = true;
       settings = {
-        theme = "Modus Vivendi";
-        font-family = "Monaco Nerd Font";
-        font-size = 13;
+        # Base16's extra terminal slots; Stylix currently sets only 0–15.
+        palette = with config.lib.stylix.colors.withHashtag; [
+          "16=${base09}"
+          "17=${base0F}"
+          "18=${base01}"
+          "19=${base02}"
+          "20=${base04}"
+          "21=${base06}"
+        ];
         cursor-style-blink = false;
         cursor-color = "cell-foreground";
         cursor-text = "cell-background";
@@ -18,10 +27,10 @@
         quick-terminal-screen = "macos-menu-bar";
         quick-terminal-animation-duration = 0;
         quick-terminal-autohide = false;
-        background-opacity = 0.90;
         background-blur-radius = 5;
       };
     };
+
   };
 
   flake.homeModules.desktop-linux = { pkgs, ... }: {

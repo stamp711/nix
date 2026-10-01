@@ -58,6 +58,7 @@ in
         enableMcpIntegration = true;
         # Merge declared settings while allowing Codex to save runtime changes.
         mutableSettings = true;
+        settings.tui.theme = "base16-256"; # Use the terminal's Base16 palette, including slots 16–21.
       };
 
       programs.mcp.enable = true;

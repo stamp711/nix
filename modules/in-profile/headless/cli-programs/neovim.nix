@@ -6,6 +6,9 @@
     {
       imports = [ inputs.nixvim.homeModules.nixvim ];
 
+      # Keep the native themes and light/dark switching until Stylix integration is revisited.
+      stylix.targets.nixvim.enable = false;
+
       programs.nixvim = {
         enable = true;
         defaultEditor = true;

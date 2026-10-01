@@ -1,11 +1,6 @@
 {
   flake.nixvimModules.default =
-    {
-      config,
-      lib, # for lib.nixvim
-      pkgs,
-      ...
-    }:
+    { lib, pkgs, ... }:
     {
 
       # We pick the active colorscheme ourselves (below), so suppress nixvim's auto-apply.
@@ -25,50 +20,12 @@
         };
       };
 
-      # dark
       colorschemes.base16 = {
         enable = true;
         setUpBar = false; # Keep lualine's automatic theme switching.
-        # Load through the named colorscheme below, after choosing light/dark mode.
+        colorscheme = "phd";
         luaConfig.content = lib.mkForce "";
-        # Tomorrow Night Blue
-        # Palette source:
-        #   https://github.com/chriskempson/vim-tomorrow-theme/blob/fd25d3be7558b9f9533837f25d7b31d31438287b/colors/Tomorrow-Night-Blue.vim#L7-L18
-        # Base16 role guidelines:
-        #   https://github.com/tinted-theming/home/blob/main/styling.md#specific-colors-and-their-usages
-        # Custom Base16 assignments:
-        #   base04      <- blue
-        #   base06/07   <- white foreground
-        #   base0F      <- orange
-        colorscheme = {
-          base00 = "#002451";
-          base01 = "#00346e";
-          base02 = "#003f8e";
-          base03 = "#7285b7";
-          base04 = "#bbdaff"; # secondary text: line numbers, inactive bars
-          base05 = "#ffffff";
-          base06 = "#ffffff"; # bright foreground: Diffview titles and filenames
-          base07 = "#ffffff"; # brightest foreground; terminal bright white
-          base08 = "#ff9da4";
-          base09 = "#ffc58f";
-          base0A = "#ffeead";
-          base0B = "#d1f1a9";
-          base0C = "#99ffff";
-          base0D = "#bbdaff";
-          base0E = "#ebbbff";
-          base0F = "#ffc58f"; # delimiters and special characters
-        };
       };
-
-      # our own base16-tomorrow-night-blue
-      extraFiles."colors/base16-tomorrow-night-blue.lua".text = ''
-        vim.cmd("highlight clear")
-        vim.g.colors_name = "base16-tomorrow-night-blue"
-        require("base16-colorscheme").setup(
-          ${lib.nixvim.toLuaObject config.colorschemes.base16.colorscheme},
-          ${lib.nixvim.toLuaObject config.colorschemes.base16.settings}
-        )
-      '';
 
       # customized night-owl; the different name avoids runtime-path collision.
       extraFiles."colors/night-owl-custom.lua".text = ''
@@ -124,7 +81,7 @@
 
       extraConfigLua = ''
         require("auto-dark-mode").setup() -- defaults to set `background` to dark/light from the OS
-        vim.cmd.colorscheme(vim.o.background == "light" and "modus_operandi" or "night-owl-custom")
+        vim.cmd.colorscheme(vim.o.background == "light" and "modus_operandi" or "base16-phd")
       '';
 
       # When background is changed, apply the theme.
@@ -139,7 +96,7 @@
               if vim.v.option_old ~= vim.v.option_new then
                 -- defer the colorscheme switch until after nvim's internal background handling
                 vim.schedule(function()
-                  vim.cmd.colorscheme(vim.o.background == "light" and "modus_operandi" or "night-owl-custom")
+                  vim.cmd.colorscheme(vim.o.background == "light" and "modus_operandi" or "base16-phd")
                 end)
               end
             end

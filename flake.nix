@@ -43,6 +43,13 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    stylix = {
+      url = "github:nix-community/stylix";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
+      inputs.systems.follows = "systems";
+      inputs.nur.follows = "nur";
+    };
     # Codex mutable settings; remove this module backport once the PR lands in our HM input.
     # https://github.com/nix-community/home-manager/pull/10000
     hm-codex-pr = {
