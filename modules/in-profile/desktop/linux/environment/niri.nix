@@ -1,7 +1,11 @@
 {
-  flake.nixosModules.desktop-linux = {
-    programs.niri.enable = true;
-  };
+  flake.nixosModules.desktop-linux =
+    { pkgs, ... }:
+    {
+      programs.niri.enable = true;
+      # The default Niri screen-brightness bindings call brightnessctl.
+      environment.systemPackages = [ pkgs.brightnessctl ];
+    };
 
   flake.homeModules.desktop-linux = {
     wayland.windowManager.niri = {
