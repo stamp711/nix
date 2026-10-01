@@ -3,6 +3,7 @@
   flake.overlays.modifications = _final: prev: {
 
     inherit (inputs.llm-agents.packages.${prev.stdenv.hostPlatform.system})
+      chatgpt
       claude-code
       cli-proxy-api
       codex

@@ -27,12 +27,13 @@ in
   flake.lib = {
 
     # Ours plus the inputs', for every package set however it gets instantiated.
-    allOverlays = builtins.attrValues self.overlays ++ [
+    allOverlays = [
       inputs.agenix-rekey.overlays.default
       inputs.brew-nix.overlays.default
       inputs.nix-alien.overlays.default
       inputs.nur.overlays.default
-    ];
+    ]
+    ++ builtins.attrValues self.overlays;
 
     # Create a nixpkgs instance with our standard configuration.
     mkPkgs =
