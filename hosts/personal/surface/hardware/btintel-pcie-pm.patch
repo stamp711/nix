@@ -1,0 +1,265 @@
+Backport to Linux 7.2.8 of:
+https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=20dfccf8d854
+https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=79463c0de429
+https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=7ec2ab118e34
+https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=6091d2771395
+
+Retain the existing reset API; omit the mailbox handshake absent from 7.2.8.
+
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -16,6 +16,7 @@
+ #include <linux/delay.h>
+ #include <linux/interrupt.h>
+ #include <linux/acpi.h>
++#include <linux/suspend.h>
+ 
+ #include <linux/unaligned.h>
+ #include <linux/devcoredump.h>
+@@ -1011,6 +1012,10 @@
+ 	submit_rx = false;
+ 	signal_waitq = false;
+ 
++	/* Serialize the alive_intr_ctxt claim against set_dxstate()'s
++	 * register-based fallback, which can run concurrently.
++	 */
++	spin_lock(&data->irq_lock);
+ 	switch (data->alive_intr_ctxt) {
+ 	case BTINTEL_PCIE_ROM:
+ 		data->alive_intr_ctxt = BTINTEL_PCIE_FW_DL;
+@@ -1066,6 +1071,7 @@
+ 			   data->alive_intr_ctxt);
+ 		break;
+ 	}
++	spin_unlock(&data->irq_lock);
+ 
+ 	if (submit_rx) {
+ 		btintel_pcie_reset_ia(data);
+@@ -3018,7 +3024,8 @@
+ 
+ static int btintel_pcie_set_dxstate(struct btintel_pcie_data *data, u32 dxstate)
+ {
+-	int retry = 0, status;
++	int retry = 0, err;
++	long status;
+ 	u32 dx_intr_timeout_ms = 200;
+ 
+ 	do {
+@@ -3029,28 +3036,68 @@
+ 		status = wait_event_timeout(data->gp0_wait_q, data->gp0_received,
+ 			msecs_to_jiffies(dx_intr_timeout_ms));
+ 
+-		if (status)
+-			return 0;
+-
+-		bt_dev_warn(data->hdev,
+-			   "Timeout (%u ms) on alive interrupt for D%d entry, retry count %d",
+-			   dx_intr_timeout_ms, dxstate, retry);
+-
+-		/* clear gp0 cause */
+-		btintel_pcie_clr_reg_bits(data,
+-					  BTINTEL_PCIE_CSR_MSIX_HW_INT_CAUSES,
+-					  BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0);
+-
+-		/* A hardware bug may cause the alive interrupt to be missed.
+-		 * Check if the controller reached the expected state and retry
+-		 * the operation only if it hasn't.
++		if (!status) {
++			bt_dev_warn(data->hdev,
++				    "Timeout (%u ms) on alive interrupt for D%d entry, retry count %d",
++				    dx_intr_timeout_ms, dxstate, retry);
++
++			/* MSIX_HW_INT_CAUSES is W1C. Write only GP0 so other
++			 * pending causes are not acknowledged here.
++			 */
++			btintel_pcie_wr_reg32(data,
++					      BTINTEL_PCIE_CSR_MSIX_HW_INT_CAUSES,
++					      BTINTEL_PCIE_MSIX_HW_INT_CAUSES_GP0);
++		}
++
++		/* gp0_received is set at the top of the handler, before the switch on
++		 * alive_intr_ctxt. Error and lockdown are filtered out above it, but a
++		 * matched case can still complete without doing anything - D3 breaks
++		 * unchanged while the controller has not reached D0 - and a hardware
++		 * bug may drop the interrupt outright. Either way the flag says a gp0
++		 * was handled, not that the transition completed, and only the register
++		 * knows. Refresh the cache here and retry only if the state check still
++		 * fails.
+ 		 */
++		data->boot_stage_cache = btintel_pcie_rd_reg32(data,
++							       BTINTEL_PCIE_CSR_BOOT_STAGE_REG);
+ 		if (dxstate == BTINTEL_PCIE_STATE_D0) {
+-			if (btintel_pcie_in_d0(data))
++			if (btintel_pcie_in_d0(data)) {
++				bool armed;
++
++				/* Claim the transition under irq_lock so a
++				 * concurrent gp0 handler run cannot also arm RX.
++				 */
++				spin_lock(&data->irq_lock);
++				armed = data->alive_intr_ctxt == BTINTEL_PCIE_D0;
++				if (!armed)
++					data->alive_intr_ctxt = BTINTEL_PCIE_D0;
++				spin_unlock(&data->irq_lock);
++
++				if (armed)
++					return 0;
++
++				/* Do what the handler's D3 -> D0 branch
++				 * would have done, unless it already has.
++				 */
++				btintel_pcie_reset_ia(data);
++				err = btintel_pcie_start_rx(data);
++				if (err)
++					return err;
++
+ 				return 0;
++			}
+ 		} else {
+-			if (btintel_pcie_in_d3(data))
++			if (btintel_pcie_in_d3(data)) {
++				/* Do what the handler's D0 -> D3 branch
++				 * would have done, unless it already has.
++				 */
++				spin_lock(&data->irq_lock);
++				if (data->alive_intr_ctxt != BTINTEL_PCIE_D3)
++					data->alive_intr_ctxt = BTINTEL_PCIE_D3;
++				spin_unlock(&data->irq_lock);
++
+ 				return 0;
++			}
+ 		}
+ 
+ 	} while (++retry < BTINTEL_PCIE_DX_TRANSITION_MAX_RETRIES);
+@@ -3068,18 +3115,23 @@
+ 
+ 	data = pci_get_drvdata(pdev);
+ 
+-	dxstate = (mesg.event == PM_EVENT_SUSPEND ?
+-		   BTINTEL_PCIE_STATE_D3_HOT : BTINTEL_PCIE_STATE_D3_COLD);
+-
+-	data->pm_sx_event = mesg.event;
++	/* S0ix (s2idle) uses D3_HOT; S3, freeze and hibernate use D3_COLD. */
++	if (mesg.event == PM_EVENT_SUSPEND &&
++	    pm_suspend_target_state == PM_SUSPEND_TO_IDLE)
++		dxstate = BTINTEL_PCIE_STATE_D3_HOT;
++	else
++		dxstate = BTINTEL_PCIE_STATE_D3_COLD;
+ 
+ 	start = ktime_get();
+ 
+ 	/* Refer: 6.4.11.7 -> Platform power management */
+ 	err = btintel_pcie_set_dxstate(data, dxstate);
+ 
+-	if (err)
++	if (err) {
++		bt_dev_err(data->hdev, "Failed to set dxstate:%u (%d)",
++			   dxstate, err);
+ 		return err;
++	}
+ 
+ 	bt_dev_dbg(data->hdev,
+ 		   "device entered into d3 state from d0 in %lld us",
+@@ -3102,7 +3154,7 @@
+ 	return btintel_pcie_suspend_late(dev, PMSG_FREEZE);
+ }
+ 
+-static int btintel_pcie_resume(struct device *dev)
++static int btintel_pcie_resume_event(struct device *dev, pm_message_t mesg)
+ {
+ 	struct pci_dev *pdev = to_pci_dev(dev);
+ 	struct btintel_pcie_data *data;
+@@ -3110,19 +3162,15 @@
+ 	int err;
+ 
+ 	data = pci_get_drvdata(pdev);
+-	data->gp0_received = false;
+ 
+ 	start = ktime_get();
+ 
+-	/* When the system enters S4 (hibernate) mode, bluetooth device loses
+-	 * power, which results in the erasure of its loaded firmware.
+-	 * Consequently, function level reset (flr) is required on system
+-	 * resume to bring the controller back into an operational state by
+-	 * initiating a new firmware download.
+-	 */
+-
+-	if (data->pm_sx_event == PM_EVENT_FREEZE ||
+-	    data->pm_sx_event == PM_EVENT_HIBERNATE) {
++	/* S3 and S4 may cut power, erasing the firmware. Force FLR to recover
++	 * instead of a normal D0 transition.
++	 */
++	if (mesg.event == PM_EVENT_RESTORE ||
++	    (mesg.event == PM_EVENT_RESUME &&
++	     pm_suspend_target_state == PM_SUSPEND_MEM)) {
+ 		set_bit(BTINTEL_PCIE_CORE_HALTED, &data->flags);
+ 		data->reset_type = BTINTEL_PCIE_IOSF_PRR_FLR;
+ 		btintel_pcie_reset(data->hdev);
+@@ -3132,7 +3180,9 @@
+ 	/* Refer: 6.4.11.7 -> Platform power management */
+ 	err = btintel_pcie_set_dxstate(data, BTINTEL_PCIE_STATE_D0);
+ 
+-	if (err == 0) {
++	if (err) {
++		bt_dev_err(data->hdev, "Failed to set D0 state (%d)", err);
++	} else {
+ 		bt_dev_dbg(data->hdev,
+ 			   "device entered into d0 state from d3 in %lld us",
+ 			   ktime_to_us(ktime_get() - start));
+@@ -3161,13 +3211,28 @@
+ 	return err;
+ }
+ 
++static int btintel_pcie_resume(struct device *dev)
++{
++	return btintel_pcie_resume_event(dev, PMSG_RESUME);
++}
++
++static int btintel_pcie_restore(struct device *dev)
++{
++	return btintel_pcie_resume_event(dev, PMSG_RESTORE);
++}
++
++static int btintel_pcie_thaw(struct device *dev)
++{
++	return btintel_pcie_resume_event(dev, PMSG_THAW);
++}
++
+ static const struct dev_pm_ops btintel_pcie_pm_ops = {
+ 	.suspend = btintel_pcie_suspend,
+ 	.resume = btintel_pcie_resume,
+ 	.freeze = btintel_pcie_freeze,
+-	.thaw = btintel_pcie_resume,
++	.thaw = btintel_pcie_thaw,
+ 	.poweroff = btintel_pcie_hibernate,
+-	.restore = btintel_pcie_resume,
++	.restore = btintel_pcie_restore,
+ };
+ 
+ static struct pci_driver btintel_pcie_driver = {
+--- a/drivers/bluetooth/btintel_pcie.h
++++ b/drivers/bluetooth/btintel_pcie.h
+@@ -50,6 +50,7 @@
+ #define BTINTEL_PCIE_CSR_BOOT_STAGE_DEVICE_HALTED	(BIT(14))
+ #define BTINTEL_PCIE_CSR_BOOT_STAGE_MAC_ACCESS_ON	(BIT(16))
+ #define BTINTEL_PCIE_CSR_BOOT_STAGE_ALIVE		(BIT(23))
++/* Reflects live D-state. Updated by hardware on every D-state transition. */
+ #define BTINTEL_PCIE_CSR_BOOT_STAGE_D3_STATE_READY	(BIT(24))
+ 
+ /* Registers for MSI-X */
+@@ -477,7 +478,6 @@
+  * @txq: TX Queue struct
+  * @rxq: RX Queue struct
+  * @alive_intr_ctxt: Alive interrupt context
+- * @pm_sx_event: PM event on which system got suspended
+  */
+ struct btintel_pcie_data {
+ 	struct pci_dev	*pdev;
+@@ -532,7 +532,6 @@
+ 	enum btintel_pcie_reset_type	reset_type;
+ 	struct btintel_pcie_dbgc	dbgc;
+ 	struct btintel_pcie_dump_header dmp_hdr;
+-	u8	pm_sx_event;
+ 	u32	debug_evt_addr;
+ 	u32	debug_evt_size;
+ };

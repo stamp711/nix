@@ -23,6 +23,12 @@
             hash = "sha256-JzRQwPA/a1tkfO8ChCaQ1WpVeUhGRtObudVuW0Wvjbk=";
           };
         }
+        {
+          # Fix hibernation thaw and missed Bluetooth power-state interrupts. Backport of
+          # https://lore.kernel.org/lkml/20260928171003.2925480-1-ravindra@intel.com/
+          name = "btintel-pcie-pm";
+          patch = ./btintel-pcie-pm.patch;
+        }
       ];
 
       specialisation.linux-surface.configuration = {
