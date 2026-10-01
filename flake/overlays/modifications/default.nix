@@ -27,6 +27,13 @@
       patches = (old.patches or [ ]) ++ [ ./gamescope-nvidia-hdr-toggle-flicker.patch ];
     });
 
+    # Let any keyboard trigger DWT on internal touchpads.
+    libinput = prev.libinput.overrideAttrs (old: {
+      patches = (old.patches or [ ]) ++ [ ./libinput-dwt-any-keyboard.patch ];
+      # Require matching context when updating libinput.
+      patchFlags = (old.patchFlags or [ "-p1" ]) ++ [ "--fuzz=0" ];
+    });
+
     # Mihomo's fallback proxy-group: when no member passes its health-check,
     # use the LAST member as last resort instead of the first.
     mihomo = prev.mihomo.overrideAttrs (old: {

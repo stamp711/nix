@@ -1,0 +1,17 @@
+--- a/src/evdev-mt-touchpad.c
++++ b/src/evdev-mt-touchpad.c
+@@ -2300,12 +2300,8 @@ tp_want_dwt(struct evdev_device *touchpad, struct evdev_device *keyboard)
+ 	if (touchpad->tags & EVDEV_TAG_EXTERNAL_TOUCHPAD)
+ 		return vendor_tp == vendor_kbd && product_tp == product_kbd;
+ 
+-	if (keyboard->tags & EVDEV_TAG_INTERNAL_KEYBOARD)
+-		return true;
+-
+-	/* keyboard is not tagged as internal keyboard and it's not part of
+-	 * a combo */
+-	return false;
++	/* Let any keyboard trigger DWT on internal touchpads. */
++	return true;
+ }
+ 
+ static void
