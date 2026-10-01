@@ -18,6 +18,19 @@
       '';
     in
     {
+      services.keyd.keyboards.surface-flex = {
+        # Swap left Alt and left Windows on the Surface Flex Keyboard.
+        ids = [
+          "045e:0c8b:b040ea89" # Attached
+          "045e:0c7a:3ff4f52e" # Bluetooth
+        ];
+        settings.main = {
+          capslock = "leftcontrol";
+          leftalt = "layer(meta)";
+          leftmeta = "layer(alt)";
+        };
+      };
+
       age.secrets = self.lib.mergeDisjoint [
         keyboard.ageSecret
         pen.ageSecret
