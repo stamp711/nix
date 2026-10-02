@@ -17,6 +17,8 @@
       enableDefaultConfig = true;
       settings = {
         prefer-no-csd = { };
+        layout.gaps = 4;
+        layout.focus-ring.width = 2;
 
         # Let logind handle the power key to avoid suspending again after wake.
         # https://github.com/niri-wm/niri/issues/2233
