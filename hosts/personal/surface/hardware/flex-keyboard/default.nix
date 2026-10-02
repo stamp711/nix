@@ -24,7 +24,7 @@
         # Swap left Alt and left Windows on the Surface Flex Keyboard.
         ids = [
           "045e:0c8b:b040ea89" # Attached
-          "045e:0c7a:3ff4f52e" # Bluetooth
+          "045e:0c7a:a0c84f36" # Bluetooth
         ];
         settings.main = {
           capslock = "leftcontrol";
