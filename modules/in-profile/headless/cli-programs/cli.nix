@@ -20,6 +20,7 @@
         imgcat
         helix
         just
+        mosh
         netcat
         osc
         scc
