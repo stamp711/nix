@@ -28,10 +28,6 @@
             };
             "org/gnome/shell".enabled-extensions = [ "kimpanel@kde.org" ]; # for fcitx5
           };
-          locks = [
-            "/org/gnome/desktop/background/picture-options"
-            "/org/gnome/desktop/background/primary-color"
-          ];
         }
       ];
 
