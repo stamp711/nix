@@ -4,6 +4,7 @@
     { config, lib, ... }:
     let
       psk = self.lib.mkAgeSecret config { rekeyFile = ./psk.age; };
+      pskGL = self.lib.mkAgeSecret config { rekeyFile = ./psk-gl.age; };
       env = config.my.age-template.files."nm-wifi.env";
 
       ssids = [
@@ -28,16 +29,30 @@
       };
     in
     {
-      age.secrets = psk.ageSecret;
+      age.secrets = self.lib.mergeDisjoint [
+        psk.ageSecret
+        pskGL.ageSecret
+      ];
 
       my.age-template.files."nm-wifi.env" = {
         placeholders.psk = psk.path;
-        content = "PERSONAL_WIFI_PSK=$psk";
+        placeholders.pskGL = pskGL.path;
+        content = ''
+          PERSONAL_WIFI_PSK=$psk
+          PERSONAL_WIFI_GL_PSK=$pskGL
+        '';
       };
 
       networking.networkmanager.ensureProfiles = {
         environmentFiles = [ env.path ];
-        profiles = lib.listToAttrs (map mkProfile ssids);
+        profiles = self.lib.mergeDisjoint [
+          (lib.listToAttrs (map mkProfile ssids))
+          {
+            "Aprixnet.GL" = lib.recursiveUpdate (mkProfile "Aprixnet.GL").value {
+              wifi-security.psk = "$PERSONAL_WIFI_GL_PSK";
+            };
+          }
+        ];
       };
 
       systemd.services.NetworkManager-ensure-profiles.restartTriggers = [ env.renderedFileHash ];
