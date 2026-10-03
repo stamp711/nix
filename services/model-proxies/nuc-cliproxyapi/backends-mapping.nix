@@ -1,4 +1,4 @@
-# NOTE: 8.0.4's dynamic Codex catalog gives models without a built-in
+# The dynamic Codex catalog gives models without a built-in
 # Codex template a short generic coding prompt.
 { config, lib, ... }:
 {
@@ -9,8 +9,8 @@
       base-url = backend.baseUrl;
       # These inference endpoints need no API key or explicit Internet proxy.
       api-key-entries = [ { proxy-url = "direct"; } ];
-      # 8.0.4 exposes these capabilities, but has no catalog options for
-      # reviewer, prompt, default effort, compaction, summary or verbosity.
+      # CPA has no per-model catalog overrides for reviewer, prompt, default effort,
+      # compaction, reasoning summary or verbosity.
       models = lib.mapAttrsToList (model: cfg: {
         name = model;
         max-context-length = cfg.contextWindow;

@@ -1,0 +1,432 @@
+CPA v8.0.15: reuse Antigravity compaction for Chat Completions backends.
+Based on wwkozwpl; reject unusable summaries before replacing history.
+
+diff --git a/internal/runtime/executor/helps/antigravity_compaction.go b/internal/runtime/executor/helps/antigravity_compaction.go
+index 60d4329d..377c7efb 100644
+--- a/internal/runtime/executor/helps/antigravity_compaction.go
++++ b/internal/runtime/executor/helps/antigravity_compaction.go
+@@ -66,7 +66,7 @@ func PrepareAntigravityCompactionSummaryPayload(payload []byte, modelName string
+ 		var filtered []string
+ 		for _, item := range input.Array() {
+ 			itemType := item.Get("type").String()
+-			if itemType == "compaction_trigger" {
++			if itemType == "compaction_trigger" || itemType == "additional_tools" {
+ 				continue
+ 			}
+ 			filtered = append(filtered, item.Raw)
+diff --git a/internal/runtime/executor/openai_compat_compaction.go b/internal/runtime/executor/openai_compat_compaction.go
+new file mode 100644
+index 00000000..6d0a7261
+--- /dev/null
++++ b/internal/runtime/executor/openai_compat_compaction.go
+@@ -0,0 +1,97 @@
++package executor
++
++import (
++	"context"
++	"fmt"
++	"net/http"
++	"strings"
++
++	"github.com/router-for-me/CLIProxyAPI/v8/internal/runtime/executor/helps"
++	"github.com/router-for-me/CLIProxyAPI/v8/internal/thinking"
++	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
++	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
++	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
++	"github.com/tidwall/gjson"
++)
++
++// Antigravity's compaction helpers operate on Responses JSON, so its existing
++// summary format can also be used for Chat Completions backends.
++func expandOpenAICompatCompaction(req *cliproxyexecutor.Request, opts *cliproxyexecutor.Options) error {
++	for _, payload := range []*[]byte{&req.Payload, &opts.OriginalRequest} {
++		if !helps.HasResponsesCompactionItem(*payload) {
++			continue
++		}
++		expanded, err := helps.ExpandAntigravityCompactionCapsules(*payload)
++		if err != nil {
++			return statusErr{code: http.StatusBadRequest, msg: err.Error()}
++		}
++		*payload = expanded
++	}
++	return nil
++}
++
++func (e *OpenAICompatExecutor) executeCompaction(ctx context.Context, auth *cliproxyauth.Auth, req cliproxyexecutor.Request, opts cliproxyexecutor.Options) (cliproxyexecutor.Response, error) {
++	baseModel := thinking.ParseSuffix(req.Model).ModelName
++	payload := req.Payload
++	if len(payload) == 0 {
++		payload = opts.OriginalRequest
++	}
++	req.Payload = helps.PrepareAntigravityCompactionSummaryPayload(payload, baseModel)
++	opts.Alt = ""
++	opts.Stream = false
++	opts.OriginalRequest = nil
++	opts.SourceFormat = sdktranslator.FormatOpenAIResponse
++	opts.ResponseFormat = sdktranslator.FormatOpenAI
++	response, err := e.Execute(ctx, auth, req, opts)
++	if err != nil {
++		return cliproxyexecutor.Response{}, err
++	}
++	// A checkpoint replaces history, so accept only a finished text summary.
++	choice := gjson.GetBytes(response.Payload, "choices.0")
++	message := choice.Get("message")
++	if choice.Get("finish_reason").String() != "stop" ||
++		len(message.Get("tool_calls").Array()) != 0 ||
++		message.Get("function_call").IsObject() ||
++		strings.TrimSpace(message.Get("refusal").String()) != "" {
++		return cliproxyexecutor.Response{}, fmt.Errorf("compaction did not finish a text summary")
++	}
++	summary, err := helps.ExtractAntigravitySummaryText(response.Payload)
++	if err != nil {
++		return cliproxyexecutor.Response{}, fmt.Errorf("extract compaction summary: %w", err)
++	}
++	if strings.TrimSpace(summary) == "" {
++		return cliproxyexecutor.Response{}, fmt.Errorf("compaction summary was empty")
++	}
++	capsule, err := helps.SealAntigravityCompaction(summary, baseModel)
++	if err != nil {
++		return cliproxyexecutor.Response{}, err
++	}
++	usage := helps.ParseOpenAIUsage(response.Payload)
++	response.Payload = helps.BuildAntigravityCompactionResponse(baseModel, capsule, int(usage.InputTokens), int(usage.OutputTokens), int(usage.TotalTokens))
++	response.Headers = response.Headers.Clone()
++	if response.Headers == nil {
++		response.Headers = make(http.Header)
++	}
++	response.Headers.Del("Content-Length")
++	response.Headers.Del("Content-Encoding")
++	response.Headers.Set("Content-Type", "application/json")
++	return response, nil
++}
++
++func (e *OpenAICompatExecutor) executeCompactionStream(ctx context.Context, auth *cliproxyauth.Auth, req cliproxyexecutor.Request, opts cliproxyexecutor.Options) (*cliproxyexecutor.StreamResult, error) {
++	response, err := e.executeCompaction(ctx, auth, req, opts)
++	if err != nil {
++		return nil, err
++	}
++	baseModel := thinking.ParseSuffix(req.Model).ModelName
++	capsule := gjson.GetBytes(response.Payload, "output.0.encrypted_content").String()
++	usage := helps.ParseOpenAIUsage(response.Payload)
++	frames := helps.BuildAntigravityCompactionStreamChunks(baseModel, capsule, int(usage.InputTokens), int(usage.OutputTokens), int(usage.TotalTokens))
++	chunks := make(chan cliproxyexecutor.StreamChunk, len(frames))
++	for _, frame := range frames {
++		chunks <- cliproxyexecutor.StreamChunk{Payload: frame}
++	}
++	close(chunks)
++	response.Headers.Set("Content-Type", "text/event-stream")
++	return &cliproxyexecutor.StreamResult{Headers: response.Headers, Chunks: chunks}, nil
++}
+diff --git a/internal/runtime/executor/openai_compat_compaction_test.go b/internal/runtime/executor/openai_compat_compaction_test.go
+new file mode 100644
+index 00000000..8d3ca4e7
+--- /dev/null
++++ b/internal/runtime/executor/openai_compat_compaction_test.go
+@@ -0,0 +1,144 @@
++package executor
++
++import (
++	"context"
++	"fmt"
++	"io"
++	"net/http"
++	"net/http/httptest"
++	"strings"
++	"testing"
++
++	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
++	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/translator"
++	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
++	cliproxyexecutor "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/executor"
++	sdktranslator "github.com/router-for-me/CLIProxyAPI/v8/sdk/translator"
++	"github.com/tidwall/gjson"
++	"github.com/tidwall/sjson"
++)
++
++func TestOpenAICompatCompactionRoundTrip(t *testing.T) {
++	for _, stream := range []bool{false, true} {
++		t.Run(fmt.Sprintf("stream=%t", stream), func(t *testing.T) {
++			var requests [][]byte
++			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++				body, _ := io.ReadAll(r.Body)
++				requests = append(requests, body)
++				if r.URL.Path != "/v1/chat/completions" || r.Header.Get("Authorization") != "Bearer test-key" {
++					t.Errorf("unexpected upstream route or credential: %s", r.URL.Path)
++				}
++				w.Header().Set("Content-Type", "application/json")
++				_, _ = io.WriteString(w, `{"id":"summary","object":"chat.completion","choices":[{"message":{"role":"assistant","content":"The project codename is cobalt. Rename foo to bar; no files changed."},"finish_reason":"stop"}],"usage":{"prompt_tokens":100,"completion_tokens":20,"total_tokens":120}}`)
++			}))
++			defer server.Close()
++			executor := NewOpenAICompatExecutor("test", &config.Config{})
++			auth := &cliproxyauth.Auth{Attributes: map[string]string{"base_url": server.URL + "/v1", "api_key": "test-key"}}
++			payload := []byte(`{"model":"local-model","input":[{"type":"additional_tools","tools":[{"type":"function","name":"desktop_shell","parameters":{"type":"object"}}]},{"type":"message","role":"user","content":"The project codename is cobalt. Rename foo to bar."},{"type":"message","role":"assistant","content":"No files changed."},{"type":"compaction_trigger"}],"tools":[{"type":"function","name":"shell","parameters":{"type":"object"}}],"tool_choice":"auto"}`)
++			opts := cliproxyexecutor.Options{SourceFormat: sdktranslator.FormatOpenAIResponse, ResponseFormat: sdktranslator.FormatOpenAIResponse, Stream: stream, OriginalRequest: payload}
++			req := cliproxyexecutor.Request{Model: "local-model", Payload: payload}
++			var compacted []byte
++			if stream {
++				result, err := executor.ExecuteStream(context.Background(), auth, req, opts)
++				if err != nil {
++					t.Fatal(err)
++				}
++				var outputItems, completed int
++				for chunk := range result.Chunks {
++					if chunk.Err != nil {
++						t.Fatal(chunk.Err)
++					}
++					for line := range strings.SplitSeq(string(chunk.Payload), "\n") {
++						if !strings.HasPrefix(line, "data: ") {
++							continue
++						}
++						data := []byte(strings.TrimPrefix(line, "data: "))
++						switch gjson.GetBytes(data, "type").String() {
++						case "response.output_item.done":
++							outputItems++
++							if gjson.GetBytes(data, "item.type").String() != "compaction" {
++								t.Fatalf("unexpected output item: %s", data)
++							}
++						case "response.completed":
++							completed++
++							compacted = []byte(gjson.GetBytes(data, "response").Raw)
++						}
++					}
++				}
++				if outputItems != 1 || completed != 1 {
++					t.Fatalf("items=%d, completed=%d; Codex needs exactly one of each", outputItems, completed)
++				}
++			} else {
++				result, err := executor.Execute(context.Background(), auth, req, opts)
++				if err != nil {
++					t.Fatal(err)
++				}
++				compacted = result.Payload
++			}
++			if len(requests) != 1 || !strings.Contains(string(requests[0]), "cobalt") || !strings.Contains(string(requests[0]), "summary") {
++				t.Fatalf("summary request lost the conversation: %q", requests)
++			}
++			if gjson.GetBytes(requests[0], "tools").Exists() || gjson.GetBytes(requests[0], "stream").Bool() || strings.Contains(string(requests[0]), "compaction_trigger") {
++				t.Fatalf("summary must be a non-stream chat request without tools or triggers: %s", requests[0])
++			}
++			if gjson.GetBytes(compacted, "output.0.type").String() != "compaction" || gjson.GetBytes(compacted, "output.0.encrypted_content").String() == "" || gjson.GetBytes(compacted, "usage.input_tokens").Int() != 100 {
++				t.Fatalf("invalid compaction response: %s", compacted)
++			}
++
++			// Replay through both payload copies, then compact the restored context again.
++			replay, _ := sjson.SetRawBytes([]byte(`{"model":"local-model"}`), "input", []byte(gjson.GetBytes(compacted, "output").Raw))
++			req.Payload, opts.OriginalRequest = replay, replay
++			opts.Stream = false
++			if _, err := executor.Execute(context.Background(), auth, req, opts); err != nil {
++				t.Fatal(err)
++			}
++			replay, _ = sjson.SetRawBytes(replay, "input.-1", []byte(`{"type":"compaction_trigger"}`))
++			req.Payload, opts.OriginalRequest = replay, replay
++			if _, err := executor.Execute(context.Background(), auth, req, opts); err != nil {
++				t.Fatal(err)
++			}
++			for _, body := range requests[1:] {
++				if !strings.Contains(string(body), "The project codename is cobalt") || strings.Contains(string(body), "encrypted_content") {
++					t.Fatalf("compacted context was not restored before translation: %s", body)
++				}
++			}
++		})
++	}
++}
++
++func TestOpenAICompatCompactionRejectsInvalidSummary(t *testing.T) {
++	for _, response := range []string{
++		`{"choices":[{"message":{"content":""},"finish_reason":"stop"}]}`,
++		`{"choices":[{"message":{"content":"   "},"finish_reason":"stop"}]}`,
++		`{"choices":[{"message":{"content":"unfinished summary"},"finish_reason":"length"}]}`,
++		`{"choices":[{"message":{"content":"partial summary"},"finish_reason":"content_filter"}]}`,
++		`{"choices":[{"message":{"content":"unconfirmed summary"}}]}`,
++		`{"choices":[{"message":{"content":"Inspect files first","tool_calls":[{"id":"call_1","type":"function","function":{"name":"shell","arguments":"{}"}}]},"finish_reason":"tool_calls"}]}`,
++		`{"choices":[{"message":{"content":"Inspect files first","tool_calls":[{"id":"call_1","type":"function","function":{"name":"shell","arguments":"{}"}}]},"finish_reason":"stop"}]}`,
++		`{"choices":[{"message":{"content":"Inspect files first","function_call":{"name":"shell","arguments":"{}"}},"finish_reason":"stop"}]}`,
++		`{"choices":[{"message":{"content":"Cannot summarize","refusal":"Cannot comply"},"finish_reason":"stop"}]}`,
++	} {
++		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++			_, _ = io.WriteString(w, response)
++		}))
++		executor := NewOpenAICompatExecutor("test", &config.Config{})
++		auth := &cliproxyauth.Auth{Attributes: map[string]string{"base_url": server.URL}}
++		_, err := executor.ExecuteStream(context.Background(), auth,
++			cliproxyexecutor.Request{Model: "local-model", Payload: []byte(`{"input":[{"type":"compaction_trigger"}]}`)},
++			cliproxyexecutor.Options{SourceFormat: sdktranslator.FormatOpenAIResponse, Stream: true})
++		server.Close()
++		if err == nil {
++			t.Fatalf("accepted unusable summary: %s", response)
++		}
++	}
++}
++
++func TestOpenAICompatCompactionRejectsUnknownCapsule(t *testing.T) {
++	executor := NewOpenAICompatExecutor("test", &config.Config{})
++	_, err := executor.ExecuteStream(context.Background(), nil,
++		cliproxyexecutor.Request{Model: "local-model", Payload: []byte(`{"input":[{"type":"compaction","encrypted_content":"unknown-format"}]}`)},
++		cliproxyexecutor.Options{SourceFormat: sdktranslator.FormatOpenAIResponse, Stream: true})
++	if status, ok := err.(interface{ StatusCode() int }); !ok || status.StatusCode() != http.StatusBadRequest {
++		t.Fatalf("expected explicit rejection of unreadable context, got %v", err)
++	}
++}
+diff --git a/internal/runtime/executor/openai_compat_executor.go b/internal/runtime/executor/openai_compat_executor.go
+index 49ba0eb3..2116160d 100644
+--- a/internal/runtime/executor/openai_compat_executor.go
++++ b/internal/runtime/executor/openai_compat_executor.go
+@@ -90,6 +90,14 @@ func (e *OpenAICompatExecutor) Execute(ctx context.Context, auth *cliproxyauth.A
+ 	if endpointPath := openAICompatImageEndpointPath(opts); endpointPath != "" {
+ 		return e.executeImages(ctx, auth, req, opts, endpointPath)
+ 	}
++	if opts.Alt != "responses/compact" {
++		if err = expandOpenAICompatCompaction(&req, &opts); err != nil {
++			return resp, err
++		}
++		if helps.HasResponsesCompactionTrigger(req.Payload) || helps.HasResponsesCompactionTrigger(opts.OriginalRequest) {
++			return e.executeCompaction(ctx, auth, req, opts)
++		}
++	}
+ 
+ 	baseModel := thinking.ParseSuffix(req.Model).ModelName
+ 
+@@ -319,6 +327,12 @@ func (e *OpenAICompatExecutor) ExecuteStream(ctx context.Context, auth *cliproxy
+ 	if endpointPath := openAICompatImageEndpointPath(opts); endpointPath != "" {
+ 		return e.executeImagesStream(ctx, auth, req, opts, endpointPath)
+ 	}
++	if err = expandOpenAICompatCompaction(&req, &opts); err != nil {
++		return nil, err
++	}
++	if helps.HasResponsesCompactionTrigger(req.Payload) || helps.HasResponsesCompactionTrigger(opts.OriginalRequest) {
++		return e.executeCompactionStream(ctx, auth, req, opts)
++	}
+ 
+ 	baseModel := thinking.ParseSuffix(req.Model).ModelName
+ 
+diff --git a/test/openai_compat_compaction_websocket_test.go b/test/openai_compat_compaction_websocket_test.go
+new file mode 100644
+index 00000000..283a4296
+--- /dev/null
++++ b/test/openai_compat_compaction_websocket_test.go
+@@ -0,0 +1,125 @@
++package test
++
++import (
++	"context"
++	"fmt"
++	"io"
++	"net/http"
++	"net/http/httptest"
++	"strings"
++	"testing"
++	"time"
++
++	"github.com/gin-gonic/gin"
++	"github.com/gorilla/websocket"
++	"github.com/router-for-me/CLIProxyAPI/v8/internal/config"
++	"github.com/router-for-me/CLIProxyAPI/v8/internal/registry"
++	runtimeexecutor "github.com/router-for-me/CLIProxyAPI/v8/internal/runtime/executor"
++	_ "github.com/router-for-me/CLIProxyAPI/v8/internal/translator"
++	"github.com/router-for-me/CLIProxyAPI/v8/internal/util"
++	"github.com/router-for-me/CLIProxyAPI/v8/sdk/api/handlers"
++	openaihandlers "github.com/router-for-me/CLIProxyAPI/v8/sdk/api/handlers/openai"
++	cliproxyauth "github.com/router-for-me/CLIProxyAPI/v8/sdk/cliproxy/auth"
++	"github.com/tidwall/gjson"
++)
++
++func TestOpenAICompatCompactionWebsocket(t *testing.T) {
++	const model = "compaction-websocket-model"
++	requests := make(chan string, 3)
++	upstream := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
++		body, errRead := io.ReadAll(r.Body)
++		if errRead != nil {
++			t.Error(errRead)
++			return
++		}
++		requests <- string(body)
++		if r.URL.Path != "/v1/chat/completions" {
++			t.Errorf("unexpected upstream path: %s", r.URL.Path)
++		}
++		if !gjson.GetBytes(body, "stream").Bool() {
++			w.Header().Set("Content-Type", "application/json")
++			_, _ = io.WriteString(w, `{"id":"summary","object":"chat.completion","choices":[{"message":{"role":"assistant","content":"CHECKPOINT_SUMMARY"},"finish_reason":"stop"}]}`)
++			return
++		}
++		w.Header().Set("Content-Type", "text/event-stream")
++		delta, finish := `{"role":"assistant","content":"INITIAL_ASSISTANT"}`, "stop"
++		if gjson.GetBytes(body, "tools").Exists() {
++			delta, finish = `{"role":"assistant","tool_calls":[{"index":0,"id":"call_shell","type":"function","function":{"name":"shell","arguments":"{}"}}]}`, "tool_calls"
++		}
++		_, _ = fmt.Fprintf(w, "data: {\"id\":\"chatcmpl_mock\",\"object\":\"chat.completion.chunk\",\"model\":%q,\"choices\":[{\"index\":0,\"delta\":%s,\"finish_reason\":null}]}\n\n", model, delta)
++		_, _ = fmt.Fprintf(w, "data: {\"id\":\"chatcmpl_mock\",\"object\":\"chat.completion.chunk\",\"model\":%q,\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":%q}]}\n\ndata: [DONE]\n\n", model, finish)
++	}))
++	defer upstream.Close()
++	cfg := &config.Config{OpenAICompatibility: []config.OpenAICompatibility{{
++		Name: "compaction-websocket", BaseURL: upstream.URL + "/v1",
++		Models: []config.OpenAICompatibilityModel{{Name: model, Alias: model}},
++	}}}
++	provider := util.OpenAICompatibleProviderKey("compaction-websocket")
++	manager := cliproxyauth.NewManager(nil, &cliproxyauth.RoundRobinSelector{}, nil)
++	manager.SetConfig(cfg)
++	manager.SetRetryConfig(0, 0, 0)
++	manager.RegisterExecutor(runtimeexecutor.NewOpenAICompatExecutor(provider, cfg))
++	registry.GetGlobalRegistry().RegisterClient(t.Name(), provider, []*registry.ModelInfo{{ID: model}})
++	defer registry.GetGlobalRegistry().UnregisterClient(t.Name())
++	_, errRegister := manager.Register(context.Background(), &cliproxyauth.Auth{
++		ID: t.Name(), Provider: provider, Status: cliproxyauth.StatusActive,
++		Attributes: map[string]string{"base_url": upstream.URL + "/v1", "compat_name": "compaction-websocket", "provider_key": provider, "auth_kind": "apikey"},
++	})
++	if errRegister != nil {
++		t.Fatal(errRegister)
++	}
++	manager.RefreshSchedulerEntry(t.Name())
++	gin.SetMode(gin.TestMode)
++	handler := openaihandlers.NewOpenAIResponsesAPIHandler(handlers.NewBaseAPIHandlers(&cfg.SDKConfig, manager))
++	router := gin.New()
++	router.GET("/v1/responses", handler.ResponsesWebsocket)
++	server := httptest.NewServer(router)
++	defer server.Close()
++	conn, _, errDial := websocket.DefaultDialer.Dial("ws"+strings.TrimPrefix(server.URL, "http")+"/v1/responses", nil)
++	if errDial != nil {
++		t.Fatal(errDial)
++	}
++	defer func() { _ = conn.Close() }()
++	create := func(request string) gjson.Result {
++		t.Helper()
++		if errWrite := conn.WriteMessage(websocket.TextMessage, []byte(request)); errWrite != nil {
++			t.Fatal(errWrite)
++		}
++		_ = conn.SetReadDeadline(time.Now().Add(10 * time.Second))
++		for {
++			_, body, errRead := conn.ReadMessage()
++			if errRead != nil {
++				t.Fatal(errRead)
++			}
++			event := gjson.ParseBytes(body)
++			switch event.Get("type").String() {
++			case "error", "response.failed":
++				t.Fatalf("websocket request failed: %s", body)
++			case "response.completed":
++				return event.Get("response")
++			}
++		}
++	}
++
++	first := create(fmt.Sprintf(`{"type":"response.create","model":%q,"input":[{"role":"user","content":"OLD_TRANSCRIPT"}]}`, model))
++	<-requests
++	if first.Get("id").String() == "" {
++		t.Fatalf("missing response ID: %s", first.Raw)
++	}
++	compacted := create(fmt.Sprintf(`{"type":"response.create","previous_response_id":%q,"input":[{"type":"compaction_trigger"}]}`, first.Get("id").String()))
++	summaryRequest := <-requests
++	if !strings.Contains(summaryRequest, "OLD_TRANSCRIPT") || !strings.Contains(summaryRequest, "INITIAL_ASSISTANT") || gjson.Get(summaryRequest, "previous_response_id").Exists() {
++		t.Fatalf("incremental compaction lost resolved history: %s", summaryRequest)
++	}
++	if compacted.Get("output.0.type").String() != "compaction" || compacted.Get("output.0.encrypted_content").String() == "" {
++		t.Fatalf("invalid checkpoint: %s", compacted.Raw)
++	}
++	replayed := create(fmt.Sprintf(`{"type":"response.create","model":%q,"input":[%s,{"role":"user","content":"Continue with shell"}],"tools":[{"type":"function","name":"shell","parameters":{"type":"object"}}]}`, model, compacted.Get("output.0").Raw))
++	replayRequest := <-requests
++	if !strings.Contains(replayRequest, "CHECKPOINT_SUMMARY") || strings.Contains(replayRequest, "OLD_TRANSCRIPT") || strings.Contains(replayRequest, "encrypted_content") || !gjson.Get(replayRequest, "tools").Exists() {
++		t.Fatalf("checkpoint replay lost context or tools: %s", replayRequest)
++	}
++	if replayed.Get("output.0.type").String() != "function_call" || replayed.Get("output.0.name").String() != "shell" {
++		t.Fatalf("tool call lost after compaction: %s", replayed.Raw)
++	}
++}
