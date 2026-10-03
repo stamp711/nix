@@ -51,6 +51,7 @@ in
               enable = true;
               remoteControl = true;
             };
+            programs.t3code.server.enable = true;
           }
         ];
       })
