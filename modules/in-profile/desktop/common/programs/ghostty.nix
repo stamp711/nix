@@ -1,21 +1,15 @@
 {
 
-  flake.homeModules.desktop = { config, ... }: {
+  flake.homeModules.desktop = {
 
-    stylix.targets.ghostty.enable = true;
+    stylix.targets.ghostty = {
+      enable = true;
+      colors.enable = false;
+    };
 
     programs.ghostty = {
       enable = true;
       settings = {
-        # Base16's extra terminal slots; Stylix currently sets only 0–15.
-        palette = with config.lib.stylix.colors.withHashtag; [
-          "16=${base09}"
-          "17=${base0F}"
-          "18=${base01}"
-          "19=${base02}"
-          "20=${base04}"
-          "21=${base06}"
-        ];
         cursor-style-blink = false;
         cursor-color = "cell-foreground";
         cursor-text = "cell-background";

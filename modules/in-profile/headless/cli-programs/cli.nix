@@ -71,6 +71,7 @@
 
       # System monitoring
       programs.btop.enable = true;
+      stylix.targets.btop.enable = true;
 
       # Better cat
       programs.bat.enable = true;

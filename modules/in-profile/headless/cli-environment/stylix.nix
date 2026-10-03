@@ -1,11 +1,11 @@
 { inputs, lib, ... }:
 let
   stylixConfig =
-    { config, pkgs, ... }:
+    { pkgs, ... }:
     {
       stylix = {
         enable = true;
-        autoEnable = true;
+        autoEnable = false;
         base16Scheme = inputs.stylix.inputs.tinted-schemes + "/base16/phd.yaml";
         opacity.terminal = 0.9;
 
@@ -14,7 +14,6 @@ let
             name = "Monaco Nerd Font";
             package = pkgs.my.monaco-nerd-font;
           };
-          sansSerif = config.stylix.fonts.monospace;
           sizes.applications = 10;
         };
       };

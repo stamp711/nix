@@ -4,6 +4,7 @@
     { pkgs, ... }:
     {
       fonts.fontconfig.enable = true;
+      stylix.targets.fontconfig.enable = true;
       home.packages = [
         pkgs.my.monaco
         pkgs.my.monaco-nerd-font
