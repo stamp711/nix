@@ -4,36 +4,39 @@
   flake.homeModules.cli-programs =
     { config, pkgs, ... }:
     {
-      home.packages = with pkgs; [
-        # Search
-        fd
-        ripgrep
+      home.packages =
+        with pkgs;
+        [
+          # Search
+          fd
+          ripgrep
 
-        # General utilities
-        assh
-        age
-        agenix-rekey
-        age-plugin-1p
-        doxygen
-        eternal-terminal
-        ghgrab
-        imgcat
-        helix
-        just
-        mosh
-        netcat
-        osc
-        scc
-        sops
-        watch
-        wakatime-cli
-        wget
+          # General utilities
+          assh
+          age
+          agenix-rekey
+          age-plugin-1p
+          doxygen
+          eternal-terminal
+          ghgrab
+          imgcat
+          helix
+          just
+          mosh
+          netcat
+          osc
+          scc
+          sops
+          watch
+          wakatime-cli
+          wget
 
-        b4
-        public-inbox
+          b4
+          public-inbox
 
-        my.even-terminal
-      ];
+          my.even-terminal
+        ]
+        ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [ waypipe ];
 
       # Modern ls replacement
       programs.lsd = {
