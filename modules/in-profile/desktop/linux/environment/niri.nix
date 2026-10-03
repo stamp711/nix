@@ -26,6 +26,7 @@
 
         # This block replaces the included defaults; omitting tap disables tap-to-click.
         input.touchpad = {
+          click-method = "clickfinger";
           natural-scroll = { };
           # Suppress accidental touchpad movement while typing.
           dwt = { };
