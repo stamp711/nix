@@ -56,6 +56,12 @@
       url = "github:alyraffauf/home-manager/codex-mutable-settings";
       flake = false;
     };
+    # T3 Code daemon; remove this backport once the PR lands in our HM input.
+    # https://github.com/nix-community/home-manager/pull/9695
+    hm-t3code-pr = {
+      url = "github:jonocodes/home-manager/310ddb10c6510498cf11d0f186f2069415ef280d";
+      flake = false;
+    };
     vicinae-extensions = {
       url = "github:vicinaehq/extensions";
       inputs.nixpkgs.follows = "nixpkgs";

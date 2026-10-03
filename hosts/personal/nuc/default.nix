@@ -41,16 +41,11 @@ in
           self.profiles.homeManager.desktop-linux
           self.homeModules.linux-gaming
           self.homeModules.personal
+          self.homeModules.nuc
           {
             my.primaryUser = username;
             age.rekey.hostPubkey = userPubkey;
             age.rekey.localStorageDir = self.lib.rekeyDir "${hostname}-${username}";
-          }
-          {
-            my.codex.appServer = {
-              enable = true;
-              remoteControl = true;
-            };
           }
         ];
       })

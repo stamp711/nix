@@ -692,6 +692,23 @@
         "type": "github"
       }
     },
+    "hm-t3code-pr": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1784696724,
+        "narHash": "sha256-cN/0VpxQSfDpti1WWRxx5RPkdTXpjLpGctcQs+BTNZM=",
+        "owner": "jonocodes",
+        "repo": "home-manager",
+        "rev": "310ddb10c6510498cf11d0f186f2069415ef280d",
+        "type": "github"
+      },
+      "original": {
+        "owner": "jonocodes",
+        "repo": "home-manager",
+        "rev": "310ddb10c6510498cf11d0f186f2069415ef280d",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -813,11 +830,11 @@
         "treefmt-nix": "treefmt-nix"
       },
       "locked": {
-        "lastModified": 1790832743,
-        "narHash": "sha256-ho6vTx7+GLxXZNzp9eCq/X+49s16KLO1EEEGYCkMjQ0=",
+        "lastModified": 1791001326,
+        "narHash": "sha256-pwJhtpRcNX1pJ9luUy3Eh1EYUFsZjv5m2xSqZ1hEhMU=",
         "owner": "numtide",
         "repo": "llm-agents.nix",
-        "rev": "3a994324e0a724f3eb043200368f0b60c06862e3",
+        "rev": "83984ebbbe5322b261d9fdc24eb15cf44f23abec",
         "type": "github"
       },
       "original": {
@@ -1274,6 +1291,7 @@
         "hermes-agent": "hermes-agent",
         "hermes-webui": "hermes-webui",
         "hm-codex-pr": "hm-codex-pr",
+        "hm-t3code-pr": "hm-t3code-pr",
         "home-manager": "home-manager",
         "homebrew-cask": "homebrew-cask",
         "homebrew-core": "homebrew-core",
