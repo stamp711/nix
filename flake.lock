@@ -135,6 +135,23 @@
         "type": "github"
       }
     },
+    "bifrost": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1790949844,
+        "narHash": "sha256-6WEIbrpctkMN/qjzfCGFT9xhT8Hp9j+atBWOK5Dd7rA=",
+        "owner": "maximhq",
+        "repo": "bifrost",
+        "rev": "77d08f241cfa10d09ea37d6b00ef9f2c363a3ede",
+        "type": "github"
+      },
+      "original": {
+        "owner": "maximhq",
+        "ref": "transports/v2.2.5",
+        "repo": "bifrost",
+        "type": "github"
+      }
+    },
     "brew-api": {
       "flake": false,
       "locked": {
@@ -1280,6 +1297,7 @@
         "NixVirt": "NixVirt",
         "agenix": "agenix",
         "agenix-rekey": "agenix-rekey",
+        "bifrost": "bifrost",
         "brew-api": "brew-api",
         "brew-nix": "brew-nix",
         "claude-code-wakatime": "claude-code-wakatime",
