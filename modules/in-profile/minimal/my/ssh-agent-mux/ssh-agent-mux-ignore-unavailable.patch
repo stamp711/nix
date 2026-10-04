@@ -1,0 +1,22 @@
+diff --git a/src/lib.rs b/src/lib.rs
+--- a/src/lib.rs
++++ b/src/lib.rs
+@@ -200,7 +200,17 @@ impl MuxAgent {
+                     continue;
+                 }
+             };
+-            let agent_identities = client.request_identities().await?;
++            let agent_identities = match client.request_identities().await {
++                Ok(identities) => identities,
++                Err(error) => {
++                    log::warn!(
++                        "Ignoring unavailable upstream agent at {}: {}",
++                        sock_path.display(),
++                        error
++                    );
++                    continue;
++                }
++            };
+             {
+                 for id in &agent_identities {
+                     known_keys.insert(id.pubkey.clone(), sock_path.clone());

@@ -18,7 +18,7 @@ let
           my.primaryUser = username;
           my.flake = "github:stamp711/nix";
           # Only way in: these hosts opt out of nixosModules.personal.
-          users.users.${username}.openssh.authorizedKeys.keys = [ self.lib.sshPubKey ];
+          users.users.${username}.openssh.authorizedKeys.keys = self.lib.sshPubKeys;
           networking.hostName = hostname;
           age.rekey.hostPubkey = hostPubkey;
           age.rekey.localStorageDir = self.lib.rekeyDir hostname;

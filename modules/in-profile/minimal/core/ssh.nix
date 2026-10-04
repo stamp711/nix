@@ -47,19 +47,8 @@
   };
 
   flake.homeModules.core =
-    { lib, pkgs, ... }:
-    let
-      ssh-agent-switcher = pkgs.ssh-agent-switcher.overrideAttrs { doCheck = false; };
-    in
+    { pkgs, ... }:
     {
-      # SSH agent switcher daemon for stable agent forwarding in tmux/zellij
-      programs.zsh.initContent = ''
-        if [ -n "$SSH_CONNECTION" ]; then
-          export SSH_AUTH_SOCK="/tmp/ssh-agent-switcher.''${USER}.sock"
-          ${lib.getExe ssh-agent-switcher} --daemon --socket-path="$SSH_AUTH_SOCK" 2>/dev/null || true
-        fi
-      '';
-
       home.packages = [ pkgs.connect ];
 
       # Route ssh via the local proxy when $HTTP_PROXY is set.

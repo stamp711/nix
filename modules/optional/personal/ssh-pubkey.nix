@@ -1,4 +1,4 @@
-# Operator SSH key, authorized on personal hosts.
+# Operator SSH keys, authorized on personal hosts.
 { lib, self, ... }: {
 
   flake.nixosModules.personal = {
@@ -9,7 +9,7 @@
         lib.types.submodule (
           { config, ... }:
           {
-            config.openssh.authorizedKeys.keys = lib.mkIf config.isNormalUser [ self.lib.sshPubKey ];
+            config.openssh.authorizedKeys.keys = lib.mkIf config.isNormalUser self.lib.sshPubKeys;
           }
         )
       );
@@ -17,7 +17,7 @@
   };
 
   flake.darwinModules.personal = { config, ... }: {
-    users.users.${config.my.primaryUser}.openssh.authorizedKeys.keys = [ self.lib.sshPubKey ];
+    users.users.${config.my.primaryUser}.openssh.authorizedKeys.keys = self.lib.sshPubKeys;
   };
 
 }

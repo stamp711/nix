@@ -115,7 +115,7 @@
             # The root is wiped on every start; /persist is the host's.
             my.persistence.enable = true;
             my.primaryUser = user;
-            users.users.${user}.openssh.authorizedKeys.keys = [ self.lib.sshPubKey ];
+            users.users.${user}.openssh.authorizedKeys.keys = self.lib.sshPubKeys;
           };
       };
     in
