@@ -6,13 +6,14 @@
     name: backend: {
       inherit name;
       prefix = name;
-      base-url = backend.baseUrl;
+      base-url = "http://127.0.0.1:8080/openai/v1";
       # These inference endpoints need no API key or explicit Internet proxy.
       api-key-entries = [ { proxy-url = "direct"; } ];
       # CPA has no per-model catalog overrides for reviewer, prompt, default effort,
       # compaction, reasoning summary or verbosity.
       models = lib.mapAttrsToList (model: cfg: {
-        name = model;
+        name = "${name}/${model}";
+        alias = model;
         max-context-length = cfg.contextWindow;
         input-modalities = cfg.inputModalities;
         thinking.levels = cfg.reasoningEfforts;

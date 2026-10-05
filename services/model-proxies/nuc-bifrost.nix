@@ -1,4 +1,4 @@
-{ inputs, ... }:
+flake@{ inputs, lib, ... }:
 {
   flake.nixosModules.nuc =
     { config, pkgs, ... }:
@@ -18,7 +18,14 @@
               enabled = false;
             }
           ];
-          providers = { }; # TODO:
+          providers.spark = {
+            network_config.base_url = lib.removeSuffix "/v1" flake.config.modelBackends.spark.baseUrl;
+            network_config.allow_private_network = true; # LAN endpoints and fake-IP DNS.
+            custom_provider_config = {
+              base_provider_type = "openai";
+              is_key_less = true;
+            };
+          };
         };
       };
 
