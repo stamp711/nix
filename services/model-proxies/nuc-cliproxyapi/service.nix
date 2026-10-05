@@ -10,8 +10,6 @@ in
     { config, pkgs, ... }:
     let
       cfg = config.services.cliproxyapi;
-      configFile = (pkgs.formats.yaml { }).generate "cliproxyapi.yaml" cfg.settings;
-      configPath = "/etc/cliproxyapi/config.yaml";
       management = self.lib.mkAgeSecret config {
         rekeyFile = ./management.env.age;
         generator.script = { pkgs, ... }: ''
@@ -40,16 +38,6 @@ in
           # Let the client choose tools; do not inject image_generation.
           disable-image-generation = "passthrough";
         };
-      };
-
-      environment.etc."cliproxyapi/config.yaml".source = configFile;
-      systemd.services.cliproxyapi = {
-        # ProtectSystem=strict makes /etc read-only; StateDirectory stays writable.
-        environment.MANAGEMENT_STATIC_PATH = "/var/lib/cliproxyapi/static";
-        # Upstream otherwise generates a writable copy in its state directory.
-        preStart = lib.mkForce "";
-        serviceConfig.ExecStart = lib.mkForce "${lib.getExe cfg.package} -config ${configPath}";
-        restartTriggers = [ configFile ];
       };
 
       # The service's StateDirectory sets ownership and mode 0700 before startup.
