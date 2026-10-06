@@ -1,7 +1,7 @@
 # Operator SSH keys.
 { lib, ... }:
 let
-  nucTpmPubkeyFile = ../../hosts/personal/nuc/ssh-tpm-agent/key.pub;
+  nucTpmPubkeyFile = ../../hosts/nuc/ssh-tpm-agent/key.pub;
 in
 {
   flake.lib.sshPubKeys = [
