@@ -9,6 +9,10 @@
 
       # Enable autonomous CPU performance selection on GB10.
       boot.kernelParams = [ "cppc_cpufreq.auto_sel_mode=1" ];
+      boot.kernelModules = [
+        "mlx5_ib"
+        "ib_uverbs"
+      ];
 
       services.xserver.videoDrivers = [ "nvidia" ];
       hardware.graphics.enable = true; # /run/opengl-driver/lib/libcuda.so.1
@@ -55,6 +59,7 @@
       services.fwupd.enable = true;
 
       environment.systemPackages = [
+        pkgs.rdma-core
         pkgs.nvtopPackages.nvidia
         pkgs.cudaPackages.nsight_systems
         pkgs.cudaPackages.nsight_compute
