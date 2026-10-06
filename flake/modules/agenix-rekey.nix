@@ -106,6 +106,16 @@ let
       config = {
         flake.agenix-rekey = inputs.agenix-rekey.configure {
           userFlake = self;
+          # Workstation age with all bundled plugins for rekeying.
+          agePackage =
+            pkgs:
+            (pkgs.age.withPlugins builtins.attrValues).overrideAttrs (
+              old:
+              assert !(old ? meta.mainProgram);
+              {
+                meta.mainProgram = "age";
+              }
+            );
           nixosConfigurations = mergeDisjoint [
             rekeyNixos
             rekeyContainers

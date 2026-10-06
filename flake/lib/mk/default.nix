@@ -5,22 +5,48 @@
   ...
 }:
 let
-  # Operator identity for agenix-rekey. Used on the workstation at rekey time;
-  # hosts decrypt with their own key via age.identityPaths.
-  rekeyConfig =
-    { pkgs, ... }:
+  # agenix and agenix-rekey, with shared runtime plugins and operator policy.
+  agenixConfig =
     {
-      age.rekey = {
-        masterIdentities = [
-          {
-            identity = ./ssh-age.pub;
-            pubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHdOxmUp8REg9IBoipLV40VYmLNiD6+TUUHb/ofyor60 ssh-age";
-          }
-        ];
-        agePlugins = [ pkgs.age-plugin-1p ]; # default is a yubikey plugin
-        # Local mode needs store writes during evaluation; `nix run .#check` prepares them.
-        storageMode = "local";
-      };
+      _class,
+      options,
+      pkgs,
+      ...
+    }:
+    {
+      imports = [ inputs.agenix-rekey."${_class}Modules".default ]; # agenix module is unconditionally imported in each mk helper, because my/ modules use its options
+
+      age = self.lib.mergeDisjoint [
+        # select age binary for hosts. HM and system modules option name differ.
+        (
+          let
+            package = (pkgs.age.withPlugins builtins.attrValues).overrideAttrs (
+              old:
+              assert !(old ? meta.mainProgram);
+              {
+                meta.mainProgram = "age";
+              }
+            );
+          in
+          if _class == "homeManager" then
+            { package = lib.mkDefault package; }
+          else
+            { ageBin = lib.mkDefault "${package}/bin/age"; }
+        )
+        {
+          rekey = {
+            # Used on the workstation; hosts decrypt with age.identityPaths.
+            masterIdentities = [
+              {
+                identity = ./ssh-age.pub;
+                pubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHdOxmUp8REg9IBoipLV40VYmLNiD6+TUUHb/ofyor60 ssh-age";
+              }
+            ];
+            storageMode = "local"; # Local mode needs store writes during evaluation; `nix run .#check` prepares them.
+            hostPubkey = lib.mkDefault options.age.rekey.hostPubkey.default; # default to agenix-rekey's dummy key
+          };
+        }
+      ];
     };
 in
 {
@@ -63,28 +89,29 @@ in
           };
         }
       ]
-      ++ lib.optionals rekey [
-        inputs.agenix-rekey.nixosModules.default
-        rekeyConfig
-      ];
+      ++ lib.optional rekey agenixConfig;
 
     darwinBaseModules =
-      { system, rekey }:
+      {
+        system,
+        nixpkgsConfig ? { },
+      }:
       [
         inputs.nix-homebrew.darwinModules.nix-homebrew
         inputs.nix-apple-container.darwinModules.default
         inputs.agenix.darwinModules.default
-        { nixpkgs.pkgs = self.lib.mkPkgs { inherit system; }; }
-      ]
-      ++ lib.optionals rekey [
-        inputs.agenix-rekey.darwinModules.default
-        rekeyConfig
+        agenixConfig
+        {
+          nixpkgs.pkgs = self.lib.mkPkgs {
+            inherit system;
+            config = nixpkgsConfig;
+          };
+        }
       ];
 
     homeBaseModules = [
       inputs.agenix.homeManagerModules.default
-      inputs.agenix-rekey.homeManagerModules.default
-      rekeyConfig
+      agenixConfig
       {
         # https://github.com/nix-community/home-manager/pull/10000
         disabledModules = [ "programs/codex" ];
@@ -109,13 +136,12 @@ in
     mkDarwin =
       {
         system,
-        # with no hostPubkey agenix-rekey warns with networking.hostName (default null) and errors
-        rekey ? false,
+        nixpkgsConfig ? { },
         modules ? [ ],
       }:
       inputs.nix-darwin.lib.darwinSystem {
         inherit system;
-        modules = self.lib.darwinBaseModules { inherit system rekey; } ++ modules;
+        modules = self.lib.darwinBaseModules { inherit system nixpkgsConfig; } ++ modules;
       };
 
     # Create a home-manager configuration. Set my.primaryUser in modules.

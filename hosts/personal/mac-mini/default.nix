@@ -11,7 +11,6 @@ in
 
   flake.darwinConfigurations.${hostname} = self.lib.mkDarwin {
     inherit system;
-    rekey = true;
     modules = [
       self.profiles.darwin.minimal
       self.darwinModules.personal
