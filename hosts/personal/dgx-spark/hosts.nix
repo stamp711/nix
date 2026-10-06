@@ -2,20 +2,6 @@
 let
   username = "stamp";
 
-  dummyPubkey = self.nixosConfigurations.spark-xxxx.options.age.rekey.hostPubkey.default;
-
-  pubKeys = {
-    spark-abbc = {
-      host = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKvc/EVZSLvKJSJPNYKT2+CovXPGhJpyAbDuTLVhJrG0";
-      user = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAp+lIKku2LR90lnmhvV4aPHCfwDcvGMg0fQa9dW8lGl";
-    };
-    spark-xxxx = {
-      # TODO: replace the dummy keys.
-      host = dummyPubkey;
-      user = dummyPubkey;
-    };
-  };
-
   mkSpark =
     hostname:
 
@@ -37,8 +23,12 @@ let
         {
           my.primaryUser = username;
           networking.hostName = hostname;
-          age.rekey.hostPubkey = pubKeys.${hostname}.host;
+        }
+
+        {
           age.rekey.localStorageDir = self.lib.rekeyDir hostname;
+          age.rekey.hostPubkey = ./agenix/${hostname}/key.pub;
+          age.identityPaths = [ "${./agenix/${hostname}/key.tpm}" ];
         }
 
         (self.lib.mkHomeModule {
@@ -50,8 +40,9 @@ let
             self.homeModules.dgx-spark
             {
               my.primaryUser = username;
-              age.rekey.hostPubkey = pubKeys.${hostname}.user;
               age.rekey.localStorageDir = self.lib.rekeyDir "${hostname}-${username}";
+              age.rekey.hostPubkey = ./agenix/${hostname}/key.pub;
+              age.identityPaths = [ "${./agenix/${hostname}/key.tpm}" ];
             }
           ];
         })
@@ -63,5 +54,5 @@ let
 in
 {
   flake.nixosConfigurations.spark-abbc = mkSpark "spark-abbc";
-  flake.nixosConfigurations.spark-xxxx = mkSpark "spark-xxxx"; # TODO: hostname.
+  flake.nixosConfigurations.spark-xxxx = mkSpark "spark-xxxx"; # TODO:
 }
