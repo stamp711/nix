@@ -6,8 +6,9 @@ let
   nixpkgsConfig = {
     cudaSupport = true;
   };
-  hostPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIClC3VLrypgdZbvJPhufSe6BeWcijyTrnl4JqBs/r566";
-  userPubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDbNYaZnOCmlfKtRpPEq12Ot3iaVjq0AFj7vsB3DcjQ+";
+  # TPM-wrapped identity and recipient, generated on NUC with age-plugin-tpm.
+  hostPubkey = ./agenix/key.pub;
+  identityPaths = [ "${./agenix/key.tpm}" ];
 in
 {
 
@@ -24,6 +25,7 @@ in
       {
         my.primaryUser = username;
         networking.hostName = hostname;
+        age.identityPaths = identityPaths;
         age.rekey.hostPubkey = hostPubkey;
         age.rekey.localStorageDir = self.lib.rekeyDir hostname;
       }
@@ -44,7 +46,8 @@ in
           self.homeModules.nuc
           {
             my.primaryUser = username;
-            age.rekey.hostPubkey = userPubkey;
+            age.identityPaths = identityPaths;
+            age.rekey.hostPubkey = hostPubkey;
             age.rekey.localStorageDir = self.lib.rekeyDir "${hostname}-${username}";
           }
         ];
