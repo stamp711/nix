@@ -43,6 +43,15 @@
 
       hardware.nvidia-container-toolkit.enable = true;
 
+      # OCI units invoke Podman directly, so order every container after CDI generation.
+      systemd.services = lib.mapAttrs' (
+        _: container:
+        lib.nameValuePair container.serviceName {
+          requires = [ "nvidia-container-toolkit-cdi-generator.service" ];
+          after = [ "nvidia-container-toolkit-cdi-generator.service" ];
+        }
+      ) config.virtualisation.oci-containers.containers;
+
       services.fwupd.enable = true;
 
       environment.systemPackages = [
