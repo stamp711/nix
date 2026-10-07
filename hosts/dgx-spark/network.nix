@@ -29,7 +29,7 @@
       qsfp0-P2.ipv4.address1 = "10.0.21.1/24";
     };
 
-    spark-xxxx.networking.networkmanager.ensureProfiles.profiles = {
+    spark-14f3.networking.networkmanager.ensureProfiles.profiles = {
       qsfp0-P0.ipv4.address1 = "10.0.20.2/24";
       qsfp0-P2.ipv4.address1 = "10.0.21.2/24";
     };

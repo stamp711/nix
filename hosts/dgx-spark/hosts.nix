@@ -54,5 +54,5 @@ let
 in
 {
   flake.nixosConfigurations.spark-abbc = mkSpark "spark-abbc";
-  flake.nixosConfigurations.spark-xxxx = mkSpark "spark-xxxx"; # TODO:
+  flake.nixosConfigurations.spark-14f3 = mkSpark "spark-14f3";
 }

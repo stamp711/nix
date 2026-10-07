@@ -81,7 +81,7 @@
     "--tool-call-parser=glm47"
   ];
 
-  flake.nixosModules.spark-xxxx.virtualisation.oci-containers.containers.vllm.cmd = lib.mkAfter [
+  flake.nixosModules.spark-14f3.virtualisation.oci-containers.containers.vllm.cmd = lib.mkAfter [
     "--node-rank=1"
     "--headless"
   ];
