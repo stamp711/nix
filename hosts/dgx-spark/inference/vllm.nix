@@ -38,6 +38,9 @@
           VLLM_HOST_IP = getAddress config;
           NCCL_SOCKET_IFNAME = "=${interface}";
           GLOO_SOCKET_IFNAME = interface;
+          # Limit kernel compilation memory while the model is resident.
+          MAX_JOBS = "2";
+          FLASHINFER_NVCC_THREADS = "1";
           # Bound long-prefill allocations on GB10: https://github.com/vllm-project/vllm/issues/55569
           VLLM_SPARSE_INDEXER_MAX_LOGITS_MB = "64";
         };
@@ -50,8 +53,10 @@
           "--max-model-len=262144"
           "--max-num-seqs=1"
           "--max-num-batched-tokens=2048"
-          "--gpu-memory-utilization=0.9"
+          "--gpu-memory-utilization=0.85"
           "--kv-cache-dtype=fp8"
+          # Avoid the maximum-size video encoder profile during startup.
+          ''--limit-mm-per-prompt={"image":2,"video":0}''
         ];
         extraOptions = [
           "--ipc=host" # for shm
