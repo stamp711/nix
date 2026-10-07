@@ -2,6 +2,15 @@
 {
   flake.nixosModules = {
 
+    # for RoCE
+    # https://losslessnetwork.com/learn/host-networking/multi-rail-source-routing/#possible-values-cheat-sheet
+    dgx-spark.boot.kernel.sysctl = {
+      "net.ipv4.conf.enp1s0f0np0.arp_ignore" = 1;
+      "net.ipv4.conf.enp1s0f0np0.arp_announce" = 2;
+      "net.ipv4.conf.enP2p1s0f0np0.arp_ignore" = 1;
+      "net.ipv4.conf.enP2p1s0f0np0.arp_announce" = 2;
+    };
+
     dgx-spark.networking.networkmanager.ensureProfiles.profiles =
       lib.mapAttrs
         (_: connection: {
