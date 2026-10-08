@@ -94,20 +94,21 @@ in
     darwinBaseModules =
       {
         system,
+        rekey,
         nixpkgsConfig ? { },
       }:
       [
         inputs.nix-homebrew.darwinModules.nix-homebrew
         inputs.nix-apple-container.darwinModules.default
         inputs.agenix.darwinModules.default
-        agenixConfig
         {
           nixpkgs.pkgs = self.lib.mkPkgs {
             inherit system;
             config = nixpkgsConfig;
           };
         }
-      ];
+      ]
+      ++ lib.optional rekey agenixConfig;
 
     homeBaseModules = [
       inputs.agenix.homeManagerModules.default
@@ -136,12 +137,13 @@ in
     mkDarwin =
       {
         system,
+        rekey ? true,
         nixpkgsConfig ? { },
         modules ? [ ],
       }:
       inputs.nix-darwin.lib.darwinSystem {
         inherit system;
-        modules = self.lib.darwinBaseModules { inherit system nixpkgsConfig; } ++ modules;
+        modules = self.lib.darwinBaseModules { inherit system nixpkgsConfig rekey; } ++ modules;
       };
 
     # Create a home-manager configuration. Set my.primaryUser in modules.
