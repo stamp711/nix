@@ -7,8 +7,13 @@
 
       boot.kernelPackages = pkgs.linuxPackagesFor pkgs.my.linux_nvidia;
 
-      # Enable autonomous CPU performance selection on GB10.
-      boot.kernelParams = [ "cppc_cpufreq.auto_sel_mode=1" ];
+      boot.kernelParams = [
+        # Enable autonomous CPU performance selection on GB10.
+        "cppc_cpufreq.auto_sel_mode=1"
+        # Avoid NCCL RDMA memory-registration failures with Kexec HandOver on Linux 7.0.
+        # https://forums.developer.nvidia.com/t/dgx-spark-update-advisory/383254/6
+        "kho=off"
+      ];
       boot.kernelModules = [
         "mlx5_ib"
         "ib_uverbs"
