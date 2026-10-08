@@ -55,6 +55,9 @@
           "--max-num-batched-tokens=2048"
           "--gpu-memory-utilization=0.85"
           "--kv-cache-dtype=fp8"
+          # Avoid synchronized FlashInfer autotuning stalls across the two Sparks.
+          # https://github.com/vllm-project/vllm/issues/52291
+          "--no-enable-flashinfer-autotune"
           # Avoid the maximum-size video encoder profile during startup.
           ''--limit-mm-per-prompt={"image":2,"video":0}''
         ];
