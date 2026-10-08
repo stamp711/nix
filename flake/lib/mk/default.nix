@@ -162,18 +162,12 @@ in
     # Home-manager embedded in a NixOS or nix-darwin system, as a module for it.
     mkHomeModule =
       {
-        class, # "nixos" or "darwin"
         username,
         modules ? [ ],
       }:
+      { _class, ... }:
       {
-        imports = [
-          {
-            nixos = inputs.home-manager.nixosModules.home-manager;
-            darwin = inputs.home-manager.darwinModules.home-manager;
-          }
-          .${class}
-        ];
+        imports = [ inputs.home-manager."${_class}Modules".home-manager ];
 
         home-manager = {
           useGlobalPkgs = true;

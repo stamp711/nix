@@ -19,7 +19,6 @@ in
       }
 
       (self.lib.mkHomeModule {
-        class = "darwin";
         inherit username;
         modules = [
           self.profiles.homeManager.desktop-darwin

@@ -32,7 +32,6 @@ let
         }
 
         (self.lib.mkHomeModule {
-          class = "nixos";
           inherit username;
           modules = [
             self.profiles.homeManager.headless

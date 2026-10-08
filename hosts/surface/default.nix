@@ -23,7 +23,6 @@ in
         age.rekey.localStorageDir = self.lib.rekeyDir hostname;
       }
       (self.lib.mkHomeModule {
-        class = "nixos";
         inherit username;
         modules = [
           self.profiles.homeManager.desktop-linux
