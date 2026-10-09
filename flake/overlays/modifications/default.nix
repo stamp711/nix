@@ -5,8 +5,12 @@
     inherit (inputs.llm-agents.packages.${prev.stdenv.hostPlatform.system})
       chatgpt
       claude-code
-      codex
       ;
+
+    codex = inputs.llm-agents.packages.${prev.stdenv.hostPlatform.system}.codex.overrideAttrs (old: {
+      patches = (old.patches or [ ]) ++ [ ./codex-cloudflare-access-headers.patch ];
+      patchFlags = (old.patchFlags or [ "-p1" ]) ++ [ "--fuzz=0" ];
+    });
 
     cli-proxy-api =
       inputs.llm-agents.packages.${prev.stdenv.hostPlatform.system}.cli-proxy-api.overrideAttrs

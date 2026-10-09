@@ -1,0 +1,18 @@
+diff --git a/model-provider-info/src/lib.rs b/model-provider-info/src/lib.rs
+--- a/model-provider-info/src/lib.rs
++++ b/model-provider-info/src/lib.rs
+@@ -542,6 +542,14 @@ impl ModelProviderInfo {
+                         "OPENAI_ORGANIZATION".to_string(),
+                     ),
+                     ("OpenAI-Project".to_string(), "OPENAI_PROJECT".to_string()),
++                    (
++                        "CF-Access-Client-Id".to_string(),
++                        "CF_ACCESS_CLIENT_ID".to_string(),
++                    ),
++                    (
++                        "CF-Access-Client-Secret".to_string(),
++                        "CF_ACCESS_CLIENT_SECRET".to_string(),
++                    ),
+                 ]
+                 .into_iter()
+                 .collect(),
