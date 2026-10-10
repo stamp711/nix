@@ -709,23 +709,6 @@
         "type": "github"
       }
     },
-    "hm-codex-pr": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1790985768,
-        "narHash": "sha256-ZN+riaeFuE+DZ5zfqJiXlM12jLwZzeIXiNkU1YeHMXI=",
-        "owner": "alyraffauf",
-        "repo": "home-manager",
-        "rev": "6bf53e4ab79e9ab0ed5f226d59939355f88b5c61",
-        "type": "github"
-      },
-      "original": {
-        "owner": "alyraffauf",
-        "ref": "codex-mutable-settings",
-        "repo": "home-manager",
-        "type": "github"
-      }
-    },
     "hm-t3code-pr": {
       "flake": false,
       "locked": {
@@ -1325,7 +1308,6 @@
         "flake-parts": "flake-parts",
         "hermes-agent": "hermes-agent",
         "hermes-webui": "hermes-webui",
-        "hm-codex-pr": "hm-codex-pr",
         "hm-t3code-pr": "hm-t3code-pr",
         "home-manager": "home-manager",
         "homebrew-cask": "homebrew-cask",

@@ -55,12 +55,6 @@
       inputs.systems.follows = "systems";
       inputs.nur.follows = "nur";
     };
-    # Codex mutable settings; remove this module backport once the PR lands in our HM input.
-    # https://github.com/nix-community/home-manager/pull/10000
-    hm-codex-pr = {
-      url = "github:alyraffauf/home-manager/codex-mutable-settings";
-      flake = false;
-    };
     # T3 Code daemon; remove this backport once the PR lands in our HM input.
     # https://github.com/nix-community/home-manager/pull/9695
     hm-t3code-pr = {

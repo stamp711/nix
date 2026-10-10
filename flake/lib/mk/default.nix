@@ -113,11 +113,6 @@ in
     homeBaseModules = [
       inputs.agenix.homeManagerModules.default
       agenixConfig
-      {
-        # https://github.com/nix-community/home-manager/pull/10000
-        disabledModules = [ "programs/codex" ];
-        imports = [ "${inputs.hm-codex-pr}/modules/programs/codex" ];
-      }
     ];
 
     # Create a NixOS system configuration.
