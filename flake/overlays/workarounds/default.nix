@@ -1,6 +1,31 @@
 {
   flake.overlays.workarounds = _: prev: {
 
+    # 2026-10-22
+    # deal needs docstring-parser's source fixtures and support for pytest.param cases.
+    # TODO: remove once nixpkgs fixes deal's docstring-parser test integration.
+    pythonPackagesExtensions = prev.pythonPackagesExtensions ++ [
+      (_: pythonPrev: {
+        deal = pythonPrev.deal.overridePythonAttrs (old: {
+          postPatch = (old.postPatch or "") + ''
+            substituteInPlace tests/test_linter/test_extractors/test_exceptions.py \
+              --replace-fail \
+                "root = Path(docstring_parser.__path__[0]) / 'tests'" \
+                "root = Path('${pythonPrev.docstring-parser.src}/docstring_parser/tests')" \
+              --replace-fail \
+                "assert isinstance(case, astroid.Tuple)" \
+                "assert isinstance(case, (astroid.Tuple, astroid.Call))" \
+              --replace-fail \
+                "given = case.elts[0]" \
+                "given = case.args[0] if isinstance(case, astroid.Call) else case.elts[0]" \
+              --replace-fail \
+                "if not isinstance(given, astroid.Const):" \
+                "if not isinstance(given, astroid.Const) or not isinstance(given.value, str):"
+          '';
+        });
+      })
+    ];
+
     # 2026-09-24
     # nixpkgs installs Nsight Compute's host/, target/ and sections/ dirs under bin/,
     # so bin/host shadows host(1) in every buildEnv. Expose the launchers only.
