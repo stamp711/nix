@@ -43,16 +43,35 @@ let
     let
       cfg = config.my.maintenance;
       flake = config.my.flake;
+      logUpdate = asRoot && pkgs.stdenv.hostPlatform.isDarwin;
       runtimeInputs = [
         # nix-darwin has no programs.nh.
         (config.programs.nh.package or pkgs.nh)
         config.nix.package
-      ];
+      ]
+      ++ lib.optional logUpdate pkgs.coreutils;
     in
     {
       updateApp = pkgs.writeShellApplication {
         name = "nh-update";
         text = ''
+          ${lib.optionalString logUpdate ''
+            report_exit() {
+              status=$?
+              if (( status == 0 )); then
+                result=succeeded
+              else
+                result=failed
+              fi
+              printf '\n[%s] nh-update: %s (exit=%s)\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$result" "$status"
+              exit "$status"
+            }
+            trap report_exit EXIT
+            trap 'exit 129' HUP
+            trap 'exit 130' INT
+            trap 'exit 143' TERM
+            printf '\n[%s] nh-update: started\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          ''}
           ${refreshGuard flake}
           ${lib.optionalString asRoot "NH_BYPASS_ROOT_CHECK=true "}nh ${updateCommand} --no-nom "${flake}" -- --refresh
         '';
@@ -121,12 +140,34 @@ in
 
         # `nh darwin` has no `boot`, so this activates then and there.
         (lib.mkIf cfg.autoUpdate {
+          environment.systemPackages = [ updateApp ];
+
           launchd.daemons.nh-update.serviceConfig = {
-            ProgramArguments = [ "${updateApp}/bin/nh-update" ];
+            # A store path changes on updates, making activation unload its own job.
+            ProgramArguments = [ "/run/current-system/sw/bin/nh-update" ];
             StartCalendarInterval = mkCalendarInterval cfg.updateDates;
+            StandardOutPath = "/var/log/nh-update.log";
+            StandardErrorPath = "/var/log/nh-update.log";
+            Umask = 63; # 0077
             Nice = 19;
             LowPriorityIO = true;
             ProcessType = "Background";
+          };
+
+          system.newsyslog = {
+            enable = true;
+            files.nh-update = [
+              {
+                logfilename = "/var/log/nh-update.log";
+                owner = "root";
+                group = "wheel";
+                mode = "600";
+                count = 7;
+                size = "10240";
+                # A running update may still be writing to a rotated file.
+                flags = [ "N" ];
+              }
+            ];
           };
         })
 
