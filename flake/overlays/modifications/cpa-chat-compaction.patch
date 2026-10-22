@@ -1,11 +1,11 @@
-CPA v8.0.15: reuse Antigravity compaction for Chat Completions backends.
+CPA v8.0.38: reuse Antigravity compaction for Chat Completions backends.
 Based on wwkozwpl; reject unusable summaries before replacing history.
 
 diff --git a/internal/runtime/executor/helps/antigravity_compaction.go b/internal/runtime/executor/helps/antigravity_compaction.go
-index 60d4329d..377c7efb 100644
+index a550c934..e5f8f68d 100644
 --- a/internal/runtime/executor/helps/antigravity_compaction.go
 +++ b/internal/runtime/executor/helps/antigravity_compaction.go
-@@ -66,7 +66,7 @@ func PrepareAntigravityCompactionSummaryPayload(payload []byte, modelName string
+@@ -143,7 +143,7 @@ func PrepareAntigravityCompactionSummaryPayload(payload []byte, modelName string
  		var filtered []string
  		for _, item := range input.Array() {
  			itemType := item.Get("type").String()
@@ -268,10 +268,10 @@ index 00000000..8d3ca4e7
 +	}
 +}
 diff --git a/internal/runtime/executor/openai_compat_executor.go b/internal/runtime/executor/openai_compat_executor.go
-index 49ba0eb3..2116160d 100644
+index ae9f2be5..b5c7571e 100644
 --- a/internal/runtime/executor/openai_compat_executor.go
 +++ b/internal/runtime/executor/openai_compat_executor.go
-@@ -90,6 +90,14 @@ func (e *OpenAICompatExecutor) Execute(ctx context.Context, auth *cliproxyauth.A
+@@ -100,6 +100,14 @@ func (e *OpenAICompatExecutor) Execute(ctx context.Context, auth *cliproxyauth.A
  	if endpointPath := openAICompatImageEndpointPath(opts); endpointPath != "" {
  		return e.executeImages(ctx, auth, req, opts, endpointPath)
  	}
@@ -283,10 +283,10 @@ index 49ba0eb3..2116160d 100644
 +			return e.executeCompaction(ctx, auth, req, opts)
 +		}
 +	}
- 
- 	baseModel := thinking.ParseSuffix(req.Model).ModelName
- 
-@@ -319,6 +327,12 @@ func (e *OpenAICompatExecutor) ExecuteStream(ctx context.Context, auth *cliproxy
+ 	baseURL, apiKey := e.resolveCredentials(auth)
+ 	compat := e.resolveCompatConfig(auth, req)
+ 	return e.executeWithCredentials(ctx, auth, req, opts, baseURL, apiKey, compat)
+@@ -341,6 +349,12 @@ func (e *OpenAICompatExecutor) ExecuteStream(ctx context.Context, auth *cliproxy
  	if endpointPath := openAICompatImageEndpointPath(opts); endpointPath != "" {
  		return e.executeImagesStream(ctx, auth, req, opts, endpointPath)
  	}
@@ -296,9 +296,9 @@ index 49ba0eb3..2116160d 100644
 +	if helps.HasResponsesCompactionTrigger(req.Payload) || helps.HasResponsesCompactionTrigger(opts.OriginalRequest) {
 +		return e.executeCompactionStream(ctx, auth, req, opts)
 +	}
- 
- 	baseModel := thinking.ParseSuffix(req.Model).ModelName
- 
+ 	baseURL, apiKey := e.resolveCredentials(auth)
+ 	compat := e.resolveCompatConfig(auth, req)
+ 	return e.executeStreamWithCredentials(ctx, auth, req, opts, baseURL, apiKey, compat)
 diff --git a/test/openai_compat_compaction_websocket_test.go b/test/openai_compat_compaction_websocket_test.go
 new file mode 100644
 index 00000000..283a4296
