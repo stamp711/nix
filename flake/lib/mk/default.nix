@@ -20,13 +20,7 @@ let
         # select age binary for hosts. HM and system modules option name differ.
         (
           let
-            package = (pkgs.age.withPlugins builtins.attrValues).overrideAttrs (
-              old:
-              assert !(old ? meta.mainProgram);
-              {
-                meta.mainProgram = "age";
-              }
-            );
+            package = self.lib.mkAgePackage pkgs;
           in
           if _class == "homeManager" then
             { package = lib.mkDefault package; }

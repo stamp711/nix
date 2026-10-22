@@ -6,7 +6,7 @@
 }:
 let
   # Ours, bound out here: inside the module `self` is whichever flake imports it.
-  inherit (self.lib) mergeDisjoint;
+  inherit (self.lib) mergeDisjoint mkAgePackage;
 
   agenix-rekey =
     { config, self, ... }:
@@ -106,16 +106,7 @@ let
       config = {
         flake.agenix-rekey = inputs.agenix-rekey.configure {
           userFlake = self;
-          # Workstation age with all bundled plugins for rekeying.
-          agePackage =
-            pkgs:
-            (pkgs.age.withPlugins builtins.attrValues).overrideAttrs (
-              old:
-              assert !(old ? meta.mainProgram);
-              {
-                meta.mainProgram = "age";
-              }
-            );
+          agePackage = mkAgePackage;
           nixosConfigurations = mergeDisjoint [
             rekeyNixos
             rekeyContainers

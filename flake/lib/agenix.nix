@@ -7,6 +7,32 @@
 {
   flake.lib = {
 
+    # Host identities use TPM; the rekeying master identity uses 1Password.
+    mkAgePackage =
+      pkgs:
+      (pkgs.age.withPlugins (plugins: [
+        plugins.age-plugin-tpm
+        plugins.age-plugin-1p
+      ])).overrideAttrs
+        (
+          old:
+          assert !(old ? meta.mainProgram);
+          {
+            meta.mainProgram = "age";
+          }
+        );
+
+    # Full-plugin variant: age-plugin-se pulls in broken Swift on aarch64-linux.
+    # mkAgePackage =
+    #   pkgs:
+    #   (pkgs.age.withPlugins builtins.attrValues).overrideAttrs (
+    #     old:
+    #     assert !(old ? meta.mainProgram);
+    #     {
+    #       meta.mainProgram = "age";
+    #     }
+    #   );
+
     # Derive a stable secret name from a .age file path, relative to the flake root.
     # e.g. profiles/nixos/kvm-proxy/xray-proxy.env.age => profiles__nixos__kvm-proxy__xray-proxy.env
     #
