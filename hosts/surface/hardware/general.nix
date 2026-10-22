@@ -33,7 +33,13 @@
 
       specialisation.linux-surface.configuration = {
         imports = [ inputs.nixos-hardware.nixosModules.microsoft-surface-pro-intel ];
-        boot.kernelPatches = lib.mkForce [ ];
+        boot.kernelPatches = lib.mkForce [
+          {
+            # TODO: remove once the Surface kernel supports Rust 1.99's ABI name.
+            name = "rustc-softfloat-abi";
+            patch = ./rustc-softfloat-abi.patch;
+          }
+        ];
       };
 
     };
