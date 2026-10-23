@@ -4,6 +4,7 @@
   stdenv,
   buildLinux,
   writeText,
+  removeReferencesTo,
   kernelSource,
   ...
 }@args:
@@ -33,7 +34,7 @@ let
   };
   seedFile = writeText "linux-nvidia.config" nvidiaConfig.seedConfig;
 in
-buildLinuxWithChecker (
+(buildLinuxWithChecker (
   # Forward kernel build arguments; keep recipe dependencies out of the derivation.
   lib.attrsets.unionOfDisjoint
     (builtins.removeAttrs args [
@@ -41,6 +42,7 @@ buildLinuxWithChecker (
       "stdenv"
       "buildLinux"
       "writeText"
+      "removeReferencesTo"
       "kernelSource"
     ])
     {
@@ -63,4 +65,14 @@ buildLinuxWithChecker (
 
       extraMeta.platforms = builtins.attrNames kernelSource.architectures;
     }
-)
+)).overrideAttrs
+  (old: {
+    nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ removeReferencesTo ];
+    # Packaging compatibility: NVIDIA enables UBSan, which embeds source filenames.
+    # nixpkgs builds the sources under $dev, so Nix interprets these diagnostic
+    # strings as dependencies, creating an out -> dev -> out cycle during output
+    # registration. Remove these build-only references from the kernel image.
+    postFixup = (old.postFixup or "") + ''
+      remove-references-to -t "$dev" "$out/${old.passthru.target}"
+    '';
+  })
