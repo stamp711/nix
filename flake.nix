@@ -17,6 +17,11 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixarr = {
+      url = "github:nix-media-server/nixarr";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.treefmt-nix.follows = "treefmt-nix";
+    };
     # Reuse the upstream service module; the package uses the stock release binary.
     bifrost = {
       url = "github:maximhq/bifrost?ref=transports/v2.2.5";

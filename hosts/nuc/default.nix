@@ -1,4 +1,9 @@
-{ inputs, self, ... }:
+{
+  inputs,
+  lib,
+  self,
+  ...
+}:
 let
   username = "stamp";
   hostname = "NUC";
@@ -31,9 +36,12 @@ in
       }
 
       {
-        # Stationary host, so writing back to the NAS is fine here.
-        my.smbMounts.nas.shares.Dropbox.rw = true;
-        my.smbMounts.nas.shares.Z = { };
+        my.smbMounts.nas.server = lib.mkForce "10.0.10.2";
+        my.smbMounts.nas.shares = {
+          Dropbox.rw = true;
+          Library.rw = true;
+          Z = { };
+        };
       }
 
       (self.lib.mkHomeModule {
