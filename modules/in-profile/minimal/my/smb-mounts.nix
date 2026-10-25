@@ -1,5 +1,5 @@
 # SMB shares, mounted on demand via systemd automount.
-{ lib, ... }:
+{ lib, self, ... }:
 {
   flake.nixosModules.my =
     { config, ... }:
@@ -43,6 +43,21 @@
                         default = false;
                         description = "Mount read-write. Read-only by default.";
                       };
+                      options.mountOptions = lib.mkOption {
+                        type = lib.types.attrsOf (lib.types.either lib.types.str lib.types.bool);
+                        default = { };
+                        example = {
+                          dir_mode = "0775";
+                          "x-systemd.idle-timeout" = "0";
+                          "x-systemd.requires" = "tailscaled.service";
+                        };
+                        description = ''
+                          Add mount options or override defaults for this share.
+                          A string produces `name=value`.
+                          `true` adds the option name without a value.
+                          `false` removes the option.
+                        '';
+                      };
                     }
                   );
                   description = "Shares to mount, keyed by their name on the server.";
@@ -57,32 +72,43 @@
         lib.concatLists (
           lib.mapAttrsToList (
             _: server:
-            lib.mapAttrsToList (share: shareCfg: {
-              name = "${server.mountBase}/${share}";
-              value = {
-                device = "//${server.server}/${share}";
-                fsType = "cifs";
-                options = [
-                  "credentials=${server.credentialsFile}"
-                  "vers=3.1.1"
-                  "uid=${toString primaryUser.uid}"
-                  "gid=${toString config.users.groups.${primaryUser.group}.gid}"
-                  "file_mode=0644"
-                  "dir_mode=0755"
-                  "iocharset=utf8"
-                  (if shareCfg.rw then "rw" else "ro")
-                  "nofail"
-                  "noauto"
-                  "x-systemd.automount"
-                  # mount attempt on access fails after this (default 90s)
-                  "x-systemd.mount-timeout=10s"
-                  # auto-unmount when untouched this long (default: never)
-                  "x-systemd.idle-timeout=5min"
-                  "x-gvfs-show"
-                  "x-gvfs-name=${server.label}%20${share}"
+            lib.mapAttrsToList (
+              share: shareCfg:
+              let
+                defaultMountOptions = {
+                  credentials = toString server.credentialsFile;
+                  vers = "3.1.1";
+                  uid = toString primaryUser.uid;
+                  gid = toString config.users.groups.${primaryUser.group}.gid;
+                  file_mode = "0664";
+                  dir_mode = "0775";
+                  iocharset = "utf8";
+                  inherit (shareCfg) rw;
+                  ro = !shareCfg.rw;
+                  nofail = true;
+                  noauto = true;
+                  "x-systemd.automount" = true;
+                  "x-systemd.mount-timeout" = "10s";
+                  "x-systemd.idle-timeout" = "5min";
+                  "x-gvfs-show" = true;
+                  "x-gvfs-name" = "${server.label}%20${share}";
+                };
+                mountOptions = self.lib.mergeDisjoint [
+                  (builtins.removeAttrs defaultMountOptions (builtins.attrNames shareCfg.mountOptions))
+                  shareCfg.mountOptions
                 ];
-              };
-            }) server.shares
+              in
+              {
+                name = "${server.mountBase}/${share}";
+                value = {
+                  device = "//${server.server}/${share}";
+                  fsType = "cifs";
+                  options = lib.mapAttrsToList (name: value: if value == true then name else "${name}=${value}") (
+                    lib.filterAttrs (_: value: value != false) mountOptions
+                  );
+                };
+              }
+            ) server.shares
           ) cfg
         )
       );
