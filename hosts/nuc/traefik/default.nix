@@ -4,10 +4,10 @@
     { config, ... }:
     let
       tunnelId = "b2cf7941-2ee4-4aab-bba6-3b261a13460b";
-      address = "127.0.0.1:18080";
       tunnelCredentials = self.lib.mkAgeSecret config { rekeyFile = ./credentials.json.age; };
     in
     {
+      # Cloudflare Tunnel.
       age.secrets = tunnelCredentials.ageSecret;
 
       services.cloudflared = {
@@ -21,11 +21,15 @@
       };
       systemd.services."cloudflared-tunnel-${tunnelId}".restartTriggers = [ ./credentials.json.age ];
 
+      # HTTP entry points.
       services.traefik = {
         enable = true;
-        staticConfigOptions.entryPoints.tunnel = {
-          inherit address;
-          forwardedHeaders.trustedIPs = [ "127.0.0.1/32" ];
+        staticConfigOptions.entryPoints = {
+          web.address = ":80";
+          tunnel = {
+            address = "127.0.0.1:18080";
+            forwardedHeaders.trustedIPs = [ "127.0.0.1/32" ];
+          };
         };
       };
     };

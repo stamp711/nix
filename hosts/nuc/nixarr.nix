@@ -20,5 +20,17 @@
         "x-systemd.idle-timeout" = "0";
       };
       systemd.services.komga.unitConfig.RequiresMountsFor = [ "/mnt/nas/Library" ];
+
+      # Komga HTTP proxy.
+      services.traefik.dynamicConfigOptions.http = {
+        routers.komga = {
+          entryPoints = [ "web" ];
+          rule = "Host(`komga.nuc.apric.net`)";
+          service = "komga";
+        };
+        services.komga.loadBalancer.servers = [
+          { url = "http://127.0.0.1:${toString config.services.komga.settings.server.port}"; }
+        ];
+      };
     };
 }
