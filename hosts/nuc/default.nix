@@ -36,6 +36,10 @@ in
       }
 
       {
+        networking.networkmanager.ensureProfiles.profiles.Aprixnet.connection.autoconnect = false;
+      }
+
+      {
         my.smbMounts.nas.server = lib.mkForce "10.0.10.2";
         my.smbMounts.nas.shares = {
           Dropbox.rw = true;
