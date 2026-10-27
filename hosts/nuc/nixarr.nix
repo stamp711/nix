@@ -20,10 +20,9 @@
         "x-systemd.idle-timeout" = "0";
       };
 
-      # Komga HTTP proxy.
+      # Komga proxy.
       services.traefik.dynamicConfigOptions.http = {
         routers.komga = {
-          entryPoints = [ "web" ];
           rule = "Host(`komga.nuc.apric.net`)";
           service = "komga";
         };
