@@ -19,7 +19,6 @@
         gid = toString config.users.groups.media.gid;
         "x-systemd.idle-timeout" = "0";
       };
-      systemd.services.komga.unitConfig.RequiresMountsFor = [ "/mnt/nas/Library" ];
 
       # Komga HTTP proxy.
       services.traefik.dynamicConfigOptions.http = {
