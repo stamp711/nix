@@ -20,7 +20,7 @@
         nativeBuildInputs = [ pkgs.nerd-font-patcher ];
         buildPhase = ''
           mkdir -p patched
-          for f in $(find $src -name '*.ttf'); do
+          for f in $(find . -name '*.ttf'); do
             nerd-font-patcher --complete --no-progressbars -out patched "$f"
           done
         '';

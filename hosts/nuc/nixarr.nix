@@ -1,7 +1,12 @@
-{ inputs, ... }:
+{ inputs, lib, ... }:
 {
   flake.nixosModules.nuc =
-    { config, ... }:
+    {
+      config,
+      options,
+      pkgs,
+      ...
+    }:
     {
       imports = [ inputs.nixarr.nixosModules.default ];
 
@@ -11,6 +16,24 @@
         stateDir = "/var/lib/nixarr";
         mediaUsers = [ config.my.primaryUser ];
         komga.enable = true;
+
+        # Workaround 2026-10-28: remove once Nixarr includes the Jellyfin 12.4 API spec hash.
+        nixarr-py.package = options.nixarr.nixarr-py.package.default.overridePythonAttrs {
+          dependencies = pkgs.callPackage "${inputs.nixarr}/nixarr/lib/nixarr-py/python-deps.nix" {
+            jellyfin = config.nixarr.jellyfin.package;
+            fetchurl =
+              args:
+              pkgs.fetchurl (
+                args
+                //
+                  lib.optionalAttrs
+                    (args.url == "https://repo.jellyfin.org/files/openapi/stable/jellyfin-openapi-12.4.json")
+                    {
+                      hash = "sha256-AqYGSRa34I8fHY1//B+xx2I98ON4cp/Nf9NTdmhoA24=";
+                    }
+              );
+          };
+        };
       };
       my.persistence.directories = [ config.nixarr.stateDir ];
 

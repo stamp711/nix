@@ -161,7 +161,6 @@
                 fileSystems.${config.my.persistence.path}.neededForBoot = true;
                 boot.loader.systemd-boot.enable = true;
                 boot.loader.efi.canTouchEfiVariables = true;
-                boot.initrd.systemd.enable = true;
               }
 
               # Listing any subvol in wipeTargets gives impermanence for it.

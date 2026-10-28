@@ -1,6 +1,17 @@
 {
   flake.overlays.workarounds = _: prev: {
 
+    # 2026-10-28
+    # The bundled Codex catalog now sets multi_agent_version to "v2".
+    # TODO: remove once CLIProxyAPI's preservation test matches its catalog.
+    cli-proxy-api = prev.cli-proxy-api.overrideAttrs (old: {
+      postPatch = (old.postPatch or "") + ''
+        substituteInPlace sdk/api/handlers/openai/codex_client_models_test.go \
+          --replace-fail 'if !exists || value != nil {' 'if !exists || value != "v2" {' \
+          --replace-fail 'want preserved null' 'want preserved v2'
+      '';
+    });
+
     # 2026-10-22
     # deal needs docstring-parser's source fixtures and support for pytest.param cases.
     # TODO: remove once nixpkgs fixes deal's docstring-parser test integration.
