@@ -3,9 +3,13 @@
     { config, ... }:
     {
       services.traefik.dynamicConfigOptions.http = {
-        routers.cpa = {
+        routers.cpa-cf = {
           entryPoints = [ "tunnel" ];
           rule = "Host(`cpa.apric.net`)";
+          service = "cpa";
+        };
+        routers.cpa = {
+          rule = "Host(`cpa.nuc.apric.net`)";
           service = "cpa";
         };
         services.cpa.loadBalancer.servers = [

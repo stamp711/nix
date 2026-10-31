@@ -7,13 +7,18 @@
         # Entry points.
         staticConfigOptions.entryPoints = {
           web = {
+            asDefault = true;
             address = ":80";
             http.redirections.entryPoint.to = "websecure";
           };
           websecure = {
-            address = ":443";
             asDefault = true;
+            address = ":443";
             http.tls = { };
+          };
+          tunnel = {
+            address = "127.0.0.1:18080";
+            forwardedHeaders.trustedIPs = [ "127.0.0.1/32" ];
           };
         };
 
