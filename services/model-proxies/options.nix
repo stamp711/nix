@@ -38,7 +38,7 @@
   };
 
   # Proxy deployment modules publish their client-facing endpoints here;
-  # personal-codex-config.nix uses them to create profiles with dynamic model discovery.
+  # codex-config/personal.nix uses them to create profiles with dynamic model discovery.
   options.modelProxies = lib.mkOption {
     default = { };
     description = "Model proxy endpoints exposed to clients.";

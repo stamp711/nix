@@ -1,0 +1,393 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index f2b0fba..2ad4add 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -4168,6 +4168,7 @@ dependencies = [
+  "pretty_assertions",
+  "schemars 0.8.22",
+  "serde",
++ "serde_json",
+  "tempfile",
+  "toml 0.9.11+spec-1.1.0",
+ ]
+diff --git a/app-server/src/request_processors/thread_processor_tests.rs b/app-server/src/request_processors/thread_processor_tests.rs
+index dab5a60..15700f7 100644
+--- a/app-server/src/request_processors/thread_processor_tests.rs
++++ b/app-server/src/request_processors/thread_processor_tests.rs
+@@ -655,6 +655,7 @@ mod thread_processor_behavior_tests {
+             supports_websockets: true,
+             supports_standalone_web_search: false,
+             capabilities: None,
++            http_headers_file: None,
+             include_internal_metadata: false,
+         };
+         let config_manager = ConfigManager::new(
+diff --git a/config/src/config_toml.rs b/config/src/config_toml.rs
+index c3ac3e0..0748b2b 100644
+--- a/config/src/config_toml.rs
++++ b/config/src/config_toml.rs
+@@ -938,14 +938,22 @@ pub fn validate_reserved_model_provider_ids(
+     model_providers: &HashMap<String, ModelProviderInfo>,
+ ) -> Result<(), String> {
+     let mut conflicts = model_providers
+-        .keys()
+-        .filter(|key| {
++        .iter()
++        .filter(|(key, provider)| {
++            if key.as_str() == OPENAI_PROVIDER_ID && provider.http_headers_file.is_some() {
++                let allowed = ModelProviderInfo {
++                    name: provider.name.clone(),
++                    http_headers_file: provider.http_headers_file.clone(),
++                    ..Default::default()
++                };
++                return **provider != allowed;
++            }
+             !matches!(
+                 key.as_str(),
+                 AMAZON_BEDROCK_PROVIDER_ID | AMAZON_BEDROCK_RUNTIME_PROVIDER_ID | GCP_PROVIDER_ID
+             ) && RESERVED_MODEL_PROVIDER_IDS.contains(&key.as_str())
+         })
+-        .map(|key| format!("`{key}`"))
++        .map(|(key, _)| format!("`{key}`"))
+         .collect::<Vec<_>>();
+     conflicts.sort_unstable();
+     if conflicts.is_empty() {
+diff --git a/config/src/thread_config/remote.rs b/config/src/thread_config/remote.rs
+index 0f2a436..199aee0 100644
+--- a/config/src/thread_config/remote.rs
++++ b/config/src/thread_config/remote.rs
+@@ -196,6 +196,7 @@ fn model_provider_from_proto(
+         supports_websockets: provider.supports_websockets,
+         supports_standalone_web_search: provider.supports_standalone_web_search,
+         capabilities: None,
++        http_headers_file: None,
+         include_internal_metadata: false,
+     };
+     Ok((id, info))
+@@ -227,6 +228,7 @@ fn model_provider_to_proto(
+         requires_openai_auth,
+         supports_websockets,
+         supports_standalone_web_search,
++        http_headers_file: _,
+         include_internal_metadata: _,
+         capabilities: _,
+     } = provider;
+@@ -585,6 +587,7 @@ mod tests {
+             gateway_oauth: None,
+             aws: None,
+             capabilities: None,
++            http_headers_file: None,
+             include_internal_metadata: false,
+         }
+     }
+diff --git a/config/src/thread_config.rs b/config/src/thread_config.rs
+index 0518ea8..56be0d8 100644
+--- a/config/src/thread_config.rs
++++ b/config/src/thread_config.rs
+@@ -317,6 +317,7 @@ mod tests {
+             supports_websockets: true,
+             supports_standalone_web_search: true,
+             capabilities: None,
++            http_headers_file: None,
+             include_internal_metadata: false,
+         }
+     }
+diff --git a/core/config.schema.json b/core/config.schema.json
+index 7a96817..110b6a1 100644
+--- a/core/config.schema.json
++++ b/core/config.schema.json
+@@ -2982,6 +2982,10 @@
+           "description": "Additional HTTP headers to include in requests to this provider where the (key, value) pairs are the header name and value.",
+           "type": "object"
+         },
++        "http_headers_file": {
++          "description": "Absolute path to a JSON object of HTTP header names and string values. Read at runtime; file headers override configured and environment headers.",
++          "type": "string"
++        },
+         "model_catalog_url": {
+           "description": "Optional full URL for a Codex-native model catalog. When unset, OpenAI discovery uses the Codex backend unless `base_url` overrides the inference endpoint.",
+           "type": "string"
+diff --git a/core/tests/responses_headers.rs b/core/tests/responses_headers.rs
+index 74b52a3..fb07974 100644
+--- a/core/tests/responses_headers.rs
++++ b/core/tests/responses_headers.rs
+@@ -93,6 +93,7 @@ async fn responses_stream_includes_subagent_header_on_review() {
+         supports_websockets: false,
+         supports_standalone_web_search: false,
+         capabilities: None,
++        http_headers_file: None,
+         include_internal_metadata: false,
+     };
+ 
+@@ -240,6 +241,7 @@ async fn responses_stream_includes_subagent_header_on_other() {
+         supports_websockets: false,
+         supports_standalone_web_search: false,
+         capabilities: None,
++        http_headers_file: None,
+         include_internal_metadata: false,
+     };
+ 
+@@ -368,6 +370,7 @@ async fn responses_respects_model_info_overrides_from_config() {
+         supports_websockets: false,
+         supports_standalone_web_search: false,
+         capabilities: None,
++        http_headers_file: None,
+         include_internal_metadata: false,
+     };
+ 
+diff --git a/core/tests/suite/client.rs b/core/tests/suite/client.rs
+index 2c01fcb..540e4fa 100644
+--- a/core/tests/suite/client.rs
++++ b/core/tests/suite/client.rs
+@@ -1734,6 +1734,7 @@ async fn send_provider_auth_request(server: &MockServer, auth: ModelProviderAuth
+         supports_websockets: false,
+         supports_standalone_web_search: false,
+         capabilities: None,
++        http_headers_file: None,
+         include_internal_metadata: false,
+     };
+ 
+@@ -3240,6 +3241,7 @@ async fn azure_responses_request_does_not_store_and_preserves_prefixed_item_ids(
+         supports_websockets: false,
+         supports_standalone_web_search: false,
+         capabilities: None,
++        http_headers_file: None,
+         include_internal_metadata: false,
+     };
+ 
+@@ -4088,6 +4090,7 @@ async fn azure_overrides_assign_properties_used_for_responses_url() {
+         supports_websockets: false,
+         supports_standalone_web_search: false,
+         capabilities: None,
++        http_headers_file: None,
+         include_internal_metadata: false,
+     };
+ 
+@@ -4176,6 +4179,7 @@ async fn env_var_overrides_loaded_auth() {
+         supports_websockets: false,
+         supports_standalone_web_search: false,
+         capabilities: None,
++        http_headers_file: None,
+         include_internal_metadata: false,
+     };
+ 
+diff --git a/core/tests/suite/client_websockets.rs b/core/tests/suite/client_websockets.rs
+index 288b8e2..4a9fdbe 100644
+--- a/core/tests/suite/client_websockets.rs
++++ b/core/tests/suite/client_websockets.rs
+@@ -2733,6 +2733,7 @@ fn websocket_provider_with_connect_timeout(
+         supports_websockets: true,
+         supports_standalone_web_search: false,
+         capabilities: None,
++        http_headers_file: None,
+         include_internal_metadata: false,
+     }
+ }
+diff --git a/core/tests/suite/stream_error_allows_next_turn.rs b/core/tests/suite/stream_error_allows_next_turn.rs
+index c381b78..5d41783 100644
+--- a/core/tests/suite/stream_error_allows_next_turn.rs
++++ b/core/tests/suite/stream_error_allows_next_turn.rs
+@@ -85,6 +85,7 @@ async fn continue_after_stream_error() {
+         supports_websockets: false,
+         supports_standalone_web_search: false,
+         capabilities: None,
++        http_headers_file: None,
+         include_internal_metadata: false,
+     };
+ 
+diff --git a/core/tests/suite/stream_no_completed.rs b/core/tests/suite/stream_no_completed.rs
+index 1823275..373aa76 100644
+--- a/core/tests/suite/stream_no_completed.rs
++++ b/core/tests/suite/stream_no_completed.rs
+@@ -71,6 +71,7 @@ async fn retries_on_early_close() {
+         supports_websockets: false,
+         supports_standalone_web_search: false,
+         capabilities: None,
++        http_headers_file: None,
+         include_internal_metadata: false,
+     };
+ 
+diff --git a/login/src/auth_env_telemetry.rs b/login/src/auth_env_telemetry.rs
+index 6ee0c43..e64a8b3 100644
+--- a/login/src/auth_env_telemetry.rs
++++ b/login/src/auth_env_telemetry.rs
+@@ -80,6 +80,7 @@ mod tests {
+             supports_websockets: false,
+             supports_standalone_web_search: false,
+             capabilities: None,
++            http_headers_file: None,
+             include_internal_metadata: false,
+         };
+ 
+diff --git a/model-provider/src/provider.rs b/model-provider/src/provider.rs
+index 9bd79f9..9d96ca7 100644
+--- a/model-provider/src/provider.rs
++++ b/model-provider/src/provider.rs
+@@ -667,6 +667,7 @@ mod tests {
+             supports_websockets: false,
+             supports_standalone_web_search: false,
+             capabilities: None,
++            http_headers_file: None,
+             include_internal_metadata: false,
+         }
+     }
+diff --git a/model-provider-info/Cargo.toml b/model-provider-info/Cargo.toml
+index 51d3026..7b0f3b1 100644
+--- a/model-provider-info/Cargo.toml
++++ b/model-provider-info/Cargo.toml
+@@ -20,6 +20,7 @@ codex-utils-redacted-string = { workspace = true }
+ http = { workspace = true }
+ schemars = { workspace = true }
+ serde = { workspace = true, features = ["derive"] }
++serde_json = { workspace = true }
+ 
+ [dev-dependencies]
+ codex-utils-absolute-path = { workspace = true }
+diff --git a/model-provider-info/src/lib.rs b/model-provider-info/src/lib.rs
+index 534a60c..d1875be 100644
+--- a/model-provider-info/src/lib.rs
++++ b/model-provider-info/src/lib.rs
+@@ -27,6 +27,7 @@ use std::fmt;
+ use std::num::NonZeroU64;
+ use std::path::Component;
+ use std::path::Path;
++use std::path::PathBuf;
+ use std::sync::PoisonError;
+ use std::sync::RwLock;
+ use std::time::Duration;
+@@ -177,6 +178,10 @@ pub struct ModelProviderInfo {
+     /// Additional HTTP headers to include in requests to this provider where
+     /// the (key, value) pairs are the header name and value.
+     pub http_headers: Option<HashMap<String, RedactedString>>,
++    /// Absolute path to a JSON object of HTTP header names and string values.
++    /// Read at runtime; file headers override configured and environment headers.
++    #[serde(skip_serializing_if = "Option::is_none")]
++    pub http_headers_file: Option<PathBuf>,
+     /// Optional HTTP headers to include in requests to this provider where the
+     /// (key, value) pairs are the header name and _environment variable_ whose
+     /// value should be used. If the environment variable is not set, or the
+@@ -425,6 +430,43 @@ other non-default provider fields are not supported"
+             }
+         }
+ 
++        if let Some(path) = &self.http_headers_file {
++            if !path.is_absolute() {
++                return Err(CodexErr::InvalidRequest(
++                    "http_headers_file must be an absolute path".into(),
++                ));
++            }
++            let contents = std::fs::read(path).map_err(|err| {
++                CodexErr::InvalidRequest(format!(
++                    "cannot read http_headers_file {}: {err}",
++                    path.display()
++                ))
++            })?;
++            let extra: HashMap<String, RedactedString> = serde_json::from_slice(&contents)
++                .map_err(|_| {
++                    CodexErr::InvalidRequest(format!(
++                        "http_headers_file {} must contain a JSON object of string header values",
++                        path.display()
++                    ))
++                })?;
++            for (name, value) in extra {
++                let name = HeaderName::try_from(name).map_err(|_| {
++                    CodexErr::InvalidRequest(format!(
++                        "http_headers_file {} contains an invalid HTTP header name",
++                        path.display()
++                    ))
++                })?;
++                let mut value = HeaderValue::try_from(value.as_str()).map_err(|_| {
++                    CodexErr::InvalidRequest(format!(
++                        "http_headers_file {} contains an invalid HTTP header value",
++                        path.display()
++                    ))
++                })?;
++                value.set_sensitive(true);
++                headers.insert(name, value);
++            }
++        }
++
+         Ok(headers)
+     }
+ 
+@@ -574,6 +616,7 @@ other non-default provider fields are not supported"
+             supports_websockets: true,
+             supports_standalone_web_search: true,
+             capabilities: None,
++            http_headers_file: None,
+             include_internal_metadata: true,
+         }
+     }
+@@ -614,6 +657,7 @@ other non-default provider fields are not supported"
+             supports_websockets: false,
+             supports_standalone_web_search: false,
+             capabilities: None,
++            http_headers_file: None,
+             include_internal_metadata: false,
+         }
+     }
+@@ -650,6 +694,7 @@ other non-default provider fields are not supported"
+             requires_openai_auth: false,
+             supports_websockets: false,
+             supports_standalone_web_search: false,
++            http_headers_file: None,
+             include_internal_metadata: false,
+         }
+     }
+@@ -746,7 +791,11 @@ pub fn merge_configured_model_providers(
+     configured_model_providers: HashMap<String, ModelProviderInfo>,
+ ) -> Result<HashMap<String, ModelProviderInfo>, String> {
+     for (key, mut provider) in configured_model_providers {
+-        if matches!(
++        if key == OPENAI_PROVIDER_ID {
++            if let Some(built_in_provider) = model_providers.get_mut(&key) {
++                built_in_provider.http_headers_file = provider.http_headers_file.take();
++            }
++        } else if matches!(
+             key.as_str(),
+             AMAZON_BEDROCK_PROVIDER_ID | AMAZON_BEDROCK_RUNTIME_PROVIDER_ID
+         ) {
+@@ -845,6 +894,7 @@ pub fn create_oss_provider_with_base_url(base_url: &str, wire_api: WireApi) -> M
+         supports_websockets: false,
+         supports_standalone_web_search: false,
+         capabilities: None,
++        http_headers_file: None,
+         include_internal_metadata: false,
+     }
+ }
+diff --git a/model-provider-info/src/model_provider_info_tests.rs b/model-provider-info/src/model_provider_info_tests.rs
+index 10a70b6..9d4541c 100644
+--- a/model-provider-info/src/model_provider_info_tests.rs
++++ b/model-provider-info/src/model_provider_info_tests.rs
+@@ -97,6 +97,7 @@ base_url = "http://localhost:11434/v1"
+         supports_websockets: false,
+         supports_standalone_web_search: false,
+         capabilities: None,
++        http_headers_file: None,
+         include_internal_metadata: false,
+     };
+ 
+@@ -136,6 +137,7 @@ query_params = { api-version = "2025-04-01-preview" }
+         supports_websockets: false,
+         supports_standalone_web_search: false,
+         capabilities: None,
++        http_headers_file: None,
+         include_internal_metadata: false,
+     };
+ 
+@@ -179,6 +181,7 @@ supports_standalone_web_search = true
+         supports_websockets: false,
+         supports_standalone_web_search: true,
+         capabilities: None,
++        http_headers_file: None,
+         include_internal_metadata: false,
+     };
+ 
+@@ -369,6 +372,7 @@ fn test_create_amazon_bedrock_provider() {
+             supports_websockets: false,
+             supports_standalone_web_search: false,
+             capabilities: None,
++            http_headers_file: None,
+             include_internal_metadata: false,
+         }
+     );

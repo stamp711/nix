@@ -8,7 +8,14 @@
       ;
 
     codex = inputs.llm-agents.packages.${prev.stdenv.hostPlatform.system}.codex.overrideAttrs (old: {
-      patches = (old.patches or [ ]) ++ [ ./codex-cloudflare-access-headers.patch ];
+      patches = (old.patches or [ ]) ++ [
+        ./codex/cf-access-headers.patch
+        ./codex/http-headers-file.patch
+      ];
+      postPatch = (old.postPatch or "") + ''
+        # Sync vendor lockfile; serde_json is already vendored.
+        cp Cargo.lock "$cargoDepsCopy/Cargo.lock"
+      '';
     });
 
     cli-proxy-api =
