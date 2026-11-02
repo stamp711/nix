@@ -46,7 +46,7 @@
       # Komga proxy.
       services.traefik.dynamicConfigOptions.http = {
         routers.komga = {
-          rule = "Host(`komga.nuc.apric.net`)";
+          rule = "Host(`komga.nuc.apric.net`) || Host(`komga.apric.net`)";
           service = "komga";
         };
         services.komga.loadBalancer.servers = [

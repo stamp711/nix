@@ -17,6 +17,7 @@
             http.tls = { };
           };
           tunnel = {
+            asDefault = true;
             address = "127.0.0.1:18080";
             forwardedHeaders.trustedIPs = [ "127.0.0.1/32" ];
           };

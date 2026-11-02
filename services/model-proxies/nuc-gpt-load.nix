@@ -33,7 +33,7 @@
 
       services.traefik.dynamicConfigOptions.http = {
         routers.gpt-load = {
-          rule = "Host(`gpt-load.nuc.apric.net`)";
+          rule = "Host(`gpt-load.nuc.apric.net`) || Host(`gpt-load.apric.net`)";
           service = "gpt-load";
         };
         services.gpt-load.loadBalancer.servers = [

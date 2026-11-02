@@ -43,5 +43,16 @@ in
       # The service's StateDirectory sets ownership and mode 0700 before startup.
       my.persistence.directories = [ "/var/lib/cliproxyapi" ];
       environment.systemPackages = [ cfg.package ];
+
+      services.traefik.dynamicConfigOptions.http = {
+        routers.cpa = {
+          rule = "Host(`cpa.nuc.apric.net`) || Host(`cpa.apric.net`)";
+          service = "cpa";
+        };
+        services.cpa.loadBalancer.servers = [
+          { url = "http://127.0.0.1:${toString cfg.settings.port}"; }
+        ];
+      };
+
     };
 }
