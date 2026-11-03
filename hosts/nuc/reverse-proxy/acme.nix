@@ -14,7 +14,8 @@
       security.acme = {
         acceptTerms = true;
         certs.nuc = {
-          domain = "*.nuc.apric.net";
+          domain = "*.apric.net";
+          extraDomainNames = [ "*.nuc.apric.net" ];
           dnsProvider = "cloudflare";
           dnsResolver = "1.1.1.1:53";
           credentialFiles.CF_DNS_API_TOKEN_FILE = cfDnsToken.path;
