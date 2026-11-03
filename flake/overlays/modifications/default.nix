@@ -5,6 +5,7 @@
     inherit (inputs.llm-agents.packages.${prev.stdenv.hostPlatform.system})
       chatgpt
       claude-code
+      dsh
       ;
 
     codex = inputs.llm-agents.packages.${prev.stdenv.hostPlatform.system}.codex.overrideAttrs (old: {
