@@ -5,8 +5,17 @@
     inherit (inputs.llm-agents.packages.${prev.stdenv.hostPlatform.system})
       chatgpt
       claude-code
-      dsh
       ;
+
+    dsh = inputs.llm-agents.packages.${prev.stdenv.hostPlatform.system}.dsh.overrideAttrs (old: {
+      postInstall = (old.postInstall or "") + ''
+        # Keep Host/Origin checks; skip browser token authentication.
+        substituteInPlace \
+          $out/lib/node_modules/@deepseek-ai/dsh/node_modules/@deepseek-ai/dsh-client-connection/lib/index.js \
+          --replace-fail 'return this.authenticate(request, secure)?.version === COOKIE_PAYLOAD_VERSION;' \
+          'return true;'
+      '';
+    });
 
     codex = inputs.llm-agents.packages.${prev.stdenv.hostPlatform.system}.codex.overrideAttrs (old: {
       patches = (old.patches or [ ]) ++ [

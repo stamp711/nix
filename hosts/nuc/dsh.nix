@@ -22,7 +22,7 @@
         Unit.Description = "dsh web";
         Install.WantedBy = [ "default.target" ];
         Service = {
-          ExecStart = "${pkgs.zsh}/bin/zsh -lc 'exec ${pkgs.dsh}/bin/dsh web --no-open --public-url https://dsh.nuc.apric.net/ --trusted-host dsh.nuc.apric.net dsh.apric.net'";
+          ExecStart = "${pkgs.zsh}/bin/zsh -lc 'exec ${pkgs.dsh}/bin/dsh web --no-open --trusted-host dsh.nuc.apric.net dsh.apric.net'";
           Restart = "on-failure";
         };
       };
