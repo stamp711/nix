@@ -188,7 +188,7 @@
           }
 
           (lib.mkIf cfg.enableZshIntegration {
-            programs.zsh.initContent = ''
+            programs.zsh.envExtra = ''
               export {http,https}_proxy="http://127.0.0.1:${toString cfg.port}"
               export {HTTP,HTTPS}_PROXY="http://127.0.0.1:${toString cfg.port}"
               export {all_proxy,ALL_PROXY}="socks5h://127.0.0.1:${toString cfg.port}"
