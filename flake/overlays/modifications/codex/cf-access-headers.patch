@@ -1,10 +1,10 @@
 diff --git a/model-provider-info/src/lib.rs b/model-provider-info/src/lib.rs
 --- a/model-provider-info/src/lib.rs
 +++ b/model-provider-info/src/lib.rs
-@@ -542,6 +542,14 @@ impl ModelProviderInfo {
-                         "OPENAI_ORGANIZATION".to_string(),
+@@ -593,6 +593,14 @@
+                         OPENAI_PROJECT_HEADER.to_string(),
+                         "OPENAI_PROJECT".to_string(),
                      ),
-                     ("OpenAI-Project".to_string(), "OPENAI_PROJECT".to_string()),
 +                    (
 +                        "CF-Access-Client-Id".to_string(),
 +                        "CF_ACCESS_CLIENT_ID".to_string(),

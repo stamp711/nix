@@ -2,9 +2,11 @@
 {
   flake.overlays.modifications = _final: prev: {
 
+    # Globally use some packages from numtide/llm-agentx.
     inherit (inputs.llm-agents.packages.${prev.stdenv.hostPlatform.system})
       chatgpt
       claude-code
+      cli-proxy-api
       ;
 
     dsh = inputs.llm-agents.packages.${prev.stdenv.hostPlatform.system}.dsh.overrideAttrs (old: {
@@ -27,21 +29,6 @@
         cp Cargo.lock "$cargoDepsCopy/Cargo.lock"
       '';
     });
-
-    cli-proxy-api =
-      inputs.llm-agents.packages.${prev.stdenv.hostPlatform.system}.cli-proxy-api.overrideAttrs
-        (old: {
-          patches = (old.patches or [ ]) ++ [ ./cpa-chat-compaction.patch ];
-          patchFlags = (old.patchFlags or [ "-p1" ]) ++ [ "--fuzz=0" ];
-          # Upstream only tests cmd/server; exercise the patched compaction path too.
-          postCheck = (old.postCheck or "") + ''
-            go test -vet=off -count=1 -p "$NIX_BUILD_CORES" \
-              ./internal/runtime/executor/helps \
-              ./internal/runtime/executor \
-              ./sdk/api/handlers/openai
-            go test -vet=off -count=1 -run '^TestOpenAICompatCompactionWebsocket$' ./test
-          '';
-        });
 
     # Default clang-format to --fallback-style=none so it no-ops when no
     # .clang-format is present (instead of silently reformatting to LLVM).
