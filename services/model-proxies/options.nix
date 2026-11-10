@@ -1,5 +1,6 @@
 { lib, ... }:
 {
+
   # OpenAI-compatible backends to feed into CLIProxyAPI
   options.modelBackends = lib.mkOption {
     default = { };
@@ -37,20 +38,4 @@
     );
   };
 
-  # Proxy deployment modules publish their client-facing endpoints here;
-  # codex-config/personal.nix uses them to create profiles with dynamic model discovery.
-  options.modelProxies = lib.mkOption {
-    default = { };
-    description = "Model proxy endpoints exposed to clients.";
-    type = lib.types.attrsOf (
-      lib.types.submodule {
-        options = {
-          baseUrl = lib.mkOption {
-            type = lib.types.str;
-            description = "OpenAI-compatible API endpoint. Loopback URLs are usable only on the serving host.";
-          };
-        };
-      }
-    );
-  };
 }

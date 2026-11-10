@@ -1,21 +1,19 @@
 { lib, self, ... }:
-let
-  port = 8317;
-in
 {
-  # Official models, including codex-auto-review, use maintained catalog snapshots.
-  modelProxies.cliproxyapi.baseUrl = "http://nuc.boar-char.ts.net:${toString port}/v1";
-
   flake.nixosModules.nuc =
     { config, pkgs, ... }:
     let
       cfg = config.services.cliproxyapi;
+
+      port = 8317;
+
       management = self.lib.mkAgeSecret config {
         rekeyFile = ./management.env.age;
         generator.script = { pkgs, ... }: ''
           printf 'MANAGEMENT_PASSWORD=%s\n' "$(${lib.getExe pkgs.openssl} rand -hex 32)"
         '';
       };
+
     in
     {
       age.secrets = management.ageSecret;
