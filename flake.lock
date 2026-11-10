@@ -709,23 +709,6 @@
         "type": "github"
       }
     },
-    "hm-t3code-pr": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1784696724,
-        "narHash": "sha256-cN/0VpxQSfDpti1WWRxx5RPkdTXpjLpGctcQs+BTNZM=",
-        "owner": "jonocodes",
-        "repo": "home-manager",
-        "rev": "310ddb10c6510498cf11d0f186f2069415ef280d",
-        "type": "github"
-      },
-      "original": {
-        "owner": "jonocodes",
-        "repo": "home-manager",
-        "rev": "310ddb10c6510498cf11d0f186f2069415ef280d",
-        "type": "github"
-      }
-    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -1333,7 +1316,6 @@
         "flake-parts": "flake-parts",
         "hermes-agent": "hermes-agent",
         "hermes-webui": "hermes-webui",
-        "hm-t3code-pr": "hm-t3code-pr",
         "home-manager": "home-manager",
         "homebrew-cask": "homebrew-cask",
         "homebrew-core": "homebrew-core",
