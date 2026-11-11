@@ -9,7 +9,8 @@
           name = "nvide";
           runtimeInputs = [ pkgs.neovide ];
           text = ''
-            exec neovide --neovim-bin ${config.programs.nixvim.build.package}/bin/nvim "$@"
+            # Without --no-startup-message-capture noice refuses to work.
+            exec neovide --no-startup-message-capture --neovim-bin ${config.programs.nixvim.build.package}/bin/nvim "$@"
           '';
         })
       ];
