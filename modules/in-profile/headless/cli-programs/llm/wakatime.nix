@@ -42,8 +42,5 @@
       programs.claude-code.plugins.${claude-wakatime-plugin-name} = claude-wakatime;
       # Read the built manifest's name/version instead of derivation metadata (0.0.0).
       programs.codex.plugins = [ "${codex-wakatime}" ];
-
-      # those are raft agent notes, give it a project name, so they don't show as uuid
-      home.file.".slock/agents/.wakatime-project".text = "raft-agents";
     };
 }

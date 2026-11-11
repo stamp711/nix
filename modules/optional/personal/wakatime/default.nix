@@ -19,22 +19,14 @@
         [settings]
         api_key_vault_cmd = ${pkgs.coreutils}/bin/cat ${s.path}
 
-        # agent notes, and the session state each AI tool keeps for itself
-        ; exclude =
-        ;   /[.]slock/agents/
-        ;   /[.]claude/projects/
-        ;   /[.]codex/sessions/
-
         # allowlist mode
         exclude = true
         include =
           ^${ghqRoot}/
-          ^${home}/agents/
 
-        # name the project after the repo, not after whoever edited it
+        # Use repository names for projects.
         [projectmap]
         ^${ghqRoot}/[^/]+/[^/]+/([^/]+) = {0}
-        ^${home}/agents/[^/]+/[^/]+/[^/]+/([^/]+) = {0}
         github[.]com/[^/]+/([^/]+) = {0}
       '';
 
