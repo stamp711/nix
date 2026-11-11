@@ -33,8 +33,6 @@
 
           b4
           public-inbox
-
-          my.even-terminal
         ]
         ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [ waypipe ];
 
