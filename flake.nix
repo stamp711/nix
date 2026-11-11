@@ -116,16 +116,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
-    # NOTE: Upstream calls nix a tier-2 platform.
-    hermes-agent = {
-      url = "github:NousResearch/hermes-agent/v2026.7.30";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-parts.follows = "flake-parts";
-    };
-    hermes-webui = {
-      url = "github:nesquena/hermes-webui";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     jj-starship = {
       url = "github:dmmulroy/jj-starship";
       inputs.nixpkgs.follows = "nixpkgs";

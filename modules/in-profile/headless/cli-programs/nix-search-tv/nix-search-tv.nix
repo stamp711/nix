@@ -18,8 +18,6 @@
         experimental.options_file = {
 
           agenix = config.lib.my.mkOpts inputs.agenix.nixosModules.default;
-          hermes-agent = config.lib.my.mkOpts inputs.hermes-agent.nixosModules.default;
-          hermes-webui = config.lib.my.mkOpts inputs.hermes-webui.nixosModules.default;
           impermanence = config.lib.my.mkOpts inputs.impermanence.nixosModules.impermanence;
           microvm = config.lib.my.mkOpts inputs.microvm.nixosModules.microvm;
           nix-homebrew = config.lib.my.mkOpts inputs.nix-homebrew.darwinModules.nix-homebrew;
