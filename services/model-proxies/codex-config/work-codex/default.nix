@@ -23,6 +23,6 @@
         };
       };
 
-      programs.codex.settings = config.programs.codex.profiles.cpa;
+      # programs.codex.settings = config.programs.codex.profiles.cpa;
     };
 }
