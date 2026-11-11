@@ -15,11 +15,6 @@
         nix-direnv.enable = true;
       };
 
-      # Devenv
-      home.packages = with pkgs; [
-        devenv
-      ];
-
       programs.git.ignores = [
         # Devenv
         ".devenv*"
