@@ -118,7 +118,6 @@
         diffnav
         ghq
         git-filter-repo
-        lazyjj
         oyui
       ];
     };
