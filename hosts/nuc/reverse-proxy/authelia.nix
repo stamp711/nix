@@ -70,12 +70,6 @@ lib.mkMerge [
       { config, ... }:
       {
         services.traefik = {
-
-          staticConfigOptions.entryPoints.tunnel-auth = {
-            address = "127.0.0.1:18081";
-            forwardedHeaders.trustedIPs = [ "127.0.0.1/32" ];
-          };
-
           dynamicConfigOptions.http =
             let
               autheliaUrl = lib.removeSuffix "/" (
@@ -92,10 +86,6 @@ lib.mkMerge [
               };
               routers.authelia = {
                 rule = "Host(`auth.nuc.apric.net`) || Host(`auth.apric.net`)";
-                entryPoints = [
-                  "websecure"
-                  "tunnel-auth"
-                ];
                 service = "authelia";
               };
               services.authelia.loadBalancer.servers = [ { url = autheliaUrl; } ];

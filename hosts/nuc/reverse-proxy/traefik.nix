@@ -6,20 +6,19 @@
         enable = true;
         # Entry points.
         staticConfigOptions.entryPoints = {
-          web = {
-            asDefault = true;
+          http = {
             address = ":80";
-            http.redirections.entryPoint.to = "websecure";
+            http.redirections.entryPoint.to = "https";
           };
-          websecure = {
+          https = {
             asDefault = true;
             address = ":443";
             http.tls = { };
           };
-          tunnel = {
+          https-auth = {
             asDefault = true;
-            address = "127.0.0.1:18080";
-            forwardedHeaders.trustedIPs = [ "127.0.0.1/32" ];
+            address = "127.0.0.1:18443";
+            http.tls = { };
             http.middlewares = [ "authelia@file" ];
           };
         };
