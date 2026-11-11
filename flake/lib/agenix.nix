@@ -34,9 +34,10 @@
     #   );
 
     # Derive a stable secret name from a .age file path, relative to the flake root.
-    # e.g. profiles/nixos/kvm-proxy/xray-proxy.env.age => profiles__nixos__kvm-proxy__xray-proxy.env
+    # e.g. profiles/nixos/kvm-proxy/xray-proxy.env.age => <prefix>--profiles__nixos__kvm-proxy__xray-proxy.env
     #
     # Works for paths from any flake by stripping the /nix/store/<hash>-<name>/ prefix.
+    # The source root's .agenix-namespace supplies the secret name prefix.
     # In flake evaluation, all paths resolve to store paths with this structure:
     #   /nix/store/abc123-source/hosts/ssh-config.age
     #   ^^^^^^^^^^^^^^^^^^^^^^^^ 4 components when split by "/": "", "nix", "store", "<hash>-<name>"
@@ -44,9 +45,11 @@
       path:
       let
         parts = lib.splitString "/" (toString path);
+        root = lib.concatStringsSep "/" (lib.take 4 parts); # [ "" "nix" "store" "abc123-source" ]
+        namespace = lib.fileContents "${root}/.agenix-namespace";
         relative = lib.concatStringsSep "/" (lib.drop 4 parts);
       in
-      lib.removeSuffix ".age" (builtins.replaceStrings [ "/" ] [ "__" ] relative);
+      "${namespace}--${lib.removeSuffix ".age" (builtins.replaceStrings [ "/" ] [ "__" ] relative)}";
 
     # Takes an agenix secret definition, names it after its rekeyFile, hands back the path.
     mkAgeSecret =
