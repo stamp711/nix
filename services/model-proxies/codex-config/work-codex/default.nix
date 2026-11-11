@@ -1,6 +1,6 @@
 { self, ... }:
 {
-  flake.homeModules.work =
+  flake.homeModules.work-codex =
     { config, ... }:
     let
       headers = self.lib.mkAgeSecret config {

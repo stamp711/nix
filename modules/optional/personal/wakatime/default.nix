@@ -1,5 +1,8 @@
 { lib, self, ... }:
 {
+
+  flake.homeModules.personal.imports = [ self.homeModules.personal-wakatime ];
+
   flake.homeModules.personal-wakatime =
     { config, pkgs, ... }:
     let
@@ -65,5 +68,4 @@
       };
     };
 
-  flake.homeModules.personal.imports = [ self.homeModules.personal-wakatime ];
 }
