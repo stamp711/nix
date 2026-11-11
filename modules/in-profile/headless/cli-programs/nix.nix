@@ -38,7 +38,5 @@
           { content = "source ${config.programs.nix-index.package}/etc/profile.d/command-not-found.sh"; }
           { content = "source ${nysInit}"; }
         ];
-
-      programs.nix-init.enable = true;
     };
 }
