@@ -30,7 +30,7 @@
           # Publish only prefixed backend IDs, avoiding duplicate model-picker entries.
           force-model-prefix = true;
           # OAuth login and refresh write credentials here, outside the config.
-          auth-dir = "/var/lib/cliproxyapi/auth";
+          oauth.auth-dir = "/var/lib/cliproxyapi/auth";
           # Preserve upstream rate-limit and Codex session/catalog headers.
           passthrough-headers = true;
           # Let the client choose tools; do not inject image_generation.
