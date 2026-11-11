@@ -17,20 +17,23 @@ lib.mkMerge [
             authentication_backend.file.path = "${stateDir}/users.yml";
             storage.local.path = "${stateDir}/db.sqlite3";
             notifier.filesystem.filename = "${stateDir}/notifications.txt";
-            server.endpoints.authz.forward-auth = {
-              implementation = "ForwardAuth";
-              authn_strategies = [
-                # order matters
-                # {
-                #   name = "HeaderAuthorization";
-                #   schemes = [ "Basic" ];
-                # }
-                {
-                  name = "HeaderProxyAuthorization";
-                  schemes = [ "Basic" ];
-                }
-                { name = "CookieSession"; }
-              ];
+            server = {
+              buffers.read = 16384; # default 4KB is too small for codex headers
+              endpoints.authz.forward-auth = {
+                implementation = "ForwardAuth";
+                authn_strategies = [
+                  # order matters
+                  # {
+                  #   name = "HeaderAuthorization";
+                  #   schemes = [ "Basic" ];
+                  # }
+                  {
+                    name = "HeaderProxyAuthorization";
+                    schemes = [ "Basic" ];
+                  }
+                  { name = "CookieSession"; }
+                ];
+              };
             };
             session.cookies = [
               {
