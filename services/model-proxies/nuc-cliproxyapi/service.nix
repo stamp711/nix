@@ -27,6 +27,7 @@
         settings = {
           inherit port;
           host = "0.0.0.0";
+          routing.session-affinity = true;
           # Publish only prefixed backend IDs, avoiding duplicate model-picker entries.
           force-model-prefix = true;
           # OAuth login and refresh write credentials here, outside the config.
