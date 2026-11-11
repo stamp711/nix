@@ -50,6 +50,8 @@ lib.mkMerge [
                   subject = "user:work";
                   policy = "one_factor";
                   domain = [ "cpa.apric.net" ];
+                  # Work clients may use the model API, but not the management UI or API.
+                  resources = [ "^/v1/.*$" ];
                 }
               ];
             };
