@@ -21,7 +21,6 @@
           impermanence = config.lib.my.mkOpts inputs.impermanence.nixosModules.impermanence;
           microvm = config.lib.my.mkOpts inputs.microvm.nixosModules.microvm;
           nix-homebrew = config.lib.my.mkOpts inputs.nix-homebrew.darwinModules.nix-homebrew;
-          nixos-wsl = config.lib.my.mkOpts inputs.nixos-wsl.nixosModules.default;
           nixvirt = config.lib.my.mkOpts inputs.NixVirt.nixosModules.default;
 
         };
