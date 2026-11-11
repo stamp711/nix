@@ -1,6 +1,7 @@
 # Nix Configuration
 
-Personal Nix setup.
+Personal NixOS and nix-darwin configurations, with reusable modules and profiles
+for downstream Home Manager and system-manager configurations.
 
 ## Structure
 
@@ -17,10 +18,8 @@ Personal Nix setup.
 ├── modules/               # nixos & darwin & HM & system-manager
 │   ├── in-profile/        # pulled in by the matching profile
 │   └── optional/          # opt-in modules
-├── profiles/              # minimal < headless < desktop
-├── hosts/
-│   ├── personal/
-│   └── proxy-servers/
+├── profiles/              # minimal < headless < desktop, plus work
+├── hosts/                 # NUC, Surface, Macs, DGX Sparks and proxy servers
 ├── services/              # deployments, exposed service data and client integration
 ├── nixvim/                # neovim config
 ├── packages/
@@ -29,17 +28,30 @@ Personal Nix setup.
 
 ## Usage
 
+Run these commands from the checkout. The configured hosts embed Home Manager,
+so switching the system also updates the user's home configuration.
+
 ```bash
-# First-time setup
-nix --experimental-features 'nix-command flakes' run nixpkgs#nh -- home switch github:stamp711/nix
+# NixOS (selects the current hostname)
+nh os switch .
 
-# Switch configuration (NH_FLAKE is set after first switch)
-nh home switch
+# macOS (selects the current hostname)
+nh darwin switch .
 
-# Or explicitly specify configuration
-nh home switch -c stamp@GPD
+# Or explicitly select the local machine's configuration
+nh os switch . --hostname NUC
+nh darwin switch . --hostname Lius-MacBook
 
-# Deploy to remote host
-deploy .#NUC
-deploy .#GPD
+# Deploy the configured remote proxy servers
+nix develop -c deploy .#VIA
+nix develop -c deploy .#NURO
 ```
+
+Omit `.` to use `NH_FLAKE`; pass `.` to include local changes. If `nh` is not
+installed yet, use `nix run nixpkgs#nh -- os switch .` on NixOS or
+`nix run nixpkgs#nh -- darwin switch .` on macOS with an existing nix-darwin setup.
+
+This repository exports no standalone `homeConfigurations`. Downstream flakes
+can use `lib.mkHome`, `lib.mkSystem`, and the exported modules and profiles.
+`profiles.homeManager.work` groups the work Codex configuration, GitHub rate-limit
+token, and WakaTime configuration for downstream imports.
