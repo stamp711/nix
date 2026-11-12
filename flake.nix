@@ -147,6 +147,12 @@
     };
     # no nixpkgs follows so cache.numtide.com hits
     llm-agents.url = "github:numtide/llm-agents.nix";
+    codex-web = {
+      url = "github:0xcaff/codex-web";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.treefmt-nix.follows = "treefmt-nix";
+      inputs.flake-utils.inputs.systems.follows = "systems";
+    };
     claude-code-wakatime = {
       url = "github:wakatime/claude-code-wakatime";
       flake = false;
