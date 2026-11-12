@@ -1,0 +1,69 @@
+--- a/.vite/build/main-CqEoQDOU.js
++++ b/.vite/build/main-CqEoQDOU.js
+@@ -135053,6 +135053,7 @@
+   host: a,
+   listThreads: o,
+   matchRootsByCanonicalHostIdentity: s,
++  markUnmatchedProjectless = !0,
+   readThread: l,
+   threadProjectAssignments: u,
+ }) {
+@@ -135146,7 +135147,7 @@
+       let e = E.get(n.id) ?? n.cwd,
+         i = x.get(r.ui(e));
+       if (i == null || (_ != null && _(i.rootPath) !== _(e))) {
+-        (C.add(n.id), O.push(n.id));
++        if (markUnmatchedProjectless) (C.add(n.id), O.push(n.id));
+         continue;
+       }
+       let a = { projectKind: `local`, projectId: i.projectId };
+@@ -135481,7 +135482,10 @@
+       let n = await Wr(e, this.host),
+         r = n.filter((e) => this.#m(e) == null);
+       return (await this.confirmProjectFolders(`local`, r))
+-        ? (await this.assignUnassignedThreadsBeforeProjectRootsChange(r, t),
++        ? (await this.assignUnassignedThreadsBeforeProjectRootsChange(r, {
++            ...t,
++            markUnmatchedProjectless: !1,
++          }),
+           (
+             await Promise.all(n.toReversed().map((e) => this.#a([e])))
+           ).toReversed())
+@@ -135497,7 +135501,9 @@
+       return (
+         this.#m(n) ??
+         ((await this.confirmProjectFolders(`local`, [n]))
+-          ? (await this.assignUnassignedThreadsBeforeProjectRootsChange([n]),
++          ? (await this.assignUnassignedThreadsBeforeProjectRootsChange([n], {
++              markUnmatchedProjectless: !1,
++            }),
+             this.#a([n], t))
+           : null)
+       );
+@@ -135576,7 +135582,9 @@
+             : await Wr(s, this.host);
+       if (!(await this.confirmProjectFolders(`local`, c))) return null;
+       (s.length > 0 || c.some((e) => this.#m(e) == null)) &&
+-        (await this.assignUnassignedThreadsBeforeProjectRootsChange(c));
++        (await this.assignUnassignedThreadsBeforeProjectRootsChange(c, {
++          markUnmatchedProjectless: !1,
++        }));
+       let l = await this.#a(c, a, {
+         allowDuplicateProject: s.length > 0,
+         appearance: n,
+@@ -136214,6 +136222,7 @@
+       {
+         excludedThreadIds: t = new Set(),
+         matchRootsByCanonicalHostIdentity: n = !1,
++        markUnmatchedProjectless,
+       } = {},
+     ) {
+       await zHe({
+@@ -136224,6 +136233,7 @@
+         host: this.host,
+         listThreads: this.listThreads,
+         matchRootsByCanonicalHostIdentity: n,
++        markUnmatchedProjectless,
+         readThread: this.readThread,
+         threadProjectAssignments: this.threadProjectAssignments,
+       });

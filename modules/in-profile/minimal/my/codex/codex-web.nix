@@ -5,6 +5,12 @@
     let
       cfg = config.my.codex.web;
       packages = inputs.codex-web.packages.${pkgs.stdenv.hostPlatform.system};
+      package = packages.default.overrideAttrs {
+        # The GUI bundle is extracted during the build, after the usual patch phase.
+        postBuild = ''
+          patch --batch --fuzz=0 -p1 -d scratch/asar < ${./codex-web-project-grouping.patch}
+        '';
+      };
 
       start = pkgs.writeShellScript "codex-web-start" ''
         export CODEX_UNIX_SOCKET="''${CODEX_HOME:-$HOME/.codex}/app-server-control/app-server-control.sock"
@@ -13,7 +19,7 @@
 
         # Let systemd retry if the daemon's socket is not ready yet.
         [[ -S "$CODEX_UNIX_SOCKET" ]] || exit 1
-        exec ${lib.getExe' packages.default "codex-web"} --host 127.0.0.1 --port ${toString cfg.port}
+        exec ${lib.getExe' package "codex-web"} --host 127.0.0.1 --port ${toString cfg.port}
       '';
     in
     {
