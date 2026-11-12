@@ -2,9 +2,9 @@
 # only inside their OCI image.
 { lib, ... }:
 let
-  version = "v0.0.32";
+  version = "v0.0.67";
   # The value in the release's own SHA256SUMS.
-  sha256 = "0aab7496e9fc89c2fbff92ba5058ec0b342dff5065f4b802e3961e5e5ee39e3f";
+  sha256 = "befb6f7e1a06529db9a5a50862f3a8c809505852bcaf3deaaf47323a9c218779";
   # The Linux build, for hosts that run it as a container.
   imageDigest = "sha256:1a118d10d4acd1768a2b3903683631210d313b0273e296330a8b671badb7903a";
 in
