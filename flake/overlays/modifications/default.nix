@@ -7,6 +7,7 @@
       chatgpt
       claude-code
       cli-proxy-api
+      codex
       ;
 
     dsh = inputs.llm-agents.packages.${prev.stdenv.hostPlatform.system}.dsh.overrideAttrs (old: {
@@ -16,17 +17,6 @@
           $out/lib/node_modules/@deepseek-ai/dsh/node_modules/@deepseek-ai/dsh-client-connection/lib/index.js \
           --replace-fail 'return this.authenticate(request, secure)?.version === COOKIE_PAYLOAD_VERSION;' \
           'return true;'
-      '';
-    });
-
-    codex = inputs.llm-agents.packages.${prev.stdenv.hostPlatform.system}.codex.overrideAttrs (old: {
-      patches = (old.patches or [ ]) ++ [
-        ./codex/cf-access-headers.patch
-        ./codex/http-headers-file.patch
-      ];
-      postPatch = (old.postPatch or "") + ''
-        # Sync vendor lockfile; serde_json is already vendored.
-        cp Cargo.lock "$cargoDepsCopy/Cargo.lock"
       '';
     });
 
