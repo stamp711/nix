@@ -1,5 +1,7 @@
 { self, ... }:
 {
+  flake.homeModules.personal.imports = [ self.homeModules.github-ratelimit-token ];
+
   flake.homeModules.github-ratelimit-token =
     { config, ... }:
     let
