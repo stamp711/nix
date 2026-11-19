@@ -4,6 +4,7 @@
 
     # Globally use some packages from numtide/llm-agentx.
     inherit (inputs.llm-agents.packages.${prev.stdenv.hostPlatform.system})
+      antigravity-cli
       chatgpt
       claude-code
       cli-proxy-api
