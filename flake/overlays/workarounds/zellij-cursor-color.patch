@@ -1,0 +1,401 @@
+Forward pane cursor colors (OSC 12/112).
+
+Backport of https://github.com/zellij-org/zellij/commit/5b598e1f62aa3afc88231d537290d825c9a49806
+Rebased for Zellij 0.46.0, preserving bracketed-paste/grapheme-cluster
+teardown and live-view cursor shape handling.
+
+--- a/zellij-client/src/lib.rs
++++ b/zellij-client/src/lib.rs
+@@ -64,6 +64,7 @@
+ const ENABLE_FOCUS_REPORTING: &str = "\u{1b}[?1004h";
+ const DISABLE_FOCUS_REPORTING: &str = "\u{1b}[?1004l";
+ const RESET_STYLE: &str = "\u{1b}[m";
++const RESET_CURSOR_COLOR: &str = "\u{1b}]112\u{1b}\\";
+ const SHOW_CURSOR: &str = "\u{1b}[?25h";
+ const ENTER_KITTY_KEYBOARD_MODE: &str = "\u{1b}[>1u";
+ const EXIT_KITTY_KEYBOARD_MODE: &str = "\u{1b}[<1u";
+@@ -486,11 +487,12 @@
+                 ""
+             };
+             let rendered = format!(
+-                "{}{}{}{}{}{}{}\r\n{}\n",
++                "{}{}{}{}{}{}{}{}\r\n{}\n",
+                 kitty_exit,
+                 DISABLE_BRACKETED_PASTE,
+                 DISABLE_HOST_THEME_NOTIFY,
+                 DISABLE_FOCUS_REPORTING,
++                RESET_CURSOR_COLOR,
+                 EXIT_ALTERNATE_SCREEN,
+                 RESET_STYLE,
+                 SHOW_CURSOR,
+@@ -2080,11 +2082,12 @@
+         ""
+     };
+     format!(
+-        "{}{}{}{}{}{}{}{}{}{}\n",
++        "{}{}{}{}{}{}{}{}{}{}{}\n",
+         kitty_exit,
+         DISABLE_BRACKETED_PASTE,
+         DISABLE_HOST_THEME_NOTIFY,
+         DISABLE_FOCUS_REPORTING,
++        RESET_CURSOR_COLOR,
+         grapheme_cluster_exit,
+         EXIT_ALTERNATE_SCREEN,
+         RESET_STYLE,
+--- a/zellij-server/src/host_query.rs
++++ b/zellij-server/src/host_query.rs
+@@ -51,6 +51,8 @@
+     DefaultForeground { terminator: OscTerminator },
+     /// `OSC 11 ; ? <term>` — default background colour.
+     DefaultBackground { terminator: OscTerminator },
++    /// `OSC 12 ; ? <term>` — cursor colour.
++    CursorColor { terminator: OscTerminator },
+     /// `OSC 4 ; N ; ? <term>` — palette register `N`.
+     PaletteRegister {
+         index: u8,
+@@ -89,6 +91,11 @@
+                 v.extend_from_slice(terminator.as_bytes());
+                 v
+             },
++            HostQuery::CursorColor { terminator } => {
++                let mut v = b"\x1b]12;?".to_vec();
++                v.extend_from_slice(terminator.as_bytes());
++                v
++            },
+             HostQuery::PaletteRegister { index, terminator } => {
+                 let mut v = format!("\x1b]4;{};?", index).into_bytes();
+                 v.extend_from_slice(terminator.as_bytes());
+@@ -173,6 +180,24 @@
+     }
+
+     #[test]
++    fn cursor_color_mirrors_terminator() {
++        assert_eq!(
++            HostQuery::CursorColor {
++                terminator: OscTerminator::St,
++            }
++            .to_query_bytes(),
++            b"\x1b]12;?\x1b\\",
++        );
++        assert_eq!(
++            HostQuery::CursorColor {
++                terminator: OscTerminator::Bel,
++            }
++            .to_query_bytes(),
++            b"\x1b]12;?\x07",
++        );
++    }
++
++    #[test]
+     fn palette_register_carries_index_and_terminator() {
+         assert_eq!(
+             HostQuery::PaletteRegister {
+--- a/zellij-server/src/panes/grid.rs
++++ b/zellij-server/src/panes/grid.rs
+@@ -1049,6 +1049,11 @@
+     /// Pane-scoped override for the default background colour. Same
+     /// invariant as `pane_default_fg`.
+     pub pane_default_bg: Option<(u8, u8, u8)>,
++    /// Pane-scoped override for the host terminal cursor colour. Stored
++    /// as literal RGB so the render path can safely serialize it as OSC 12
++    /// whenever this pane is focused. `None` means "reset to the host
++    /// terminal's configured cursor colour" via OSC 112.
++    pub pane_cursor_color: Option<(u8, u8, u8)>,
+     pub plugin_highlights: HashMap<u32, Vec<(String, CompiledHighlight)>>,
+     // key: plugin_id (u32), inner vec: (pattern, compiled) pairs
+     pub hover_position: Option<Position>, // pane-relative cursor cell; None when outside pane
+@@ -1083,6 +1088,13 @@
+             self.pane_default_fg.map(rgb_to_hex_string),
+             self.pane_default_bg.map(rgb_to_hex_string),
+         )
++    }
++
++    pub fn cursor_color_osc(&self) -> String {
++        match self.pane_cursor_color {
++            Some(rgb) => format!("\u{1b}]12;{}\u{1b}\\", rgb_to_hex_string(rgb)),
++            None => "\u{1b}]112\u{1b}\\".to_string(),
++        }
+     }
+ }
+
+@@ -1435,6 +1447,7 @@
+             click: Click::default(),
+             pane_default_fg: None,
+             pane_default_bg: None,
++            pane_cursor_color: None,
+             plugin_highlights: HashMap::new(),
+             hover_position: None,
+             cached_hover_tooltip: None,
+@@ -3289,6 +3302,7 @@
+         self.pane_default_bg = None;
+         self.osc133_markers_seen = false;
+         self.osc7_payload = None;
++        self.pane_cursor_color = None;
+         if let Some(images_to_reap) = self.sixel_grid.clear() {
+             self.sixel_grid.reap_images(images_to_reap);
+         }
+@@ -5695,7 +5709,29 @@
+             },
+
+             b"12" => {
+-                // get/set cursor color currently unimplemented
++                if params.len() >= 2 {
++                    for param in &params[1..] {
++                        if param == b"?" {
++                            if let Some(rgb) = self.pane_cursor_color {
++                                let reply = format!(
++                                    "\u{1b}]12;{}{}",
++                                    osc_color_reply_body(rgb),
++                                    terminator
++                                );
++                                self.pending_messages_to_pty.push(reply.as_bytes().to_vec());
++                            } else {
++                                let term = crate::host_query::OscTerminator::from_bell_terminated(
++                                    bell_terminated,
++                                );
++                                self.pending_forwarded_queries.push(
++                                    crate::host_query::HostQuery::CursorColor { terminator: term },
++                                );
++                            }
++                        } else if let Some(rgb) = xparse_color(param).and_then(rgb_of_ansi_code) {
++                            self.pane_cursor_color = Some(rgb);
++                        }
++                    }
++                }
+             },
+
+             b"133" => {
+@@ -5795,7 +5831,7 @@
+
+             // Reset text cursor color.
+             b"112" => {
+-                // TBD - reset text cursor color - currently unimplemented
++                self.pane_cursor_color = None;
+             },
+
+             b"99" => {
+--- a/zellij-server/src/panes/terminal_pane.rs
++++ b/zellij-server/src/panes/terminal_pane.rs
+@@ -865,6 +865,9 @@
+     fn cursor_shape_csi(&self) -> String {
+         self.grid.cursor_shape().get_csi_str().to_string()
+     }
++    fn cursor_color_osc(&self) -> String {
++        self.grid.cursor_color_osc()
++    }
+     fn drain_messages_to_pty(&mut self) -> Vec<Vec<u8>> {
+         self.grid.pending_messages_to_pty.drain(..).collect()
+     }
+--- a/zellij-server/src/panes/unit/grid_tests.rs
++++ b/zellij-server/src/panes/unit/grid_tests.rs
+@@ -4858,6 +4858,59 @@
+ }
+
+ #[test]
++fn osc_12_set_and_query_pane_cursor_color() {
++    let mut grid = create_grid_with_size_and_raw(10, 20, b"\x1b]12;#001a3a\x07");
++
++    assert_eq!(grid.pane_cursor_color, Some((0, 26, 58)));
++
++    // Query cursor color via OSC 12 — pane-scoped override is in place,
++    // so the query is answered locally with the color Zellij will apply
++    // when this pane is focused.
++    feed_bytes(&mut grid, b"\x1b]12;?\x07");
++
++    assert!(
++        grid.pending_forwarded_queries.is_empty(),
++        "OSC 12 query must not be forwarded when a pane cursor-color override is set"
++    );
++    assert_eq!(grid.pending_messages_to_pty.len(), 1);
++    let reply = String::from_utf8(grid.pending_messages_to_pty[0].clone()).unwrap();
++    assert_eq!(reply, "\u{1b}]12;rgb:0000/1a1a/3a3a\u{7}");
++}
++
++#[test]
++fn osc_112_resets_pane_cursor_color() {
++    let mut grid = create_grid_with_size_and_raw(10, 20, b"\x1b]12;#00e000\x07");
++
++    assert_eq!(grid.pane_cursor_color, Some((0, 224, 0)));
++
++    feed_bytes(&mut grid, b"\x1b]112\x07");
++
++    assert_eq!(grid.pane_cursor_color, None);
++}
++
++#[test]
++fn cursor_color_osc_serializes_color_or_reset() {
++    let mut grid = create_grid_with_size_and_raw(10, 20, b"");
++
++    assert_eq!(grid.cursor_color_osc(), "\u{1b}]112\u{1b}\\");
++
++    feed_bytes(&mut grid, b"\x1b]12;#001a3a\x07");
++
++    assert_eq!(grid.cursor_color_osc(), "\u{1b}]12;#001a3a\u{1b}\\");
++}
++
++#[test]
++fn reset_terminal_state_clears_pane_cursor_color() {
++    let mut grid = create_grid_with_size_and_raw(10, 20, b"\x1b]12;#00e000\x07");
++
++    assert_eq!(grid.pane_cursor_color, Some((0, 224, 0)));
++
++    grid.reset_terminal_state();
++
++    assert_eq!(grid.pane_cursor_color, None);
++}
++
++#[test]
+ fn osc_110_111_reset_pane_default_colors() {
+     let mut vte_parser = vt_parser::Parser::new();
+     let sixel_image_store = Rc::new(RefCell::new(SixelImageStore::default()));
+@@ -6407,6 +6460,23 @@
+     assert!(matches!(
+         grid.pending_forwarded_queries[0],
+         crate::host_query::HostQuery::DefaultForeground { .. }
++    ));
++}
++
++#[test]
++fn osc_12_query_without_override_forwards_to_host() {
++    let mut parser = vte::Parser::new();
++    let mut grid = new_grid_for_forwarding_test();
++    assert!(grid.pane_cursor_color.is_none());
++    parser.advance(&mut grid, b"\x1b]12;?\x07");
++    assert!(
++        grid.pending_messages_to_pty.is_empty(),
++        "no override -> no local reply"
++    );
++    assert_eq!(grid.pending_forwarded_queries.len(), 1);
++    assert!(matches!(
++        grid.pending_forwarded_queries[0],
++        crate::host_query::HostQuery::CursorColor { .. }
+     ));
+ }
+
+--- a/zellij-server/src/screen.rs
++++ b/zellij-server/src/screen.rs
+@@ -5809,6 +5809,9 @@
+                     Vec::new()
+                 }
+             },
++            // Zellij does not cache the host's cursor color; if the live
++            // query times out, there is no reliable local value to return.
++            HostQuery::CursorColor { .. } => Vec::new(),
+             HostQuery::PaletteRegister { index, terminator } => {
+                 let codes = self.terminal_emulator_color_codes.borrow();
+                 if let Some(color) = codes.get(&(*index as usize)) {
+--- a/zellij-server/src/tab/mod.rs
++++ b/zellij-server/src/tab/mod.rs
+@@ -479,9 +479,10 @@
+     terminal_emulator_colors: Rc<RefCell<Palette>>,
+     terminal_emulator_color_codes: Rc<RefCell<HashMap<usize, String>>>,
+     pids_waiting_resize: HashSet<u32>, // u32 is the terminal_id
+-    cursor_positions_and_shape: HashMap<ClientId, (usize, usize, String)>, // (x_position,
++    cursor_positions_and_shape: HashMap<ClientId, (usize, usize, String, String)>, // (x_position,
+     // y_position,
+-    // cursor_shape_csi)
++    // cursor_shape_csi,
++    // cursor_color_osc)
+     is_pending: bool, // a pending tab is one that is still being loaded or otherwise waiting
+     pending_instructions: Vec<BufferedTabInstruction>, // instructions that came while the tab was
+     // pending and need to be re-applied
+@@ -659,6 +660,9 @@
+     }
+     fn cursor_shape_csi(&self) -> String {
+         "\u{1b}[0 q".to_string() // default to non blinking block
++    }
++    fn cursor_color_osc(&self) -> String {
++        "\u{1b}]112\u{1b}\\".to_string() // reset to host terminal default cursor colour
+     }
+     fn contains(&self, position: &Position) -> bool {
+         match self.geom_override() {
+@@ -6215,13 +6219,18 @@
+                                 .map(|ap| ap.cursor_shape_csi())
+                                 .unwrap_or_default(),
+                         };
+-                        let cursor_changed_position_or_shape = self
++                        let desired_cursor_color = self
++                            .get_active_pane(client_id)
++                            .map(|ap| ap.cursor_color_osc())
++                            .unwrap_or_else(|| "\u{1b}]112\u{1b}\\".to_string());
++                        let cursor_changed_position_or_shape_or_color = self
+                             .cursor_positions_and_shape
+                             .get(&client_id)
+-                            .map(|(previous_x, previous_y, previous_shape)| {
++                            .map(|(previous_x, previous_y, previous_shape, previous_color)| {
+                                 previous_x != &cursor_position_x
+                                     || previous_y != &cursor_position_y
+                                     || previous_shape != &desired_cursor_shape
++                                    || previous_color != &desired_cursor_color
+                             })
+                             .unwrap_or(true);
+                         output.set_client_cursor(
+@@ -6231,7 +6240,7 @@
+                             true,
+                             &desired_cursor_shape,
+                         );
+-                        if output.is_dirty() || cursor_changed_position_or_shape {
++                        if output.is_dirty() || cursor_changed_position_or_shape_or_color {
+                             let show_cursor = "\u{1b}[?25h";
+                             let goto_cursor_position = &format!(
+                                 "\u{1b}[{};{}H\u{1b}[m{}",
+@@ -6239,6 +6248,10 @@
+                                 cursor_position_x + 1,
+                                 desired_cursor_shape
+                             ); // goto row/col
++                            output.add_post_vte_instruction_to_client(
++                                client_id,
++                                &desired_cursor_color,
++                            );
+                             output.add_post_vte_instruction_to_client(client_id, show_cursor);
+                             output.add_post_vte_instruction_to_client(
+                                 client_id,
+@@ -6246,7 +6259,12 @@
+                             );
+                             self.cursor_positions_and_shape.insert(
+                                 client_id,
+-                                (cursor_position_x, cursor_position_y, desired_cursor_shape),
++                                (
++                                    cursor_position_x,
++                                    cursor_position_y,
++                                    desired_cursor_shape,
++                                    desired_cursor_color,
++                                ),
+                             );
+                         }
+                     } else if not_occluded {
+--- a/zellij-server/src/unit/screen_tests.rs
++++ b/zellij-server/src/unit/screen_tests.rs
+@@ -9373,6 +9373,11 @@
+         terminator: OscTerminator::Bel,
+     }
+ }
++fn cursor_query() -> HostQuery {
++    HostQuery::CursorColor {
++        terminator: OscTerminator::St,
++    }
++}
+ fn palette_query(index: u8) -> HostQuery {
+     HostQuery::PaletteRegister {
+         index,
+@@ -9409,6 +9414,20 @@
+         (token, query.to_query_bytes()),
+         "wire bytes must be derived from the HostQuery"
+     );
++}
++
++#[test]
++fn forward_cursor_color_query_uses_osc_12() {
++    let size = Size { cols: 80, rows: 20 };
++    let (mut screen, capture) = create_new_screen_with_forward_capture(size);
++    let pane_id = PaneId::Terminal(42);
++    let query = cursor_query();
++
++    let token = screen.forward_host_query(pane_id, query.clone());
++    assert_eq!(screen.forward_in_flight_token, Some(token));
++
++    let forwards = capture.drain_forward_queries();
++    assert_eq!(forwards, vec![(token, b"\x1b]12;?\x1b\\".to_vec())]);
+ }
+
+ #[test]
