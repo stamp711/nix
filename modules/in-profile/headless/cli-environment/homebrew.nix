@@ -13,6 +13,7 @@
         taps = {
           "homebrew/homebrew-core" = inputs.homebrew-core;
           "homebrew/homebrew-cask" = inputs.homebrew-cask;
+          "stablyai/homebrew-orca" = inputs.homebrew-orca;
         };
       };
       # https://github.com/zhaofengli/nix-homebrew/issues/77

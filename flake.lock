@@ -744,6 +744,22 @@
         "type": "github"
       }
     },
+    "homebrew-orca": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1795084569,
+        "narHash": "sha256-PcWjbV79xgLel6KB3XCtYL66sTuRszcbG75fSTnAzus=",
+        "owner": "stablyai",
+        "repo": "homebrew-orca",
+        "rev": "b2368d17e0b7ec4a39ca1fd570905008c3875a65",
+        "type": "github"
+      },
+      "original": {
+        "owner": "stablyai",
+        "repo": "homebrew-orca",
+        "type": "github"
+      }
+    },
     "impermanence": {
       "inputs": {
         "home-manager": [
@@ -1259,6 +1275,7 @@
         "home-manager": "home-manager",
         "homebrew-cask": "homebrew-cask",
         "homebrew-core": "homebrew-core",
+        "homebrew-orca": "homebrew-orca",
         "impermanence": "impermanence",
         "import-dir": "import-dir",
         "jj-starship": "jj-starship",

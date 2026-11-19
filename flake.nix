@@ -178,6 +178,10 @@
       url = "github:homebrew/homebrew-cask";
       flake = false;
     };
+    homebrew-orca = {
+      url = "github:stablyai/homebrew-orca";
+      flake = false;
+    };
     system-manager = {
       url = "github:numtide/system-manager";
       inputs.nixpkgs.follows = "nixpkgs";
