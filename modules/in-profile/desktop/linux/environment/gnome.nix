@@ -14,6 +14,7 @@
       services.libinput.enable = true;
 
       services.gnome.core-apps.enable = false; # the bundled apps
+      services.gnome.gnome-keyring.enable = false;
       environment.systemPackages = with pkgs; [
         nautilus
         gnomeExtensions.kimpanel # for fcitx5
