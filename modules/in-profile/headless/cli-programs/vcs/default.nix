@@ -1,12 +1,11 @@
 # Git configuration with signing, delta, and GitHub CLI & other VCS tools
-{ inputs, ... }:
 {
   flake.homeModules.cli-programs =
     { lib, pkgs, ... }:
     let
       ghqRoot = if pkgs.stdenv.hostPlatform.isDarwin then "~/Developer" else "~/code";
 
-      oyui = inputs.oyui.packages.${pkgs.stdenv.hostPlatform.system}.default;
+      inherit (pkgs) oyui;
 
       editorIfTty = pkgs.writeShellApplication {
         name = "editor-if-tty";

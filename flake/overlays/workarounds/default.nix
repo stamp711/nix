@@ -1,5 +1,13 @@
+{ inputs, ... }:
 {
   flake.overlays.workarounds = _: prev: {
+
+    # 2026-11-20
+    # The nixpkgs Rust hooks require onig_sys to use the system library.
+    # TODO: remove once oyui's flake includes oniguruma in buildInputs.
+    oyui = inputs.oyui.packages.${prev.stdenv.hostPlatform.system}.oyui.overrideAttrs (old: {
+      buildInputs = (old.buildInputs or [ ]) ++ [ prev.oniguruma ];
+    });
 
     # 2026-10-22
     # deal needs docstring-parser's source fixtures and support for pytest.param cases.
