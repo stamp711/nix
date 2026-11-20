@@ -123,6 +123,10 @@
       inputs.rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.inputs.systems.follows = "systems";
     };
+    gitoui = {
+      url = "github:NayJi7/gitoui";
+      flake = false;
+    };
     monaco = {
       url = "github:thep0y/monaco-nerd-font";
       flake = false;

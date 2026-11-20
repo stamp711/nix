@@ -117,6 +117,7 @@
         diffnav
         ghq
         git-filter-repo
+        my.gitoui
         oyui
       ];
     };

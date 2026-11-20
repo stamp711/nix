@@ -673,6 +673,22 @@
         "type": "github"
       }
     },
+    "gitoui": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1795097857,
+        "narHash": "sha256-zjqyMsTMPYx3/3bfhhgsgp9wQvle5rhKZH0qGb8GE04=",
+        "owner": "NayJi7",
+        "repo": "gitoui",
+        "rev": "6d5d88f0d5347a01e8be2f60262fc72048e86600",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NayJi7",
+        "repo": "gitoui",
+        "type": "github"
+      }
+    },
     "gnome-shell": {
       "flake": false,
       "locked": {
@@ -1272,6 +1288,7 @@
         "deploy-rs": "deploy-rs",
         "disko": "disko",
         "flake-parts": "flake-parts",
+        "gitoui": "gitoui",
         "home-manager": "home-manager",
         "homebrew-cask": "homebrew-cask",
         "homebrew-core": "homebrew-core",
