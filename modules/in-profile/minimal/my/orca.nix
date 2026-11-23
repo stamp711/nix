@@ -27,7 +27,8 @@
 
       config = lib.mkMerge [
         (lib.mkIf cfg.enable {
-          home.packages = [ orca ];
+          # Antigravity account switching uses gdbus to access the Linux keyring.
+          home.packages = [ orca ] ++ lib.optionals hostPlatform.isLinux [ pkgs.glib.bin ];
           my.llm-agents.skills = {
             orca-cli = "${skills}/orca-cli";
             orchestration = "${skills}/orchestration";
