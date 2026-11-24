@@ -240,6 +240,7 @@ class VaultWatcher:
         self.cfg = cfg
         self.pending: dict[Path, float] = {}
         self.inflight: dict[tuple[str, str, str], float] = {}
+        self.prev_keys: set[tuple[str, str, str]] = set()
         self.wake_event = asyncio.Event()
         self.stop_event = asyncio.Event()
 
@@ -345,11 +346,14 @@ class VaultWatcher:
         )
         return True
 
-    async def _scan_and_dispatch(self, path: Path, source: str) -> bool:
+    async def _scan_and_dispatch(
+        self, path: Path, source: str
+    ) -> tuple[set[tuple[str, str, str]], bool, bool]:
         matches = scan_file(path, self.cfg.vault)
         if not matches:
-            return False
+            return set(), False, True
 
+        file_keys = {m.key for m in matches}
         now = time.monotonic()
         self._prune_inflight(now)
         fresh = [m for m in matches if m.key not in self.inflight]
@@ -360,7 +364,7 @@ class VaultWatcher:
                 matches[0].relpath,
                 len(matches),
             )
-            return False
+            return file_keys, False, True
 
         relpath = fresh[0].relpath
         ok = await self._dispatch(relpath, fresh)
@@ -368,14 +372,16 @@ class VaultWatcher:
             exp = time.monotonic() + self.cfg.inflight_ttl
             for m in fresh:
                 self.inflight[m.key] = exp
-        return True
+            return file_keys, True, True
+        return file_keys - {m.key for m in fresh}, False, False
 
     async def _reconcile(self, respect_pending: bool = True) -> bool:
         now_wall = time.time()
-        found = False
+        cur_keys: set[tuple[str, str, str]] = set()
+        had_send_failure = False
         for path in iter_vault_md_files(self.cfg.vault):
             if self.stop_event.is_set():
-                return found
+                return False
             if respect_pending and path in self.pending:
                 continue
             if self.cfg.quiet_sec > 0:
@@ -385,9 +391,13 @@ class VaultWatcher:
                     continue
                 if now_wall - mtime < self.cfg.quiet_sec:
                     continue
-            if await self._scan_and_dispatch(path, source="reconcile"):
-                found = True
-        return found
+            file_keys, _, ok = await self._scan_and_dispatch(path, source="reconcile")
+            cur_keys.update(file_keys)
+            if not ok:
+                had_send_failure = True
+        should_backoff = not had_send_failure and cur_keys == self.prev_keys
+        self.prev_keys = cur_keys
+        return should_backoff
 
     async def _watch_task(self) -> None:
         vault = self.cfg.vault
@@ -442,14 +452,14 @@ class VaultWatcher:
 
         reconcile_delay = self.cfg.reconcile_sec
 
-        def _schedule_reconcile(found: bool) -> float:
+        def _schedule_reconcile(should_backoff: bool) -> float:
             nonlocal reconcile_delay
-            if found:
-                reconcile_delay = self.cfg.reconcile_sec
-                delay = reconcile_delay
-            else:
+            if should_backoff:
                 delay = reconcile_delay
                 reconcile_delay = min(reconcile_delay * 2, self.cfg.reconcile_max_sec)
+            else:
+                reconcile_delay = self.cfg.reconcile_sec
+                delay = reconcile_delay
             log.debug("next reconcile in %.1fs", delay)
             return time.monotonic() + delay
 
@@ -473,7 +483,11 @@ class VaultWatcher:
                         break
                     if self.pending.get(p, float("inf")) <= time.monotonic():
                         self.pending.pop(p, None)
-                        if await self._scan_and_dispatch(p, source="watch"):
+                        file_keys, dispatched, ok = await self._scan_and_dispatch(
+                            p, source="watch"
+                        )
+                        if dispatched or not ok:
+                            self.prev_keys.update(file_keys)
                             reconcile_delay = self.cfg.reconcile_sec
                             next_reconcile = min(
                                 next_reconcile, time.monotonic() + reconcile_delay
