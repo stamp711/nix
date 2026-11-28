@@ -19,6 +19,7 @@
           doxygen
           eternal-terminal
           ghgrab
+          herdr-core
           imgcat
           helix
           just
